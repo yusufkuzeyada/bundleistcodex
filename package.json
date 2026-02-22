@@ -1,0 +1,20 @@
+{
+  "name": "netlify-deployment-clean-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local development workspace for Netlify static deployment artifact",
+  "scripts": {
+    "prepare:static": "node ./scripts/prepare-static-workspace.mjs",
+    "format:static": "prettier --write \"site-local/**/*.js\" \"site-local/**/*.css\" \"site-local/**/*.html\"",
+    "setup:static": "npm run prepare:static && npm run format:static",
+    "dev": "serve -l 4173 site-local",
+    "dev:open": "serve -l 4173 -o site-local",
+    "start": "npm run dev",
+    "stop": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/stop-dev.ps1",
+    "health": "node -e \"fetch('http://127.0.0.1:4173').then((r)=>{console.log('status',r.status);process.exit(r.ok?0:1)}).catch(()=>process.exit(1))\""
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "serve": "^14.2.5"
+  }
+}

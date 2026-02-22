@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bundleist</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Preload critical resources -->
+    <link
+      rel="preload"
+      href="data:application/octet-stream;base64,CmltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7CmltcG9ydCB7IGNyZWF0ZVJvb3QgfSBmcm9tICdyZWFjdC1kb20vY2xpZW50JzsKaW1wb3J0ICcuL2luZGV4LmNzcyc7CmltcG9ydCAnLi9pMThuJzsKaW1wb3J0IHsgQm9vdHN0cmFwRXJyb3JTY3JlZW4gfSBmcm9tICcuL2NvbXBvbmVudHMvY29tbW9uL0Jvb3RzdHJhcEVycm9yU2NyZWVuJzsKaW1wb3J0IHsgQXBwRXJyb3JCb3VuZGFyeSB9IGZyb20gJy4vY29tcG9uZW50cy9jb21tb24vQXBwRXJyb3JCb3VuZGFyeSc7Cgpjb25zdCByb290RWxlbWVudCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyb290Jyk7CmlmICghcm9vdEVsZW1lbnQpIHsKICB0aHJvdyBuZXcgRXJyb3IoJ0NvdWxkIG5vdCBmaW5kIHJvb3QgZWxlbWVudCB0byBtb3VudCB0bycpOwp9Cgpjb25zdCByb290ID0gY3JlYXRlUm9vdChyb290RWxlbWVudCk7Cgpjb25zdCByZW5kZXJFcnJvciA9IChlcnI6IHVua25vd24pID0+IHsKICByb290LnJlbmRlcigKICAgIDxSZWFjdC5TdHJpY3RNb2RlPgogICAgICA8Qm9vdHN0cmFwRXJyb3JTY3JlZW4gZXJyb3I9e2Vycn0gLz4KICAgIDwvUmVhY3QuU3RyaWN0TW9kZT4KICApOwp9OwoKLy8gU3VyZmFjZSBydW50aW1lIGZhaWx1cmVzIGluc3RlYWQgb2YgYSBibGFuayBwYWdlLgp3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignZXJyb3InLCAoZSkgPT4gewogIGNvbnN0IGV2ID0gZSBhcyBFcnJvckV2ZW50OwogIHJlbmRlckVycm9yKGV2LmVycm9yIHx8IGV2Lm1lc3NhZ2UpOwp9KTsKd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3VuaGFuZGxlZHJlamVjdGlvbicsIChlKSA9PgogIHJlbmRlckVycm9yKChlIGFzIFByb21pc2VSZWplY3Rpb25FdmVudCkucmVhc29uKQopOwoKKGFzeW5jICgpID0+IHsKICB0cnkgewogICAgY29uc3QgbW9kID0gYXdhaXQgaW1wb3J0KCcuL0FwcCcpOwogICAgY29uc3QgQXBwID0gbW9kLmRlZmF1bHQ7CgogICAgcm9vdC5yZW5kZXIoCiAgICAgIDxSZWFjdC5TdHJpY3RNb2RlPgogICAgICAgIDxBcHBFcnJvckJvdW5kYXJ5PgogICAgICAgICAgPEFwcCAvPgogICAgICAgIDwvQXBwRXJyb3JCb3VuZGFyeT4KICAgICAgPC9SZWFjdC5TdHJpY3RNb2RlPgogICAgKTsKICB9IGNhdGNoIChlcnIpIHsKICAgIHJlbmRlckVycm9yKGVycik7CiAgfQp9KSgpOwo="
+      as="script"
+    />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+
+    <!-- Minimal head for app to run; all SEO/analytics will be handled dynamically in React -->
+    <script type="module" crossorigin src="/assets/index.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react.js" />
+    <link rel="modulepreload" crossorigin href="/assets/supabase.js" />
+    <link rel="modulepreload" crossorigin href="/assets/query.js" />
+    <link rel="modulepreload" crossorigin href="/assets/i18n.js" />
+    <link rel="stylesheet" crossorigin href="/assets/index.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Performance monitoring (optional, can be removed if not needed) -->
+    <script>
+      if ("PerformanceObserver" in window) {
+        window.addEventListener("load", () => {
+          const loadTime = performance.now();
+        });
+      }
+    </script>
+  </body>
+</html>
