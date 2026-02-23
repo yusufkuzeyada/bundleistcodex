@@ -10086,7 +10086,34 @@ const ie = qt.getInstance(),
           return await c(I.user);
         },
         logout: async () => {
-          (await _.auth.signOut(), t(null));
+          const { error: I } = await _.auth.signOut();
+          if (I) {
+            console.warn(
+              "Global sign-out failed, forcing local auth cleanup:",
+              I,
+            );
+            try {
+              if (typeof window < "u" && window.localStorage) {
+                const P =
+                  _.auth && typeof _.auth.storageKey == "string"
+                    ? _.auth.storageKey
+                    : null;
+                P &&
+                  (window.localStorage.removeItem(P),
+                  window.localStorage.removeItem(`${P}-code-verifier`));
+                Object.keys(window.localStorage).forEach((L) => {
+                  (L.startsWith("sb-") && L.endsWith("-auth-token")) ||
+                  L === "supabase.auth.token"
+                    ? window.localStorage.removeItem(L)
+                    : null;
+                });
+              }
+              await _.auth.signOut({ scope: "local" });
+            } catch (P) {
+              console.warn("Local auth cleanup fallback failed:", P);
+            }
+          }
+          t(null);
         },
         signUp: async (b, k, I, P, L, G, O) => {
           const A = n(),
@@ -11509,6 +11536,7 @@ class Wt {
         page: t,
         pageSize: r,
         searchTerm: i = "",
+        supplierId: s = null,
         status: n = "",
         customerId: o = null,
         isAdmin: a = !1,
@@ -11521,7 +11549,9 @@ class Wt {
       .select("*", { count: "exact" })
       .order("creation_date", { ascending: !1 })
       .range(h, p);
-    (!a && o && (y = y.eq("customer_id", o)), n && (y = y.eq("status", n)));
+    (o && (y = y.eq("customer_id", o)),
+      s && (y = y.eq("supplier_id", s)),
+      n && (y = y.eq("status", n)));
     const b = i.trim();
     if (b) {
       const L = b.replace(/[%_,]/g, "\\$&");
@@ -14247,8 +14277,26 @@ const hc = Qt.getInstance(),
               ])
               .select();
             if (S) {
-              (r("Database Error", "Error adding customer: " + S.message),
-                await _.auth.admin.deleteUser(g.user.id));
+              try {
+                const { data: E } = await _.auth.getSession(),
+                  T = E == null ? void 0 : E.session,
+                  I = T == null ? void 0 : T.access_token;
+                I &&
+                  (await fetch("/.netlify/functions/admin-delete-user", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${I}`,
+                    },
+                    body: JSON.stringify({ userId: g.user.id }),
+                  }));
+              } catch (E) {
+                console.error(
+                  "Could not rollback auth user after customer insert error:",
+                  E,
+                );
+              }
+              r("Database Error", "Error adding customer: " + S.message);
               return;
             }
             M = D;

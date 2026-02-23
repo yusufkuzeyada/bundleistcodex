@@ -79,57 +79,31 @@ const V = 20,
       [D, P] = i.useState(""),
       [y, _] = i.useState(null),
       [lt, me] = i.useState(!1);
-    (i.useEffect(() => {
+    i.useEffect(() => {
       try {
-        const t = localStorage.getItem("bundleist_payments_state");
+        const t = localStorage.getItem("bundleist_nav_intent");
         if (!t) return;
         const r = JSON.parse(t);
-        (r && typeof r.query == "string" && w(r.query),
-          r && typeof r.typeFilter == "string" && ue(r.typeFilter),
-          r &&
-            typeof r.adminCustomerFilter == "string" &&
-            P(r.adminCustomerFilter),
-          r &&
-            typeof r.currentPage == "number" &&
-            f(Math.max(1, r.currentPage)),
-          r && typeof r.selectedTxId == "string" && _(r.selectedTxId));
+        if (!r || r.page !== "payments") return;
+        (r.resetFilters &&
+          (w(""), ue("all"), _(null), l && (P(""), ce(""), We("order"))),
+          typeof r.adminCustomerFilter == "string"
+            ? (P(r.adminCustomerFilter), l && ze("customer"))
+            : typeof r.customerId == "string" &&
+              (P(r.customerId), l && ze("customer")),
+          r.forceCustomerLens && l && ze("customer"),
+          typeof r.transactionId == "string"
+            ? (_(r.transactionId), w(r.transactionId))
+            : typeof r.relatedOrderId == "string"
+              ? w(r.relatedOrderId)
+              : typeof r.relatedConsolidationId == "string"
+                ? w(r.relatedConsolidationId)
+                : typeof r.relatedShipmentId == "string" &&
+                  w(r.relatedShipmentId),
+          localStorage.removeItem("bundleist_nav_intent"),
+          f(1));
       } catch {}
-    }, []),
-      i.useEffect(() => {
-        try {
-          localStorage.setItem(
-            "bundleist_payments_state",
-            JSON.stringify({
-              query: $,
-              typeFilter: M,
-              adminCustomerFilter: D,
-              currentPage: b,
-              selectedTxId: y,
-            }),
-          );
-        } catch {}
-      }, [$, M, D, b, y]),
-      i.useEffect(() => {
-        try {
-          const t = localStorage.getItem("bundleist_nav_intent");
-          if (!t) return;
-          const r = JSON.parse(t);
-          if (!r || r.page !== "payments") return;
-          (typeof r.adminCustomerFilter == "string"
-            ? P(r.adminCustomerFilter)
-            : typeof r.customerId == "string" && P(r.customerId),
-            typeof r.transactionId == "string"
-              ? (_(r.transactionId), w(r.transactionId))
-              : typeof r.relatedOrderId == "string"
-                ? w(r.relatedOrderId)
-                : typeof r.relatedConsolidationId == "string"
-                  ? w(r.relatedConsolidationId)
-                  : typeof r.relatedShipmentId == "string" &&
-                    w(r.relatedShipmentId),
-            localStorage.removeItem("bundleist_nav_intent"),
-            f(1));
-        } catch {}
-      }, []));
+    }, []);
     const [Ye, Ve] = i.useState([]),
       [Je, Ue] = i.useState([]),
       [St, xe] = i.useState(!1);

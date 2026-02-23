@@ -41,6 +41,7 @@ This map is based on `docs/supabase-map.json` and current bundle files under `si
 ## DB Automation and Backend Logic
 - Public SQL functions include:
   - Metrics: `admin_dashboard_metrics`
+  - Newsletter normalization: `normalize_newsletter_subscriber`
   - Shipment/consolidation helpers: `create_consolidation_shipment_core`, `calculate_cost_variance`, `enforce_shipment_write_guards`
   - Operational cleanup: `cleanup_old_notifications`
   - Auth helper: `is_admin`, `create_customer_on_signup`
@@ -48,9 +49,10 @@ This map is based on `docs/supabase-map.json` and current bundle files under `si
   - `auth.users` -> `public.create_customer_on_signup`
   - `public.consolidations` -> `public.calculate_cost_variance` and `public.update_updated_at_column`
   - `public.customers`, `public.orders`, `public.shipments`, `public.suppliers` -> `public.update_updated_at_column`
+  - `public.newsletter_subscribers` -> `public.normalize_newsletter_subscriber`
   - `public.shipments` -> `public.enforce_shipment_write_guards`
 - Edge function:
-  - `cleanup-notifications` (ACTIVE, `verify_jwt=false`)
+  - `cleanup-notifications` (ACTIVE, `verify_jwt=true`)
 
 ## Fast Path When You Ask for a Feature Change
 1. Run `npm run map:supabase` to refresh live schema and usage.

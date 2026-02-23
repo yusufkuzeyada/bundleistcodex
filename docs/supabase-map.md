@@ -1,6 +1,6 @@
 # Supabase Map
 
-Generated (UTC): 2026-02-23T10:08:47.936Z
+Generated (UTC): 2026-02-23T10:53:40.833Z
 
 ## Project
 - Project: `fbpemdlnlsgqkovnatro` (v4newsupa) | Region: `eu-north-1` | Status: `ACTIVE_HEALTHY`
@@ -10,7 +10,7 @@ Generated (UTC): 2026-02-23T10:08:47.936Z
 ## Folder Snapshot
 - Top level: file: `.dev-server.log`, file: `.env`, file: `.env.codex.supabase.txt`, file: `.env.example`, file: `.gitignore`, dir: `.netlify`, dir: `docs`, dir: `netlify`, file: `netlify.toml`, dir: `node_modules`, file: `package-lock.json`, file: `package.json`, file: `README.md`, dir: `scripts`, dir: `site`
 - Files under `site/`: 40
-- Largest JS bundles: `site/dashboard/assets/app.js` (563622 bytes), `site/dashboard/assets/consolidationspage.js` (316834 bytes), `site/assets/react.js` (265456 bytes), `site/dashboard/assets/react.js` (256431 bytes), `site/assets/app.js` (255913 bytes)
+- Largest JS bundles: `site/dashboard/assets/app.js` (565381 bytes), `site/dashboard/assets/consolidationspage.js` (316834 bytes), `site/assets/react.js` (265456 bytes), `site/assets/app.js` (256905 bytes), `site/dashboard/assets/react.js` (256431 bytes)
 
 ## Schema Summary
 | Schema | Object Type | Count |
@@ -71,7 +71,7 @@ Generated (UTC): 2026-02-23T10:08:47.936Z
 - Primary key: `id`
 - Foreign keys: none
 - RLS policies: `newsletter_subscribers_admin_delete`, `newsletter_subscribers_admin_select`, `newsletter_subscribers_insert_public`
-- Triggers: none
+- Triggers: `trg_normalize_newsletter_subscriber -> normalize_newsletter_subscriber`
 - Frontend usage: none detected in local bundle.
 
 ### notifications
@@ -101,7 +101,7 @@ Generated (UTC): 2026-02-23T10:08:47.936Z
 ### shipments
 - Columns (21): `id:uuid`, `status:text`, `origin:text`, `destination:text`, `shipped_date:timestamptz`, `estimated_delivery:timestamptz`, `actual_delivery:timestamptz`, `customer_id:uuid`, `consolidation_id:uuid`, `created_at:timestamptz`, `updated_at:timestamptz`, `notes:text`, `carrier:text`, `description:text`, `type:text`, `related_id:uuid`, `tracking_url:text`, `is_mixed:bool`, `involved_customer_ids:_text`, `order_id:uuid`, `idempotency_key:text`
 - Primary key: `id`
-- Foreign keys: `consolidation_id -> consolidations.id`, `customer_id -> customers.id`, `order_id -> orders.id`, `order_id -> orders.id`
+- Foreign keys: `consolidation_id -> consolidations.id`, `customer_id -> customers.id`, `order_id -> orders.id`
 - RLS policies: `shipments_admin_write`, `shipments_select_visible`
 - Triggers: `trg_enforce_shipment_write_guards -> enforce_shipment_write_guards`, `update_shipments_updated_at -> update_updated_at_column`
 - Frontend usage: surfaces=dashboard | ops=delete:2, insert:1, select:20, update:4 | files=`site/dashboard/assets/app.js`
@@ -137,6 +137,7 @@ Generated (UTC): 2026-02-23T10:08:47.936Z
 | `create_customer_on_signup` | `` | `trigger` | `plpgsql` | yes |
 | `enforce_shipment_write_guards` | `` | `trigger` | `plpgsql` | no |
 | `is_admin` | `` | `boolean` | `sql` | yes |
+| `normalize_newsletter_subscriber` | `` | `trigger` | `plpgsql` | no |
 | `update_updated_at_column` | `` | `trigger` | `plpgsql` | no |
 
 ## Application Triggers
@@ -146,13 +147,14 @@ Generated (UTC): 2026-02-23T10:08:47.936Z
 | `public.consolidations` | `trigger_calculate_cost_variance` | `public.calculate_cost_variance` | `O` |
 | `public.consolidations` | `update_consolidations_updated_at` | `public.update_updated_at_column` | `O` |
 | `public.customers` | `update_customers_updated_at` | `public.update_updated_at_column` | `O` |
+| `public.newsletter_subscribers` | `trg_normalize_newsletter_subscriber` | `public.normalize_newsletter_subscriber` | `O` |
 | `public.orders` | `update_orders_updated_at` | `public.update_updated_at_column` | `O` |
 | `public.shipments` | `trg_enforce_shipment_write_guards` | `public.enforce_shipment_write_guards` | `O` |
 | `public.shipments` | `update_shipments_updated_at` | `public.update_updated_at_column` | `O` |
 | `public.suppliers` | `update_suppliers_updated_at` | `public.update_updated_at_column` | `O` |
 
 ## Edge Functions
-- `cleanup-notifications` | status=`ACTIVE` | verify_jwt=`false` | version=`3`
+- `cleanup-notifications` | status=`ACTIVE` | verify_jwt=`true` | version=`3`
 
 ## Frontend RPC Usage
 - `admin_dashboard_metrics` | surfaces=dashboard | files=`site/dashboard/assets/app.js`

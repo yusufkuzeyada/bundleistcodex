@@ -2991,7 +2991,34 @@ const ma = "https://fbpemdlnlsgqkovnatro.supabase.co",
         return await d(b.user);
       },
       logout: async () => {
-        (await q.auth.signOut(), r(null));
+        const { error: p } = await q.auth.signOut();
+        if (p) {
+          console.warn(
+            "Global sign-out failed, forcing local auth cleanup:",
+            p,
+          );
+          try {
+            if (typeof window < "u" && window.localStorage) {
+              const w =
+                q.auth && typeof q.auth.storageKey == "string"
+                  ? q.auth.storageKey
+                  : null;
+              w &&
+                (window.localStorage.removeItem(w),
+                window.localStorage.removeItem(`${w}-code-verifier`));
+              Object.keys(window.localStorage).forEach((b) => {
+                (b.startsWith("sb-") && b.endsWith("-auth-token")) ||
+                b === "supabase.auth.token"
+                  ? window.localStorage.removeItem(b)
+                  : null;
+              });
+            }
+            await q.auth.signOut({ scope: "local" });
+          } catch (w) {
+            console.warn("Local auth cleanup fallback failed:", w);
+          }
+        }
+        r(null);
       },
       signUp: async (p, w, b, f, N, S, R) => {
         const M = n(),

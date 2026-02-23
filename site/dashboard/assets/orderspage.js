@@ -1629,6 +1629,8 @@ const st = a.forwardRef(tt),
     const [K, D] = a.useState(!1),
       [E, n] = a.useState(null),
       [r, d] = a.useState(""),
+      [supplierFilterId, setSupplierFilterId] = a.useState(""),
+      [customerFilterId, setCustomerFilterId] = a.useState(""),
       [U, x] = a.useState(""),
       [C, B] = a.useState(""),
       [V, P] = a.useState(1),
@@ -1649,6 +1651,9 @@ const st = a.forwardRef(tt),
         if (!s) return;
         const l = JSON.parse(s);
         (l && typeof l.searchTerm == "string" && d(l.searchTerm),
+          l &&
+            typeof l.supplierFilterId == "string" &&
+            setSupplierFilterId(l.supplierFilterId),
           l && typeof l.statusFilter == "string" && B(l.statusFilter),
           l &&
             typeof l.currentPage == "number" &&
@@ -1662,20 +1667,37 @@ const st = a.forwardRef(tt),
             "bundleist_orders_state",
             JSON.stringify({
               searchTerm: r,
+              supplierFilterId,
               statusFilter: C,
               currentPage: V,
               selectedOrderId: R,
             }),
           );
         } catch {}
-      }, [r, C, V, R]),
+      }, [r, supplierFilterId, C, V, R]),
       a.useEffect(() => {
         try {
           const s = localStorage.getItem("bundleist_nav_intent");
           if (!s) return;
           const l = JSON.parse(s);
           if (!l || l.page !== "orders") return;
-          (typeof l.searchTerm == "string" && d(l.searchTerm),
+          (typeof l.supplierId == "string" &&
+            (setSupplierFilterId(l.supplierId),
+            setCustomerFilterId(""),
+            typeof l.searchTerm == "string" ? d(l.searchTerm) : d("")),
+            typeof l.adminCustomerFilter == "string"
+              ? (setCustomerFilterId(l.adminCustomerFilter),
+                setSupplierFilterId(""),
+                typeof l.searchTerm == "string" ? d(l.searchTerm) : d(""))
+              : typeof l.customerId == "string" &&
+                (setCustomerFilterId(l.customerId),
+                setSupplierFilterId(""),
+                typeof l.searchTerm == "string" ? d(l.searchTerm) : d("")),
+            typeof l.supplierId != "string" &&
+              typeof l.adminCustomerFilter != "string" &&
+              typeof l.customerId != "string" &&
+              typeof l.searchTerm == "string" &&
+              d(l.searchTerm),
             typeof l.statusFilter == "string" && B(l.statusFilter),
             typeof l.orderId == "string" && J(l.orderId),
             P(1),
@@ -1722,8 +1744,9 @@ const st = a.forwardRef(tt),
               page: V,
               pageSize: ke,
               searchTerm: U,
+              supplierId: supplierFilterId || null,
               status: C,
-              customerId: I,
+              customerId: b ? customerFilterId || null : I,
               isAdmin: b,
             });
             (A(l.orders), ee(l.totalCount), T(new Date()));
@@ -1734,7 +1757,7 @@ const st = a.forwardRef(tt),
             re(!1);
           }
         })();
-      }, [V, U, C, I, b, t, ae]));
+      }, [V, U, supplierFilterId, customerFilterId, C, I, b, t, ae]));
     const _ = j,
       Q = _.find((s) => s.id === R) || (_[0] ?? null),
       ce = Math.max(1, Math.ceil(c / ke)),
@@ -1967,6 +1990,58 @@ const st = a.forwardRef(tt),
                       e.jsxs("div", {
                         className: "flex flex-wrap gap-2 lg:justify-end",
                         children: [
+                          customerFilterId
+                            ? e.jsxs("div", {
+                                className:
+                                  "px-3 py-2 rounded-xl bg-cyan-50 border border-cyan-200 text-xs text-cyan-900 flex items-center gap-2",
+                                children: [
+                                  e.jsxs("span", {
+                                    children: [
+                                      "Customer: ",
+                                      e.jsx("span", {
+                                        className: "font-semibold",
+                                        children: ue(customerFilterId),
+                                      }),
+                                    ],
+                                  }),
+                                  e.jsx("button", {
+                                    type: "button",
+                                    onClick: () => {
+                                      (setCustomerFilterId(""), P(1));
+                                    },
+                                    className:
+                                      "text-cyan-700 underline hover:text-cyan-900",
+                                    children: "Clear",
+                                  }),
+                                ],
+                              })
+                            : null,
+                          supplierFilterId
+                            ? e.jsxs("div", {
+                                className:
+                                  "px-3 py-2 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-900 flex items-center gap-2",
+                                children: [
+                                  e.jsxs("span", {
+                                    children: [
+                                      "Supplier: ",
+                                      e.jsx("span", {
+                                        className: "font-semibold",
+                                        children: me(supplierFilterId),
+                                      }),
+                                    ],
+                                  }),
+                                  e.jsx("button", {
+                                    type: "button",
+                                    onClick: () => {
+                                      (setSupplierFilterId(""), P(1));
+                                    },
+                                    className:
+                                      "text-indigo-700 underline hover:text-indigo-900",
+                                    children: "Clear",
+                                  }),
+                                ],
+                              })
+                            : null,
                           e.jsx(k, {
                             type: "button",
                             onClick: () => y(!0),

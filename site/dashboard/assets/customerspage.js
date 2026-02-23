@@ -1155,6 +1155,8 @@ const $t = ({
                                                 page: "payments",
                                                 adminCustomerFilter:
                                                   r.customer.id,
+                                                forceCustomerLens: !0,
+                                                resetFilters: !0,
                                               }),
                                             );
                                           } catch {}
@@ -1172,7 +1174,10 @@ const $t = ({
                                               "bundleist_nav_intent",
                                               JSON.stringify({
                                                 page: "orders",
-                                                searchTerm: r.customer.id,
+                                                adminCustomerFilter:
+                                                  r.customer.id,
+                                                searchTerm: "",
+                                                statusFilter: "",
                                               }),
                                             );
                                           } catch {}
@@ -1208,7 +1213,10 @@ const $t = ({
                                               "bundleist_nav_intent",
                                               JSON.stringify({
                                                 page: "consolidations",
-                                                searchTerm: r.customer.id,
+                                                adminCustomerFilter:
+                                                  r.customer.id,
+                                                searchTerm: "",
+                                                statusFilter: "",
                                               }),
                                             );
                                           } catch {}
@@ -1368,6 +1376,8 @@ const $t = ({
                                                 JSON.stringify({
                                                   page: "payments",
                                                   adminCustomerFilter: t,
+                                                  forceCustomerLens: !0,
+                                                  resetFilters: !0,
                                                 }),
                                               );
                                             } catch {}
@@ -1593,6 +1603,8 @@ const $t = ({
                                         JSON.stringify({
                                           page: "payments",
                                           adminCustomerFilter: r.customer.id,
+                                          forceCustomerLens: !0,
+                                          resetFilters: !0,
                                         }),
                                       );
                                     } catch {}

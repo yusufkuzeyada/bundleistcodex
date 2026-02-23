@@ -2529,6 +2529,7 @@ Total would be: ${w.toFixed(2)} KG`,
       },
       [me, He] = r.useState(""),
       [ve, Je] = r.useState(""),
+      [adminCustomerFilter, setAdminCustomerFilter] = r.useState(""),
       [Fe, Ye] = r.useState(!1),
       [ge, nt] = r.useState(!1);
     (r.useEffect(() => {
@@ -2571,6 +2572,10 @@ Total would be: ${w.toFixed(2)} KG`,
           if (!a || a.page !== "consolidations") return;
           (typeof a.searchTerm == "string" && He(a.searchTerm),
             typeof a.statusFilter == "string" && Je(a.statusFilter),
+            typeof a.adminCustomerFilter == "string"
+              ? setAdminCustomerFilter(a.adminCustomerFilter)
+              : typeof a.customerId == "string" &&
+                setAdminCustomerFilter(a.customerId),
             typeof a.activeOnly == "boolean" && Ye(a.activeOnly),
             typeof a.consolidationId == "string" && ie(a.consolidationId),
             localStorage.removeItem("bundleist_nav_intent"));
@@ -2578,7 +2583,7 @@ Total would be: ${w.toFixed(2)} KG`,
       }, []),
       r.useEffect(() => {
         i(1);
-      }, [me, ve, Fe]));
+      }, [me, ve, adminCustomerFilter, Fe]));
     const ot = r.useMemo(
         () => new Map(k.map((t) => [t.id, t.customerId])),
         [k],
@@ -2607,9 +2612,14 @@ Total would be: ${w.toFixed(2)} KG`,
         [We],
       ),
       ne = Oe.filter((t) => {
-        const a = Ve(t),
+        const aFilter = b ? adminCustomerFilter : I,
+          a = Ve(t),
           n = dt(t),
-          p = b || !I || (a ? n.includes(I) : t.customerId === I || n[0] === I),
+          p =
+            !aFilter ||
+            (a
+              ? n.includes(aFilter)
+              : t.customerId === aFilter || n[0] === aFilter),
           o = new Set([
             "intransit",
             "atoriginport",
@@ -2900,6 +2910,28 @@ Total would be: ${w.toFixed(2)} KG`,
                                   "Active only",
                                 ],
                               }),
+                              b && adminCustomerFilter
+                                ? e.jsxs("div", {
+                                    className:
+                                      "inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-cyan-200 bg-cyan-50 text-xs font-semibold text-cyan-900",
+                                    children: [
+                                      e.jsxs("span", {
+                                        children: [
+                                          "Customer: ",
+                                          Ie(adminCustomerFilter),
+                                        ],
+                                      }),
+                                      e.jsx("button", {
+                                        type: "button",
+                                        onClick: () =>
+                                          setAdminCustomerFilter(""),
+                                        className:
+                                          "text-cyan-700 underline hover:text-cyan-900",
+                                        children: "Clear",
+                                      }),
+                                    ],
+                                  })
+                                : null,
                             ],
                           }),
                           ne.length === 0

@@ -1223,7 +1223,9 @@ const Ie = ({
                                             "bundleist_nav_intent",
                                             JSON.stringify({
                                               page: "orders",
-                                              searchTerm: a.supplier.id,
+                                              supplierId: a.supplier.id,
+                                              searchTerm: "",
+                                              statusFilter: "",
                                             }),
                                           );
                                         } catch {}

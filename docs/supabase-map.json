@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-23T10:08:47.936Z",
+  "generated_at_utc": "2026-02-23T10:53:40.833Z",
   "project": {
     "id": "fbpemdlnlsgqkovnatro",
     "ref": "fbpemdlnlsgqkovnatro",
@@ -16,7 +16,7 @@
   },
   "edge_functions": [
     {
-      "verify_jwt": false,
+      "verify_jwt": true,
       "id": "ddd27520-8567-4e41-9607-fa3706627889",
       "slug": "cleanup-notifications",
       "version": 3,
@@ -891,7 +891,7 @@
         "column_name": "subscribed_at",
         "data_type": "timestamp with time zone",
         "udt_name": "timestamptz",
-        "is_nullable": "YES",
+        "is_nullable": "NO",
         "column_default": "timezone('utc'::text, now())"
       },
       {
@@ -1676,13 +1676,6 @@
         "column_name": "order_id",
         "foreign_table": "orders",
         "foreign_column": "id",
-        "constraint_name": "fk_shipments_order_id"
-      },
-      {
-        "table_name": "shipments",
-        "column_name": "order_id",
-        "foreign_table": "orders",
-        "foreign_column": "id",
         "constraint_name": "shipments_order_id_fkey"
       }
     ],
@@ -1779,8 +1772,8 @@
       },
       {
         "table_name": "newsletter_subscribers",
-        "index_name": "newsletter_subscribers_email_key",
-        "index_definition": "CREATE UNIQUE INDEX newsletter_subscribers_email_key ON public.newsletter_subscribers USING btree (email)"
+        "index_name": "newsletter_subscribers_email_ci_key",
+        "index_definition": "CREATE UNIQUE INDEX newsletter_subscribers_email_ci_key ON public.newsletter_subscribers USING btree (lower(email))"
       },
       {
         "table_name": "newsletter_subscribers",
@@ -2088,6 +2081,13 @@
         "security_definer": true
       },
       {
+        "function_name": "normalize_newsletter_subscriber",
+        "args": "",
+        "return_type": "trigger",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
         "function_name": "update_updated_at_column",
         "args": "",
         "return_type": "trigger",
@@ -2130,6 +2130,15 @@
         "trigger_name": "update_customers_updated_at",
         "function_name": "update_updated_at_column",
         "definition": "CREATE TRIGGER update_customers_updated_at BEFORE UPDATE ON customers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "newsletter_subscribers",
+        "function_schema": "public",
+        "trigger_name": "trg_normalize_newsletter_subscriber",
+        "function_name": "normalize_newsletter_subscriber",
+        "definition": "CREATE TRIGGER trg_normalize_newsletter_subscriber BEFORE INSERT OR UPDATE ON newsletter_subscribers FOR EACH ROW EXECUTE FUNCTION normalize_newsletter_subscriber()",
         "enabled": "O"
       },
       {
@@ -2330,7 +2339,7 @@
         "roles": "{anon,authenticated}",
         "cmd": "INSERT",
         "qual": null,
-        "with_check": "true"
+        "with_check": "(email ~* '^[^[:space:]@]+@[^[:space:]@]+\\.[^[:space:]@]+$'::text)"
       },
       {
         "table_name": "notifications",
@@ -2455,7 +2464,7 @@
         "permissive": "PERMISSIVE",
         "roles": "{authenticated}",
         "cmd": "SELECT",
-        "qual": "true",
+        "qual": "(is_admin() OR (EXISTS ( SELECT 1\n   FROM orders o\n  WHERE ((o.supplier_id = suppliers.id) AND (o.customer_id = auth.uid())))))",
         "with_check": null
       }
     ],
@@ -2488,7 +2497,7 @@
       },
       {
         "table_name": "newsletter_subscribers",
-        "estimated_rows": 4
+        "estimated_rows": 5
       },
       {
         "table_name": "notifications",
@@ -2816,18 +2825,6 @@
     ],
     "auth_methods": [
       {
-        "name": "admin",
-        "files": [
-          "site/dashboard/assets/app.js"
-        ],
-        "surfaces": [
-          "dashboard"
-        ],
-        "operations": {
-          "call": 1
-        }
-      },
-      {
         "name": "getSession",
         "files": [
           "site/assets/app.js",
@@ -2838,7 +2835,7 @@
           "site"
         ],
         "operations": {
-          "call": 4
+          "call": 5
         }
       },
       {
@@ -2918,7 +2915,7 @@
           "site"
         ],
         "operations": {
-          "call": 11
+          "call": 13
         }
       },
       {
@@ -3024,7 +3021,7 @@
     "largest_js_bundles": [
       {
         "file": "site/dashboard/assets/app.js",
-        "bytes": 563622
+        "bytes": 565381
       },
       {
         "file": "site/dashboard/assets/consolidationspage.js",
@@ -3035,12 +3032,12 @@
         "bytes": 265456
       },
       {
-        "file": "site/dashboard/assets/react.js",
-        "bytes": 256431
+        "file": "site/assets/app.js",
+        "bytes": 256905
       },
       {
-        "file": "site/assets/app.js",
-        "bytes": 255913
+        "file": "site/dashboard/assets/react.js",
+        "bytes": 256431
       },
       {
         "file": "site/assets/supabase.js",
