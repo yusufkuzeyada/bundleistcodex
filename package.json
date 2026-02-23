@@ -7,6 +7,7 @@
     "prepare:static": "node ./scripts/prepare-static-workspace.mjs",
     "format:static": "prettier --write \"site-local/**/*.js\" \"site-local/**/*.css\" \"site-local/**/*.html\"",
     "setup:static": "npm run prepare:static && npm run format:static",
+    "map:supabase": "node ./scripts/generate-supabase-map.mjs",
     "dev": "serve -l 4173 site-local",
     "dev:open": "serve -l 4173 -o site-local",
     "start": "npm run dev",

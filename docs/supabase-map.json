@@ -1,0 +1,3281 @@
+{
+  "generated_at_utc": "2026-02-23T08:02:35.866Z",
+  "project": {
+    "id": "fbpemdlnlsgqkovnatro",
+    "ref": "fbpemdlnlsgqkovnatro",
+    "name": "v4newsupa",
+    "region": "eu-north-1",
+    "status": "ACTIVE_HEALTHY",
+    "created_at": "2025-07-13T13:41:39.418238Z",
+    "database": {
+      "host": "db.fbpemdlnlsgqkovnatro.supabase.co",
+      "version": "17.4.1.054",
+      "postgres_engine": "17",
+      "release_channel": "ga"
+    }
+  },
+  "edge_functions": [
+    {
+      "verify_jwt": false,
+      "id": "ddd27520-8567-4e41-9607-fa3706627889",
+      "slug": "cleanup-notifications",
+      "version": 3,
+      "name": "cleanup-notifications",
+      "status": "ACTIVE",
+      "entrypoint_path": "file:///tmp/user_fn_fbpemdlnlsgqkovnatro_ddd27520-8567-4e41-9607-fa3706627889_1/source/supabase/functions/cleanup-notifications/index.ts",
+      "import_map_path": null,
+      "import_map": false,
+      "created_at": 1770580363758,
+      "updated_at": 1770580363758,
+      "ezbr_sha256": "4a2f582d2410d819342d2b0783f0553e65547f136cd448b97c0202727268f82f"
+    }
+  ],
+  "database": {
+    "schema_summary": [
+      {
+        "table_schema": "auth",
+        "table_type": "BASE TABLE",
+        "count": 20
+      },
+      {
+        "table_schema": "extensions",
+        "table_type": "VIEW",
+        "count": 2
+      },
+      {
+        "table_schema": "public",
+        "table_type": "BASE TABLE",
+        "count": 12
+      },
+      {
+        "table_schema": "public",
+        "table_type": "VIEW",
+        "count": 1
+      },
+      {
+        "table_schema": "realtime",
+        "table_type": "BASE TABLE",
+        "count": 3
+      },
+      {
+        "table_schema": "storage",
+        "table_type": "BASE TABLE",
+        "count": 8
+      },
+      {
+        "table_schema": "supabase_migrations",
+        "table_type": "BASE TABLE",
+        "count": 1
+      },
+      {
+        "table_schema": "vault",
+        "table_type": "BASE TABLE",
+        "count": 1
+      },
+      {
+        "table_schema": "vault",
+        "table_type": "VIEW",
+        "count": 1
+      }
+    ],
+    "public_objects": [
+      {
+        "table_name": "blog_posts",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "client_error_events",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "consolidations",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "container_types",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "customers",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "notifications",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "orders",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "payment_transactions",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "shipments",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "suppliers",
+        "table_type": "BASE TABLE"
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "table_type": "VIEW"
+      }
+    ],
+    "public_columns": [
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()"
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 2,
+        "column_name": "title",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 3,
+        "column_name": "content",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 4,
+        "column_name": "excerpt",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 5,
+        "column_name": "author_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 6,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "timezone('utc'::text, now())"
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 7,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "timezone('utc'::text, now())"
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 8,
+        "column_name": "published",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "YES",
+        "column_default": "false"
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 9,
+        "column_name": "slug",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 10,
+        "column_name": "image_url",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 11,
+        "column_name": "title_en",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 12,
+        "column_name": "title_tr",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 13,
+        "column_name": "title_fr",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 14,
+        "column_name": "excerpt_en",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 15,
+        "column_name": "excerpt_tr",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 16,
+        "column_name": "excerpt_fr",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 17,
+        "column_name": "content_en",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 18,
+        "column_name": "content_tr",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "blog_posts",
+        "ordinal_position": 19,
+        "column_name": "content_fr",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()"
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 2,
+        "column_name": "reported_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 3,
+        "column_name": "correlation_id",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 4,
+        "column_name": "area",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 5,
+        "column_name": "message",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 6,
+        "column_name": "error_name",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 7,
+        "column_name": "error_stack",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 8,
+        "column_name": "url",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 9,
+        "column_name": "user_agent",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 10,
+        "column_name": "app_release",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 11,
+        "column_name": "tags",
+        "data_type": "jsonb",
+        "udt_name": "jsonb",
+        "is_nullable": "NO",
+        "column_default": "'{}'::jsonb"
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 12,
+        "column_name": "extra",
+        "data_type": "jsonb",
+        "udt_name": "jsonb",
+        "is_nullable": "NO",
+        "column_default": "'{}'::jsonb"
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 13,
+        "column_name": "source",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": "'frontend_web'::text"
+      },
+      {
+        "table_name": "client_error_events",
+        "ordinal_position": 14,
+        "column_name": "auth_user_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": "auth.uid()"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "ordinal_position": 1,
+        "column_name": "consolidation_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidation_orders",
+        "ordinal_position": 2,
+        "column_name": "order_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "extensions.uuid_generate_v4()"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 2,
+        "column_name": "name",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 3,
+        "column_name": "route",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 4,
+        "column_name": "departure_date",
+        "data_type": "date",
+        "udt_name": "date",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 5,
+        "column_name": "creation_date",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 6,
+        "column_name": "container_type_id",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 7,
+        "column_name": "container_space_filled_percentage",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 8,
+        "column_name": "container_weight_filled_percentage",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 9,
+        "column_name": "shipping_cost",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 10,
+        "column_name": "status",
+        "data_type": "USER-DEFINED",
+        "udt_name": "consolidation_status",
+        "is_nullable": "NO",
+        "column_default": "'Planning'::consolidation_status"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 11,
+        "column_name": "is_mixed",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 12,
+        "column_name": "customer_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 13,
+        "column_name": "shipping_cost_distributed",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "YES",
+        "column_default": "false"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 14,
+        "column_name": "cost_distribution_method",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": "'volume_proportional'::text"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 15,
+        "column_name": "fixed_rate_per_m3",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 16,
+        "column_name": "total_billed_amount",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 17,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 18,
+        "column_name": "notes",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 19,
+        "column_name": "involved_customer_ids",
+        "data_type": "ARRAY",
+        "udt_name": "_text",
+        "is_nullable": "YES",
+        "column_default": "'{}'::text[]"
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 20,
+        "column_name": "estimated_shipping_cost",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 21,
+        "column_name": "cost_variance",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations",
+        "ordinal_position": 22,
+        "column_name": "cost_variance_percentage",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 2,
+        "column_name": "name",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 3,
+        "column_name": "route",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 4,
+        "column_name": "departure_date",
+        "data_type": "date",
+        "udt_name": "date",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 5,
+        "column_name": "creation_date",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 6,
+        "column_name": "container_type_id",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 7,
+        "column_name": "container_space_filled_percentage",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 8,
+        "column_name": "container_weight_filled_percentage",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 9,
+        "column_name": "shipping_cost",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 10,
+        "column_name": "status",
+        "data_type": "USER-DEFINED",
+        "udt_name": "consolidation_status",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 11,
+        "column_name": "is_mixed",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 12,
+        "column_name": "customer_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 13,
+        "column_name": "shipping_cost_distributed",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 14,
+        "column_name": "cost_distribution_method",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 15,
+        "column_name": "fixed_rate_per_m3",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 16,
+        "column_name": "total_billed_amount",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 17,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 18,
+        "column_name": "notes",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 19,
+        "column_name": "involved_customer_ids",
+        "data_type": "ARRAY",
+        "udt_name": "_text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 20,
+        "column_name": "estimated_shipping_cost",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 21,
+        "column_name": "cost_variance",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 22,
+        "column_name": "cost_variance_percentage",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "consolidations_with_orders",
+        "ordinal_position": 23,
+        "column_name": "order_ids",
+        "data_type": "ARRAY",
+        "udt_name": "_uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "container_types",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "container_types",
+        "ordinal_position": 2,
+        "column_name": "name",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "container_types",
+        "ordinal_position": 3,
+        "column_name": "max_volume_m3",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "container_types",
+        "ordinal_position": 4,
+        "column_name": "max_weight_kg",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "extensions.uuid_generate_v4()"
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 2,
+        "column_name": "name",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 3,
+        "column_name": "email",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 4,
+        "column_name": "company_name",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 5,
+        "column_name": "contract_type_id",
+        "data_type": "USER-DEFINED",
+        "udt_name": "contract_type",
+        "is_nullable": "NO",
+        "column_default": "'trial'::contract_type"
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 6,
+        "column_name": "has_used_trial_fee",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 7,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 8,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 9,
+        "column_name": "role",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": "'customer'::text"
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 10,
+        "column_name": "phone",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 11,
+        "column_name": "address",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "customers",
+        "ordinal_position": 12,
+        "column_name": "notes",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "gen_random_uuid()"
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "ordinal_position": 2,
+        "column_name": "email",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "ordinal_position": 3,
+        "column_name": "subscribed_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "timezone('utc'::text, now())"
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "extensions.uuid_generate_v4()"
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 2,
+        "column_name": "message",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 3,
+        "column_name": "timestamp",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 4,
+        "column_name": "user_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 5,
+        "column_name": "is_read",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 6,
+        "column_name": "link_to_page",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 7,
+        "column_name": "link_to_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 8,
+        "column_name": "importance",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": "'medium'::text"
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 9,
+        "column_name": "metadata",
+        "data_type": "jsonb",
+        "udt_name": "jsonb",
+        "is_nullable": "YES",
+        "column_default": "'{}'::jsonb"
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 10,
+        "column_name": "event_type",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 11,
+        "column_name": "related_entity_type",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 12,
+        "column_name": "related_entity_id",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "notifications",
+        "ordinal_position": 13,
+        "column_name": "target_audience",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": "'customer'::text"
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "extensions.uuid_generate_v4()"
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 2,
+        "column_name": "description",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 3,
+        "column_name": "value",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 4,
+        "column_name": "supplier_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 5,
+        "column_name": "volume_m3",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 6,
+        "column_name": "weight_kg",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 7,
+        "column_name": "customer_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 8,
+        "column_name": "status",
+        "data_type": "USER-DEFINED",
+        "udt_name": "order_status",
+        "is_nullable": "NO",
+        "column_default": "'Pending'::order_status"
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 9,
+        "column_name": "notes",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 10,
+        "column_name": "creation_date",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 11,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "orders",
+        "ordinal_position": 12,
+        "column_name": "charges_applied",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "YES",
+        "column_default": "false"
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "extensions.uuid_generate_v4()"
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 2,
+        "column_name": "customer_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 3,
+        "column_name": "date",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "NO",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 4,
+        "column_name": "type",
+        "data_type": "USER-DEFINED",
+        "udt_name": "transaction_type",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 5,
+        "column_name": "description",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 6,
+        "column_name": "amount",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 7,
+        "column_name": "related_order_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 8,
+        "column_name": "related_consolidation_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 9,
+        "column_name": "related_shipment_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 10,
+        "column_name": "is_adjustment",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "YES",
+        "column_default": "false"
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 11,
+        "column_name": "adjustment_reason",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "ordinal_position": 12,
+        "column_name": "idempotency_key",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "extensions.uuid_generate_v4()"
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 3,
+        "column_name": "status",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": "'Pending'::text"
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 4,
+        "column_name": "origin",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 5,
+        "column_name": "destination",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 6,
+        "column_name": "shipped_date",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 7,
+        "column_name": "estimated_delivery",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 8,
+        "column_name": "actual_delivery",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 9,
+        "column_name": "customer_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 10,
+        "column_name": "consolidation_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 11,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 12,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 13,
+        "column_name": "notes",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 14,
+        "column_name": "carrier",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 18,
+        "column_name": "description",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 19,
+        "column_name": "type",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 20,
+        "column_name": "related_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 22,
+        "column_name": "tracking_url",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 23,
+        "column_name": "is_mixed",
+        "data_type": "boolean",
+        "udt_name": "bool",
+        "is_nullable": "YES",
+        "column_default": "false"
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 24,
+        "column_name": "involved_customer_ids",
+        "data_type": "ARRAY",
+        "udt_name": "_text",
+        "is_nullable": "YES",
+        "column_default": "'{}'::text[]"
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 25,
+        "column_name": "order_id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "shipments",
+        "ordinal_position": 26,
+        "column_name": "idempotency_key",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 1,
+        "column_name": "id",
+        "data_type": "uuid",
+        "udt_name": "uuid",
+        "is_nullable": "NO",
+        "column_default": "extensions.uuid_generate_v4()"
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 2,
+        "column_name": "name",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 6,
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 7,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "udt_name": "timestamptz",
+        "is_nullable": "YES",
+        "column_default": "now()"
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 8,
+        "column_name": "company_location",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 9,
+        "column_name": "contact_person",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 10,
+        "column_name": "phone_number",
+        "data_type": "text",
+        "udt_name": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "suppliers",
+        "ordinal_position": 11,
+        "column_name": "rating",
+        "data_type": "numeric",
+        "udt_name": "numeric",
+        "is_nullable": "YES",
+        "column_default": null
+      }
+    ],
+    "public_enums": [
+      {
+        "enum_name": "consolidation_status",
+        "labels": "{Planning,\"In Progress\",Completed,Cancelled,Loading,ReadyToShip,ArrivedAtDestination,Shipped,OrderCollection,DocumentPreparation,QualityCheck,InTransit,AtOriginPort,InTransitSea,AtDestinationPort,CustomsClearance,AwaitingDelivery,OutForDelivery,Delivered,OnHold}"
+      },
+      {
+        "enum_name": "contract_type",
+        "labels": "{trial,growth,corporate}"
+      },
+      {
+        "enum_name": "notification_importance",
+        "labels": "{low,medium,high,critical}"
+      },
+      {
+        "enum_name": "order_status",
+        "labels": "{Pending,Processing,QualityCheck,ReadyToShip,InTransit,AtOriginPort,InTransitSea,AtDestinationPort,CustomsClearance,AwaitingDelivery,OutForDelivery,Delivered,Completed,Cancelled,OnHold,InConsolidation,Draft,Submitted}"
+      },
+      {
+        "enum_name": "shipment_type",
+        "labels": "{individual,consolidation}"
+      },
+      {
+        "enum_name": "transaction_type",
+        "labels": "{Payment,Refund,ShippingCost,Fee,IncomingPayment,OrderCost,ServiceFee,MiscellaneousCost,OrderCostAdjustment,ServiceFeeAdjustment,OrderCostReversal,ServiceFeeReversal,ShippingCostReversal,RefundPayout}"
+      }
+    ],
+    "public_primary_keys": [
+      {
+        "table_name": "blog_posts",
+        "constraint_name": "blog_posts_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "client_error_events",
+        "constraint_name": "client_error_events_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "constraint_name": "consolidation_orders_pkey",
+        "columns": "consolidation_id, order_id"
+      },
+      {
+        "table_name": "consolidations",
+        "constraint_name": "consolidations_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "container_types",
+        "constraint_name": "container_types_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "customers",
+        "constraint_name": "customers_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "constraint_name": "newsletter_subscribers_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "notifications",
+        "constraint_name": "notifications_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "orders",
+        "constraint_name": "orders_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "payment_transactions",
+        "constraint_name": "payment_transactions_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "shipments",
+        "constraint_name": "shipments_pkey",
+        "columns": "id"
+      },
+      {
+        "table_name": "suppliers",
+        "constraint_name": "suppliers_pkey",
+        "columns": "id"
+      }
+    ],
+    "public_foreign_keys": [
+      {
+        "table_name": "blog_posts",
+        "column_name": "author_id",
+        "foreign_table": "customers",
+        "foreign_column": "id",
+        "constraint_name": "blog_posts_author_id_fkey"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "column_name": "consolidation_id",
+        "foreign_table": "consolidations",
+        "foreign_column": "id",
+        "constraint_name": "consolidation_orders_consolidation_id_fkey"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "column_name": "order_id",
+        "foreign_table": "orders",
+        "foreign_column": "id",
+        "constraint_name": "consolidation_orders_order_id_fkey"
+      },
+      {
+        "table_name": "consolidations",
+        "column_name": "container_type_id",
+        "foreign_table": "container_types",
+        "foreign_column": "id",
+        "constraint_name": "consolidations_container_type_id_fkey"
+      },
+      {
+        "table_name": "consolidations",
+        "column_name": "customer_id",
+        "foreign_table": "customers",
+        "foreign_column": "id",
+        "constraint_name": "consolidations_customer_id_fkey"
+      },
+      {
+        "table_name": "notifications",
+        "column_name": "user_id",
+        "foreign_table": "customers",
+        "foreign_column": "id",
+        "constraint_name": "notifications_user_id_fkey1"
+      },
+      {
+        "table_name": "orders",
+        "column_name": "customer_id",
+        "foreign_table": "customers",
+        "foreign_column": "id",
+        "constraint_name": "orders_customer_id_fkey"
+      },
+      {
+        "table_name": "orders",
+        "column_name": "supplier_id",
+        "foreign_table": "suppliers",
+        "foreign_column": "id",
+        "constraint_name": "orders_supplier_id_fkey"
+      },
+      {
+        "table_name": "payment_transactions",
+        "column_name": "customer_id",
+        "foreign_table": "customers",
+        "foreign_column": "id",
+        "constraint_name": "payment_transactions_customer_id_fkey"
+      },
+      {
+        "table_name": "payment_transactions",
+        "column_name": "related_consolidation_id",
+        "foreign_table": "consolidations",
+        "foreign_column": "id",
+        "constraint_name": "payment_transactions_related_consolidation_id_fkey"
+      },
+      {
+        "table_name": "payment_transactions",
+        "column_name": "related_order_id",
+        "foreign_table": "orders",
+        "foreign_column": "id",
+        "constraint_name": "payment_transactions_related_order_id_fkey"
+      },
+      {
+        "table_name": "payment_transactions",
+        "column_name": "related_shipment_id",
+        "foreign_table": "shipments",
+        "foreign_column": "id",
+        "constraint_name": "payment_transactions_related_shipment_id_fkey"
+      },
+      {
+        "table_name": "shipments",
+        "column_name": "consolidation_id",
+        "foreign_table": "consolidations",
+        "foreign_column": "id",
+        "constraint_name": "shipments_consolidation_id_fkey"
+      },
+      {
+        "table_name": "shipments",
+        "column_name": "customer_id",
+        "foreign_table": "customers",
+        "foreign_column": "id",
+        "constraint_name": "shipments_customer_id_fkey"
+      },
+      {
+        "table_name": "shipments",
+        "column_name": "order_id",
+        "foreign_table": "orders",
+        "foreign_column": "id",
+        "constraint_name": "fk_shipments_order_id"
+      },
+      {
+        "table_name": "shipments",
+        "column_name": "order_id",
+        "foreign_table": "orders",
+        "foreign_column": "id",
+        "constraint_name": "shipments_order_id_fkey"
+      }
+    ],
+    "public_indexes": [
+      {
+        "table_name": "blog_posts",
+        "index_name": "blog_posts_pkey",
+        "index_definition": "CREATE UNIQUE INDEX blog_posts_pkey ON public.blog_posts USING btree (id)"
+      },
+      {
+        "table_name": "blog_posts",
+        "index_name": "blog_posts_slug_key",
+        "index_definition": "CREATE UNIQUE INDEX blog_posts_slug_key ON public.blog_posts USING btree (slug)"
+      },
+      {
+        "table_name": "blog_posts",
+        "index_name": "idx_blog_posts_author_id",
+        "index_definition": "CREATE INDEX idx_blog_posts_author_id ON public.blog_posts USING btree (author_id)"
+      },
+      {
+        "table_name": "client_error_events",
+        "index_name": "client_error_events_correlation_id_key",
+        "index_definition": "CREATE UNIQUE INDEX client_error_events_correlation_id_key ON public.client_error_events USING btree (correlation_id)"
+      },
+      {
+        "table_name": "client_error_events",
+        "index_name": "client_error_events_pkey",
+        "index_definition": "CREATE UNIQUE INDEX client_error_events_pkey ON public.client_error_events USING btree (id)"
+      },
+      {
+        "table_name": "client_error_events",
+        "index_name": "client_error_events_release_reported_at_idx",
+        "index_definition": "CREATE INDEX client_error_events_release_reported_at_idx ON public.client_error_events USING btree (app_release, reported_at DESC)"
+      },
+      {
+        "table_name": "client_error_events",
+        "index_name": "client_error_events_reported_at_idx",
+        "index_definition": "CREATE INDEX client_error_events_reported_at_idx ON public.client_error_events USING btree (reported_at DESC)"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "index_name": "consolidation_orders_pkey",
+        "index_definition": "CREATE UNIQUE INDEX consolidation_orders_pkey ON public.consolidation_orders USING btree (consolidation_id, order_id)"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "index_name": "idx_consolidation_orders_consolidation_id",
+        "index_definition": "CREATE INDEX idx_consolidation_orders_consolidation_id ON public.consolidation_orders USING btree (consolidation_id)"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "index_name": "idx_consolidation_orders_order_id",
+        "index_definition": "CREATE INDEX idx_consolidation_orders_order_id ON public.consolidation_orders USING btree (order_id)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "consolidations_pkey",
+        "index_definition": "CREATE UNIQUE INDEX consolidations_pkey ON public.consolidations USING btree (id)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_container_type_id",
+        "index_definition": "CREATE INDEX idx_consolidations_container_type_id ON public.consolidations USING btree (container_type_id)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_cost_variance",
+        "index_definition": "CREATE INDEX idx_consolidations_cost_variance ON public.consolidations USING btree (cost_variance)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_cost_variance_pct",
+        "index_definition": "CREATE INDEX idx_consolidations_cost_variance_pct ON public.consolidations USING btree (cost_variance_percentage)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_creation_date_desc",
+        "index_definition": "CREATE INDEX idx_consolidations_creation_date_desc ON public.consolidations USING btree (creation_date DESC)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_customer_creation_date_desc",
+        "index_definition": "CREATE INDEX idx_consolidations_customer_creation_date_desc ON public.consolidations USING btree (customer_id, creation_date DESC)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_customer_id",
+        "index_definition": "CREATE INDEX idx_consolidations_customer_id ON public.consolidations USING btree (customer_id)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_estimated_cost",
+        "index_definition": "CREATE INDEX idx_consolidations_estimated_cost ON public.consolidations USING btree (estimated_shipping_cost)"
+      },
+      {
+        "table_name": "consolidations",
+        "index_name": "idx_consolidations_status",
+        "index_definition": "CREATE INDEX idx_consolidations_status ON public.consolidations USING btree (status)"
+      },
+      {
+        "table_name": "container_types",
+        "index_name": "container_types_pkey",
+        "index_definition": "CREATE UNIQUE INDEX container_types_pkey ON public.container_types USING btree (id)"
+      },
+      {
+        "table_name": "customers",
+        "index_name": "customers_email_key",
+        "index_definition": "CREATE UNIQUE INDEX customers_email_key ON public.customers USING btree (email)"
+      },
+      {
+        "table_name": "customers",
+        "index_name": "customers_pkey",
+        "index_definition": "CREATE UNIQUE INDEX customers_pkey ON public.customers USING btree (id)"
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "index_name": "newsletter_subscribers_email_key",
+        "index_definition": "CREATE UNIQUE INDEX newsletter_subscribers_email_key ON public.newsletter_subscribers USING btree (email)"
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "index_name": "newsletter_subscribers_pkey",
+        "index_definition": "CREATE UNIQUE INDEX newsletter_subscribers_pkey ON public.newsletter_subscribers USING btree (id)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_admin_importance",
+        "index_definition": "CREATE INDEX idx_notifications_admin_importance ON public.notifications USING btree (user_id, importance) WHERE (user_id IS NULL)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_cleanup",
+        "index_definition": "CREATE INDEX idx_notifications_cleanup ON public.notifications USING btree (is_read, \"timestamp\")"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_content_dedup",
+        "index_definition": "CREATE INDEX idx_notifications_content_dedup ON public.notifications USING btree (COALESCE((user_id)::text, 'null'::text), ((metadata ->> 'event_type'::text)), ((metadata ->> 'related_entity_type'::text)), ((metadata ->> 'related_entity_id'::text))) WHERE (((metadata ->> 'event_type'::text) IS NOT NULL) AND ((metadata ->> 'related_entity_type'::text) IS NOT NULL) AND ((metadata ->> 'related_entity_id'::text) IS NOT NULL))"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_event_type",
+        "index_definition": "CREATE INDEX idx_notifications_event_type ON public.notifications USING btree (event_type)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_importance",
+        "index_definition": "CREATE INDEX idx_notifications_importance ON public.notifications USING btree (importance)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_is_read",
+        "index_definition": "CREATE INDEX idx_notifications_is_read ON public.notifications USING btree (is_read)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_metadata",
+        "index_definition": "CREATE INDEX idx_notifications_metadata ON public.notifications USING gin (metadata)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_related_entity",
+        "index_definition": "CREATE INDEX idx_notifications_related_entity ON public.notifications USING btree (related_entity_type, related_entity_id)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_target_audience",
+        "index_definition": "CREATE INDEX idx_notifications_target_audience ON public.notifications USING btree (target_audience)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_timestamp",
+        "index_definition": "CREATE INDEX idx_notifications_timestamp ON public.notifications USING btree (\"timestamp\" DESC)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_user_id",
+        "index_definition": "CREATE INDEX idx_notifications_user_id ON public.notifications USING btree (user_id)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_user_id_timestamp",
+        "index_definition": "CREATE INDEX idx_notifications_user_id_timestamp ON public.notifications USING btree (user_id, \"timestamp\" DESC)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_user_target_audience",
+        "index_definition": "CREATE INDEX idx_notifications_user_target_audience ON public.notifications USING btree (user_id, target_audience)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "idx_notifications_user_unread",
+        "index_definition": "CREATE INDEX idx_notifications_user_unread ON public.notifications USING btree (user_id, is_read) WHERE (is_read = false)"
+      },
+      {
+        "table_name": "notifications",
+        "index_name": "notifications_pkey",
+        "index_definition": "CREATE UNIQUE INDEX notifications_pkey ON public.notifications USING btree (id)"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_charges_applied",
+        "index_definition": "CREATE INDEX idx_orders_charges_applied ON public.orders USING btree (charges_applied)"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_creation_date_desc",
+        "index_definition": "CREATE INDEX idx_orders_creation_date_desc ON public.orders USING btree (creation_date DESC)"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_customer_creation_date_desc",
+        "index_definition": "CREATE INDEX idx_orders_customer_creation_date_desc ON public.orders USING btree (customer_id, creation_date DESC)"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_customer_id",
+        "index_definition": "CREATE INDEX idx_orders_customer_id ON public.orders USING btree (customer_id)"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_shipping_status",
+        "index_definition": "CREATE INDEX idx_orders_shipping_status ON public.orders USING btree (status) WHERE (status = ANY (ARRAY['InTransit'::order_status, 'AtOriginPort'::order_status, 'InTransitSea'::order_status, 'AtDestinationPort'::order_status, 'CustomsClearance'::order_status, 'AwaitingDelivery'::order_status, 'OutForDelivery'::order_status]))"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_status",
+        "index_definition": "CREATE INDEX idx_orders_status ON public.orders USING btree (status)"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_status_workflow",
+        "index_definition": "CREATE INDEX idx_orders_status_workflow ON public.orders USING btree (status) WHERE (status = ANY (ARRAY['Pending'::order_status, 'Processing'::order_status, 'QualityCheck'::order_status, 'ReadyToShip'::order_status]))"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "idx_orders_supplier_id",
+        "index_definition": "CREATE INDEX idx_orders_supplier_id ON public.orders USING btree (supplier_id)"
+      },
+      {
+        "table_name": "orders",
+        "index_name": "orders_pkey",
+        "index_definition": "CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "idx_payment_transactions_consolidation_type_date",
+        "index_definition": "CREATE INDEX idx_payment_transactions_consolidation_type_date ON public.payment_transactions USING btree (customer_id, related_consolidation_id, type, date)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "idx_payment_transactions_customer_date_desc",
+        "index_definition": "CREATE INDEX idx_payment_transactions_customer_date_desc ON public.payment_transactions USING btree (customer_id, date DESC)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "idx_payment_transactions_customer_id",
+        "index_definition": "CREATE INDEX idx_payment_transactions_customer_id ON public.payment_transactions USING btree (customer_id)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "idx_payment_transactions_date_desc",
+        "index_definition": "CREATE INDEX idx_payment_transactions_date_desc ON public.payment_transactions USING btree (date DESC)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "idx_payment_transactions_related_consolidation_id",
+        "index_definition": "CREATE INDEX idx_payment_transactions_related_consolidation_id ON public.payment_transactions USING btree (related_consolidation_id)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "idx_payment_transactions_related_order_id",
+        "index_definition": "CREATE INDEX idx_payment_transactions_related_order_id ON public.payment_transactions USING btree (related_order_id)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "idx_payment_transactions_related_shipment_id",
+        "index_definition": "CREATE INDEX idx_payment_transactions_related_shipment_id ON public.payment_transactions USING btree (related_shipment_id)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "payment_transactions_pkey",
+        "index_definition": "CREATE UNIQUE INDEX payment_transactions_pkey ON public.payment_transactions USING btree (id)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "prevent_exact_duplicate_transactions",
+        "index_definition": "CREATE UNIQUE INDEX prevent_exact_duplicate_transactions ON public.payment_transactions USING btree (customer_id, related_consolidation_id, type, amount, description, date)"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "uniq_payment_transactions_idempotency_key",
+        "index_definition": "CREATE UNIQUE INDEX uniq_payment_transactions_idempotency_key ON public.payment_transactions USING btree (idempotency_key) WHERE ((idempotency_key IS NOT NULL) AND (btrim(idempotency_key) <> ''::text))"
+      },
+      {
+        "table_name": "payment_transactions",
+        "index_name": "unique_shipping_cost_per_individual_order",
+        "index_definition": "CREATE UNIQUE INDEX unique_shipping_cost_per_individual_order ON public.payment_transactions USING btree (customer_id, related_order_id, type) WHERE ((type = 'ShippingCost'::transaction_type) AND (related_order_id IS NOT NULL) AND (related_consolidation_id IS NULL))"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_actual_delivery",
+        "index_definition": "CREATE INDEX idx_shipments_actual_delivery ON public.shipments USING btree (actual_delivery)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_consolidation_id",
+        "index_definition": "CREATE INDEX idx_shipments_consolidation_id ON public.shipments USING btree (consolidation_id)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_customer_id",
+        "index_definition": "CREATE INDEX idx_shipments_customer_id ON public.shipments USING btree (customer_id)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_estimated_delivery",
+        "index_definition": "CREATE INDEX idx_shipments_estimated_delivery ON public.shipments USING btree (estimated_delivery)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_idempotency_key",
+        "index_definition": "CREATE INDEX idx_shipments_idempotency_key ON public.shipments USING btree (idempotency_key)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_is_mixed",
+        "index_definition": "CREATE INDEX idx_shipments_is_mixed ON public.shipments USING btree (is_mixed)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_order_id",
+        "index_definition": "CREATE INDEX idx_shipments_order_id ON public.shipments USING btree (order_id)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_related_id",
+        "index_definition": "CREATE INDEX idx_shipments_related_id ON public.shipments USING btree (related_id)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_status",
+        "index_definition": "CREATE INDEX idx_shipments_status ON public.shipments USING btree (status)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "idx_shipments_type",
+        "index_definition": "CREATE INDEX idx_shipments_type ON public.shipments USING btree (type)"
+      },
+      {
+        "table_name": "shipments",
+        "index_name": "shipments_pkey",
+        "index_definition": "CREATE UNIQUE INDEX shipments_pkey ON public.shipments USING btree (id)"
+      },
+      {
+        "table_name": "suppliers",
+        "index_name": "suppliers_pkey",
+        "index_definition": "CREATE UNIQUE INDEX suppliers_pkey ON public.suppliers USING btree (id)"
+      }
+    ],
+    "public_functions": [
+      {
+        "function_name": "admin_client_error_area_breakdown",
+        "args": "window_days integer, max_items integer",
+        "return_type": "TABLE(area_label text, total_events bigint, last_24h bigint, last_seen timestamp with time zone)",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "admin_client_error_trends",
+        "args": "window_days integer, max_releases integer",
+        "return_type": "TABLE(release_label text, total_events bigint, last_24h bigint, last_seen timestamp with time zone, daily_counts integer[])",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "admin_dashboard_metrics",
+        "args": "window_days integer, balance_threshold numeric",
+        "return_type": "TABLE(total_suppliers bigint, total_orders bigint, total_shipments bigint, total_active_consolidations bigint, pending_orders bigint, in_progress_orders bigint, ready_orders bigint, departing_soon bigint, capacity_risk bigint, missing_tracking bigint, missing_shipment bigint, negative_balances bigint)",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "admin_recent_client_errors",
+        "args": "limit_rows integer",
+        "return_type": "TABLE(reported_at timestamp with time zone, correlation_id text, area text, app_release text, message text)",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "calculate_cost_variance",
+        "args": "",
+        "return_type": "trigger",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "check_duplicate_payment_transaction",
+        "args": "p_customer_id uuid, p_related_consolidation_id uuid, p_type transaction_type, p_amount numeric, p_description text",
+        "return_type": "boolean",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "check_notification_exists",
+        "args": "p_user_id uuid, p_event_type text, p_related_entity_type text, p_related_entity_id text, p_hours_back integer",
+        "return_type": "boolean",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "cleanup_old_notifications",
+        "args": "read_retention_days integer, unread_retention_days integer, batch_size integer",
+        "return_type": "integer",
+        "language": "plpgsql",
+        "security_definer": true
+      },
+      {
+        "function_name": "create_consolidation_shipment_core",
+        "args": "p_consolidation_id uuid, p_shipping_cost numeric, p_cost_variance numeric, p_cost_variance_percentage numeric, p_carrier text, p_tracking_url text, p_estimated_delivery timestamp with time zone, p_description text, p_status text, p_customer_id uuid, p_involved_customer_ids text[], p_is_mixed boolean, p_origin text, p_destination text, p_idempotency_key text",
+        "return_type": "TABLE(shipment_id uuid, consolidation_status text, created boolean)",
+        "language": "plpgsql",
+        "security_definer": true
+      },
+      {
+        "function_name": "create_customer_on_signup",
+        "args": "",
+        "return_type": "trigger",
+        "language": "plpgsql",
+        "security_definer": true
+      },
+      {
+        "function_name": "enforce_shipment_write_guards",
+        "args": "",
+        "return_type": "trigger",
+        "language": "plpgsql",
+        "security_definer": false
+      },
+      {
+        "function_name": "is_admin",
+        "args": "",
+        "return_type": "boolean",
+        "language": "sql",
+        "security_definer": true
+      },
+      {
+        "function_name": "purge_old_client_error_events",
+        "args": "retention_days integer",
+        "return_type": "bigint",
+        "language": "plpgsql",
+        "security_definer": true
+      },
+      {
+        "function_name": "update_updated_at_column",
+        "args": "",
+        "return_type": "trigger",
+        "language": "plpgsql",
+        "security_definer": false
+      }
+    ],
+    "public_triggers": [
+      {
+        "table_schema": "auth",
+        "table_name": "users",
+        "function_schema": "public",
+        "trigger_name": "create_customer_on_signup_trigger",
+        "function_name": "create_customer_on_signup",
+        "definition": "CREATE TRIGGER create_customer_on_signup_trigger AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION create_customer_on_signup()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "consolidations",
+        "function_schema": "public",
+        "trigger_name": "trigger_calculate_cost_variance",
+        "function_name": "calculate_cost_variance",
+        "definition": "CREATE TRIGGER trigger_calculate_cost_variance BEFORE INSERT OR UPDATE ON consolidations FOR EACH ROW EXECUTE FUNCTION calculate_cost_variance()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "consolidations",
+        "function_schema": "public",
+        "trigger_name": "update_consolidations_updated_at",
+        "function_name": "update_updated_at_column",
+        "definition": "CREATE TRIGGER update_consolidations_updated_at BEFORE UPDATE ON consolidations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "customers",
+        "function_schema": "public",
+        "trigger_name": "update_customers_updated_at",
+        "function_name": "update_updated_at_column",
+        "definition": "CREATE TRIGGER update_customers_updated_at BEFORE UPDATE ON customers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "orders",
+        "function_schema": "public",
+        "trigger_name": "update_orders_updated_at",
+        "function_name": "update_updated_at_column",
+        "definition": "CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "shipments",
+        "function_schema": "public",
+        "trigger_name": "trg_enforce_shipment_write_guards",
+        "function_name": "enforce_shipment_write_guards",
+        "definition": "CREATE TRIGGER trg_enforce_shipment_write_guards BEFORE INSERT OR UPDATE OF type, related_id, idempotency_key ON shipments FOR EACH ROW EXECUTE FUNCTION enforce_shipment_write_guards()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "shipments",
+        "function_schema": "public",
+        "trigger_name": "update_shipments_updated_at",
+        "function_name": "update_updated_at_column",
+        "definition": "CREATE TRIGGER update_shipments_updated_at BEFORE UPDATE ON shipments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+        "enabled": "O"
+      },
+      {
+        "table_schema": "public",
+        "table_name": "suppliers",
+        "function_schema": "public",
+        "trigger_name": "update_suppliers_updated_at",
+        "function_name": "update_updated_at_column",
+        "definition": "CREATE TRIGGER update_suppliers_updated_at BEFORE UPDATE ON suppliers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()",
+        "enabled": "O"
+      }
+    ],
+    "public_policies": [
+      {
+        "table_name": "blog_posts",
+        "policy_name": "blog_posts_admin_delete",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "DELETE",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "blog_posts",
+        "policy_name": "blog_posts_admin_insert",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "INSERT",
+        "qual": null,
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "blog_posts",
+        "policy_name": "blog_posts_admin_select_all",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "blog_posts",
+        "policy_name": "blog_posts_admin_update",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "UPDATE",
+        "qual": "is_admin()",
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "blog_posts",
+        "policy_name": "blog_posts_public_select_published",
+        "permissive": "PERMISSIVE",
+        "roles": "{anon,authenticated}",
+        "cmd": "SELECT",
+        "qual": "(published = true)",
+        "with_check": null
+      },
+      {
+        "table_name": "client_error_events",
+        "policy_name": "client_error_events_admin_select",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "client_error_events",
+        "policy_name": "client_error_events_insert_public",
+        "permissive": "PERMISSIVE",
+        "roles": "{anon,authenticated}",
+        "cmd": "INSERT",
+        "qual": null,
+        "with_check": "(((length(correlation_id) >= 8) AND (length(correlation_id) <= 120)) AND ((length(area) >= 1) AND (length(area) <= 120)) AND ((length(message) >= 1) AND (length(message) <= 4000)) AND (COALESCE(length(app_release), 0) <= 120) AND (COALESCE(length(url), 0) <= 2048) AND (COALESCE(length(user_agent), 0) <= 1024))"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "policy_name": "consolidation_orders_admin_write",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "ALL",
+        "qual": "is_admin()",
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "consolidation_orders",
+        "policy_name": "consolidation_orders_select_visible",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "(is_admin() OR (EXISTS ( SELECT 1\n   FROM consolidations c\n  WHERE ((c.id = consolidation_orders.consolidation_id) AND ((c.customer_id = auth.uid()) OR ((auth.uid())::text = ANY (c.involved_customer_ids)))))))",
+        "with_check": null
+      },
+      {
+        "table_name": "consolidations",
+        "policy_name": "consolidations_admin_write",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "ALL",
+        "qual": "is_admin()",
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "consolidations",
+        "policy_name": "consolidations_select_visible",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "(is_admin() OR (customer_id = auth.uid()) OR ((auth.uid())::text = ANY (involved_customer_ids)))",
+        "with_check": null
+      },
+      {
+        "table_name": "container_types",
+        "policy_name": "container_types_authenticated_select",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "true",
+        "with_check": null
+      },
+      {
+        "table_name": "customers",
+        "policy_name": "customers_admin_delete",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "DELETE",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "customers",
+        "policy_name": "customers_admin_insert",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "INSERT",
+        "qual": null,
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "customers",
+        "policy_name": "customers_self_insert_customer",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "INSERT",
+        "qual": null,
+        "with_check": "((id = auth.uid()) AND (role = 'customer'::text))"
+      },
+      {
+        "table_name": "customers",
+        "policy_name": "customers_self_or_admin_select",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "(is_admin() OR (id = auth.uid()))",
+        "with_check": null
+      },
+      {
+        "table_name": "customers",
+        "policy_name": "customers_self_or_admin_update",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "UPDATE",
+        "qual": "(is_admin() OR (id = auth.uid()))",
+        "with_check": "(is_admin() OR ((id = auth.uid()) AND (role = 'customer'::text)))"
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "policy_name": "newsletter_subscribers_admin_delete",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "DELETE",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "policy_name": "newsletter_subscribers_admin_select",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "policy_name": "newsletter_subscribers_insert_public",
+        "permissive": "PERMISSIVE",
+        "roles": "{anon,authenticated}",
+        "cmd": "INSERT",
+        "qual": null,
+        "with_check": "true"
+      },
+      {
+        "table_name": "notifications",
+        "policy_name": "notifications_admin_delete",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "DELETE",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "notifications",
+        "policy_name": "notifications_insert_self_or_admin",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "INSERT",
+        "qual": null,
+        "with_check": "(is_admin() OR (user_id = auth.uid()))"
+      },
+      {
+        "table_name": "notifications",
+        "policy_name": "notifications_select_visible",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "(is_admin() OR (user_id = auth.uid()) OR (user_id IS NULL))",
+        "with_check": null
+      },
+      {
+        "table_name": "notifications",
+        "policy_name": "notifications_update_visible",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "UPDATE",
+        "qual": "(is_admin() OR (user_id = auth.uid()) OR (user_id IS NULL))",
+        "with_check": null
+      },
+      {
+        "table_name": "orders",
+        "policy_name": "orders_admin_delete",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "DELETE",
+        "qual": "is_admin()",
+        "with_check": null
+      },
+      {
+        "table_name": "orders",
+        "policy_name": "orders_admin_update",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "UPDATE",
+        "qual": "is_admin()",
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "orders",
+        "policy_name": "orders_insert_self_or_admin",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "INSERT",
+        "qual": null,
+        "with_check": "(is_admin() OR (customer_id = auth.uid()))"
+      },
+      {
+        "table_name": "orders",
+        "policy_name": "orders_select_self_or_admin",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "(is_admin() OR (customer_id = auth.uid()))",
+        "with_check": null
+      },
+      {
+        "table_name": "payment_transactions",
+        "policy_name": "payment_transactions_admin_write",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "ALL",
+        "qual": "is_admin()",
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "payment_transactions",
+        "policy_name": "payment_transactions_select_self_or_admin",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "(is_admin() OR (customer_id = auth.uid()))",
+        "with_check": null
+      },
+      {
+        "table_name": "shipments",
+        "policy_name": "shipments_admin_write",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "ALL",
+        "qual": "is_admin()",
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "shipments",
+        "policy_name": "shipments_select_visible",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "(is_admin() OR (customer_id = auth.uid()) OR ((auth.uid())::text = ANY (involved_customer_ids)))",
+        "with_check": null
+      },
+      {
+        "table_name": "suppliers",
+        "policy_name": "suppliers_admin_write",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "ALL",
+        "qual": "is_admin()",
+        "with_check": "is_admin()"
+      },
+      {
+        "table_name": "suppliers",
+        "policy_name": "suppliers_authenticated_select",
+        "permissive": "PERMISSIVE",
+        "roles": "{authenticated}",
+        "cmd": "SELECT",
+        "qual": "true",
+        "with_check": null
+      }
+    ],
+    "public_views": [
+      {
+        "view_name": "consolidations_with_orders",
+        "view_definition": null
+      }
+    ],
+    "public_row_estimates": [
+      {
+        "table_name": "blog_posts",
+        "estimated_rows": 1
+      },
+      {
+        "table_name": "client_error_events",
+        "estimated_rows": 1
+      },
+      {
+        "table_name": "consolidation_orders",
+        "estimated_rows": 2
+      },
+      {
+        "table_name": "consolidations",
+        "estimated_rows": 2
+      },
+      {
+        "table_name": "container_types",
+        "estimated_rows": 0
+      },
+      {
+        "table_name": "customers",
+        "estimated_rows": 1
+      },
+      {
+        "table_name": "newsletter_subscribers",
+        "estimated_rows": 0
+      },
+      {
+        "table_name": "notifications",
+        "estimated_rows": 121
+      },
+      {
+        "table_name": "orders",
+        "estimated_rows": 1
+      },
+      {
+        "table_name": "payment_transactions",
+        "estimated_rows": 7
+      },
+      {
+        "table_name": "shipments",
+        "estimated_rows": 4
+      },
+      {
+        "table_name": "suppliers",
+        "estimated_rows": 0
+      }
+    ],
+    "migrations": [
+      {
+        "version": "20260218000001",
+        "name": "client_error_diagnostics_and_retention",
+        "statement_count": 7
+      },
+      {
+        "version": "20260218000000",
+        "name": "client_error_events_and_trends",
+        "statement_count": 13
+      },
+      {
+        "version": "20260217000001",
+        "name": "seed_solution_focused_blog_posts",
+        "statement_count": 1
+      },
+      {
+        "version": "20260217000000",
+        "name": "payment_idempotency_and_distribution_normalization",
+        "statement_count": 7
+      },
+      {
+        "version": "20260214000000",
+        "name": "blog_posts_admin_only_writes_and_public_published_reads",
+        "statement_count": 8
+      },
+      {
+        "version": "20260213000001",
+        "name": "shipment_idempotency_and_atomic_core",
+        "statement_count": 10
+      },
+      {
+        "version": "20260213000000",
+        "name": "expand_order_status_enum",
+        "statement_count": 1
+      },
+      {
+        "version": "20260210000002",
+        "name": "normalize_payment_transaction_types",
+        "statement_count": 5
+      },
+      {
+        "version": "20260210000001",
+        "name": "admin_dashboard_metrics",
+        "statement_count": 1
+      },
+      {
+        "version": "20260210000000",
+        "name": "expand_transaction_type_enum",
+        "statement_count": 1
+      },
+      {
+        "version": "20260209000009",
+        "name": "security_invoker_and_fk_indexes",
+        "statement_count": 7
+      },
+      {
+        "version": "20260209000008",
+        "name": "rls_lockdown",
+        "statement_count": 38
+      },
+      {
+        "version": "20260209000007",
+        "name": "is_admin_security_definer",
+        "statement_count": 3
+      },
+      {
+        "version": "20260209000006",
+        "name": "customers_self_insert_and_role_protection",
+        "statement_count": 3
+      },
+      {
+        "version": "20260209000005",
+        "name": "cleanup_unused_shipment_artifacts",
+        "statement_count": 7
+      },
+      {
+        "version": "20260209000004",
+        "name": "is_admin_security_definer",
+        "statement_count": 3
+      },
+      {
+        "version": "20260209000003",
+        "name": "customers_self_insert_and_role_protection",
+        "statement_count": 3
+      },
+      {
+        "version": "20260209000002",
+        "name": "rls_lockdown",
+        "statement_count": 38
+      },
+      {
+        "version": "20260209000001",
+        "name": "security_invoker_and_fk_indexes",
+        "statement_count": 7
+      },
+      {
+        "version": "20260209000000",
+        "name": "cleanup_unused_shipment_artifacts",
+        "statement_count": 7
+      },
+      {
+        "version": "20260208000000",
+        "name": "notification_retention_cleanup",
+        "statement_count": 4
+      },
+      {
+        "version": "20250717000000",
+        "name": "remove_unused_cost_column",
+        "statement_count": 5
+      },
+      {
+        "version": "20250716060105",
+        "name": "fix_cost_distribution_constraint",
+        "statement_count": 2
+      },
+      {
+        "version": "20250716000001",
+        "name": "add_order_id_to_shipments",
+        "statement_count": 0
+      },
+      {
+        "version": "20250713000002",
+        "name": "fix_duplicate_payment_transactions",
+        "statement_count": 7
+      },
+      {
+        "version": "20250713000001",
+        "name": "fix_shipments_table_schema",
+        "statement_count": 0
+      },
+      {
+        "version": "20250709000000",
+        "name": "blog_and_newsletter",
+        "statement_count": 10
+      }
+    ],
+    "storage_buckets": []
+  },
+  "frontend_usage": {
+    "tables": [
+      {
+        "name": "blog_posts",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/assets/blogadmin.js",
+          "site-local/assets/bloglist.js",
+          "site-local/assets/blogpost.js"
+        ],
+        "surfaces": [
+          "site"
+        ],
+        "operations": {
+          "delete": 1,
+          "insert": 2,
+          "select": 7,
+          "update": 1
+        }
+      },
+      {
+        "name": "consolidation_orders",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "delete": 1,
+          "upsert": 1
+        }
+      },
+      {
+        "name": "consolidations",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "insert": 1,
+          "select": 9,
+          "update": 8
+        }
+      },
+      {
+        "name": "consolidations_with_orders",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "select": 3
+        }
+      },
+      {
+        "name": "customers",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard",
+          "site"
+        ],
+        "operations": {
+          "delete": 1,
+          "insert": 6,
+          "select": 13,
+          "update": 3
+        }
+      },
+      {
+        "name": "newsletter_subscribers",
+        "files": [
+          "site-local/assets/app.js"
+        ],
+        "surfaces": [
+          "site"
+        ],
+        "operations": {
+          "insert": 1
+        }
+      },
+      {
+        "name": "notifications",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "insert": 1,
+          "select": 8,
+          "update": 4
+        }
+      },
+      {
+        "name": "orders",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "delete": 2,
+          "insert": 2,
+          "select": 18,
+          "update": 2
+        }
+      },
+      {
+        "name": "payment_transactions",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "delete": 6,
+          "insert": 2,
+          "select": 9
+        }
+      },
+      {
+        "name": "shipments",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "delete": 2,
+          "insert": 1,
+          "select": 20,
+          "update": 4
+        }
+      },
+      {
+        "name": "suppliers",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "delete": 2,
+          "insert": 2,
+          "select": 12,
+          "update": 2
+        }
+      }
+    ],
+    "rpcs": [
+      {
+        "name": "admin_dashboard_metrics",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "call": 1
+        }
+      }
+    ],
+    "auth_methods": [
+      {
+        "name": "admin",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "call": 1
+        }
+      },
+      {
+        "name": "getSession",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard",
+          "site"
+        ],
+        "operations": {
+          "call": 4
+        }
+      },
+      {
+        "name": "getUser",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "call": 1
+        }
+      },
+      {
+        "name": "onAuthStateChange",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard",
+          "site"
+        ],
+        "operations": {
+          "call": 4
+        }
+      },
+      {
+        "name": "resend",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard",
+          "site"
+        ],
+        "operations": {
+          "call": 2
+        }
+      },
+      {
+        "name": "resetPasswordForEmail",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "call": 1
+        }
+      },
+      {
+        "name": "signInWithPassword",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard",
+          "site"
+        ],
+        "operations": {
+          "call": 2
+        }
+      },
+      {
+        "name": "signOut",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard",
+          "site"
+        ],
+        "operations": {
+          "call": 11
+        }
+      },
+      {
+        "name": "signUp",
+        "files": [
+          "site-local/assets/app.js",
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard",
+          "site"
+        ],
+        "operations": {
+          "call": 3
+        }
+      },
+      {
+        "name": "updateUser",
+        "files": [
+          "site-local/dashboard/assets/app.js"
+        ],
+        "surfaces": [
+          "dashboard"
+        ],
+        "operations": {
+          "call": 1
+        }
+      }
+    ]
+  },
+  "workspace_checks": {
+    "hashed_residual_files": [],
+    "missing_html_asset_refs": [],
+    "missing_module_imports": []
+  },
+  "project_structure": {
+    "top_level": [
+      {
+        "name": ".dev-server.log",
+        "type": "file"
+      },
+      {
+        "name": ".env",
+        "type": "file"
+      },
+      {
+        "name": ".env.codex.supabase.txt",
+        "type": "file"
+      },
+      {
+        "name": ".env.example",
+        "type": "file"
+      },
+      {
+        "name": ".gitignore",
+        "type": "file"
+      },
+      {
+        "name": "docs",
+        "type": "dir"
+      },
+      {
+        "name": "node_modules",
+        "type": "dir"
+      },
+      {
+        "name": "package-lock.json",
+        "type": "file"
+      },
+      {
+        "name": "package.json",
+        "type": "file"
+      },
+      {
+        "name": "README.md",
+        "type": "file"
+      },
+      {
+        "name": "scripts",
+        "type": "dir"
+      },
+      {
+        "name": "site-local",
+        "type": "dir"
+      }
+    ],
+    "site_pages": [
+      "site-local/dashboard/index.html",
+      "site-local/index.html"
+    ],
+    "largest_js_bundles": [
+      {
+        "file": "site-local/dashboard/assets/app.js",
+        "bytes": 563622
+      },
+      {
+        "file": "site-local/dashboard/assets/consolidationspage.js",
+        "bytes": 316834
+      },
+      {
+        "file": "site-local/assets/react.js",
+        "bytes": 265456
+      },
+      {
+        "file": "site-local/dashboard/assets/react.js",
+        "bytes": 256431
+      },
+      {
+        "file": "site-local/assets/app.js",
+        "bytes": 255639
+      },
+      {
+        "file": "site-local/assets/supabase.js",
+        "bytes": 179584
+      },
+      {
+        "file": "site-local/assets/radix.js",
+        "bytes": 155441
+      },
+      {
+        "file": "site-local/dashboard/assets/dashboardpage.js",
+        "bytes": 152914
+      },
+      {
+        "file": "site-local/assets/index.js",
+        "bytes": 145787
+      },
+      {
+        "file": "site-local/dashboard/assets/orderspage.js",
+        "bytes": 108271
+      },
+      {
+        "file": "site-local/dashboard/assets/shipmentspage.js",
+        "bytes": 107449
+      },
+      {
+        "file": "site-local/dashboard/assets/customerspage.js",
+        "bytes": 104450
+      }
+    ],
+    "total_site_files": 40
+  }
+}
