@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-23T08:02:35.866Z",
+  "generated_at_utc": "2026-02-23T08:17:00.511Z",
   "project": {
     "id": "fbpemdlnlsgqkovnatro",
     "ref": "fbpemdlnlsgqkovnatro",
@@ -2860,10 +2860,10 @@
       {
         "name": "blog_posts",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/assets/blogadmin.js",
-          "site-local/assets/bloglist.js",
-          "site-local/assets/blogpost.js"
+          "site/assets/app.js",
+          "site/assets/blogadmin.js",
+          "site/assets/bloglist.js",
+          "site/assets/blogpost.js"
         ],
         "surfaces": [
           "site"
@@ -2878,7 +2878,7 @@
       {
         "name": "consolidation_orders",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -2891,7 +2891,7 @@
       {
         "name": "consolidations",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -2905,7 +2905,7 @@
       {
         "name": "consolidations_with_orders",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -2917,8 +2917,8 @@
       {
         "name": "customers",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/dashboard/assets/app.js"
+          "site/assets/app.js",
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard",
@@ -2934,7 +2934,7 @@
       {
         "name": "newsletter_subscribers",
         "files": [
-          "site-local/assets/app.js"
+          "site/assets/app.js"
         ],
         "surfaces": [
           "site"
@@ -2946,7 +2946,7 @@
       {
         "name": "notifications",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -2960,7 +2960,7 @@
       {
         "name": "orders",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -2975,7 +2975,7 @@
       {
         "name": "payment_transactions",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -2989,7 +2989,7 @@
       {
         "name": "shipments",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -3004,7 +3004,7 @@
       {
         "name": "suppliers",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -3021,7 +3021,7 @@
       {
         "name": "admin_dashboard_metrics",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -3035,7 +3035,7 @@
       {
         "name": "admin",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -3047,8 +3047,8 @@
       {
         "name": "getSession",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/dashboard/assets/app.js"
+          "site/assets/app.js",
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard",
@@ -3061,7 +3061,7 @@
       {
         "name": "getUser",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -3073,8 +3073,8 @@
       {
         "name": "onAuthStateChange",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/dashboard/assets/app.js"
+          "site/assets/app.js",
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard",
@@ -3087,8 +3087,8 @@
       {
         "name": "resend",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/dashboard/assets/app.js"
+          "site/assets/app.js",
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard",
@@ -3101,7 +3101,7 @@
       {
         "name": "resetPasswordForEmail",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -3113,8 +3113,8 @@
       {
         "name": "signInWithPassword",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/dashboard/assets/app.js"
+          "site/assets/app.js",
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard",
@@ -3127,8 +3127,8 @@
       {
         "name": "signOut",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/dashboard/assets/app.js"
+          "site/assets/app.js",
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard",
@@ -3141,8 +3141,8 @@
       {
         "name": "signUp",
         "files": [
-          "site-local/assets/app.js",
-          "site-local/dashboard/assets/app.js"
+          "site/assets/app.js",
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard",
@@ -3155,7 +3155,7 @@
       {
         "name": "updateUser",
         "files": [
-          "site-local/dashboard/assets/app.js"
+          "site/dashboard/assets/app.js"
         ],
         "surfaces": [
           "dashboard"
@@ -3218,61 +3218,61 @@
         "type": "dir"
       },
       {
-        "name": "site-local",
+        "name": "site",
         "type": "dir"
       }
     ],
     "site_pages": [
-      "site-local/dashboard/index.html",
-      "site-local/index.html"
+      "site/dashboard/index.html",
+      "site/index.html"
     ],
     "largest_js_bundles": [
       {
-        "file": "site-local/dashboard/assets/app.js",
+        "file": "site/dashboard/assets/app.js",
         "bytes": 563622
       },
       {
-        "file": "site-local/dashboard/assets/consolidationspage.js",
+        "file": "site/dashboard/assets/consolidationspage.js",
         "bytes": 316834
       },
       {
-        "file": "site-local/assets/react.js",
+        "file": "site/assets/react.js",
         "bytes": 265456
       },
       {
-        "file": "site-local/dashboard/assets/react.js",
+        "file": "site/dashboard/assets/react.js",
         "bytes": 256431
       },
       {
-        "file": "site-local/assets/app.js",
+        "file": "site/assets/app.js",
         "bytes": 255639
       },
       {
-        "file": "site-local/assets/supabase.js",
+        "file": "site/assets/supabase.js",
         "bytes": 179584
       },
       {
-        "file": "site-local/assets/radix.js",
+        "file": "site/assets/radix.js",
         "bytes": 155441
       },
       {
-        "file": "site-local/dashboard/assets/dashboardpage.js",
+        "file": "site/dashboard/assets/dashboardpage.js",
         "bytes": 152914
       },
       {
-        "file": "site-local/assets/index.js",
+        "file": "site/assets/index.js",
         "bytes": 145787
       },
       {
-        "file": "site-local/dashboard/assets/orderspage.js",
+        "file": "site/dashboard/assets/orderspage.js",
         "bytes": 108271
       },
       {
-        "file": "site-local/dashboard/assets/shipmentspage.js",
+        "file": "site/dashboard/assets/shipmentspage.js",
         "bytes": 107449
       },
       {
-        "file": "site-local/dashboard/assets/customerspage.js",
+        "file": "site/dashboard/assets/customerspage.js",
         "bytes": 104450
       }
     ],

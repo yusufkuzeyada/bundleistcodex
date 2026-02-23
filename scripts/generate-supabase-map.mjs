@@ -4,7 +4,7 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const DOCS_DIR = path.join(ROOT, "docs");
-const SITE_DIR = path.join(ROOT, "site-local");
+const SITE_DIR = path.join(ROOT, "site");
 
 const TABLE_OPS = ["select", "insert", "update", "upsert", "delete"];
 const VENDOR_FILES = new Set(["react.js", "radix.js", "supabase.js"]);
@@ -344,7 +344,7 @@ function markdownForMap(mapData) {
     .map((e) => `${e.type === "dir" ? "dir" : "file"}: \`${e.name}\``)
     .join(", ");
   lines.push(`- Top level: ${topDirs}`);
-  lines.push(`- Files under \`site-local/\`: ${project_structure.total_site_files}`);
+  lines.push(`- Files under \`site/\`: ${project_structure.total_site_files}`);
   lines.push(
     `- Largest JS bundles: ${project_structure.largest_js_bundles
       .slice(0, 5)
@@ -729,3 +729,4 @@ main().catch((err) => {
   console.error(err instanceof Error ? err.message : String(err));
   process.exit(1);
 });
+

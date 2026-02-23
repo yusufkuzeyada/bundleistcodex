@@ -5,11 +5,11 @@
   "description": "Local development workspace for Netlify static deployment artifact",
   "scripts": {
     "prepare:static": "node ./scripts/prepare-static-workspace.mjs",
-    "format:static": "prettier --write \"site-local/**/*.js\" \"site-local/**/*.css\" \"site-local/**/*.html\"",
+    "format:static": "prettier --write \"site/**/*.js\" \"site/**/*.css\" \"site/**/*.html\"",
     "setup:static": "npm run prepare:static && npm run format:static",
     "map:supabase": "node ./scripts/generate-supabase-map.mjs",
-    "dev": "serve -l 4173 site-local",
-    "dev:open": "serve -l 4173 -o site-local",
+    "dev": "serve -l 4173 site",
+    "dev:open": "serve -l 4173 -o site",
     "start": "npm run dev",
     "stop": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/stop-dev.ps1",
     "health": "node -e \"fetch('http://127.0.0.1:4173').then((r)=>{console.log('status',r.status);process.exit(r.ok?0:1)}).catch(()=>process.exit(1))\""
@@ -19,3 +19,4 @@
     "serve": "^14.2.5"
   }
 }
+

@@ -1,42 +1,42 @@
 # Feature Map
 
-This map is based on `docs/supabase-map.json` and current bundle files under `site-local/`.
+This map is based on `docs/supabase-map.json` and current bundle files under `site/`.
 
 ## Entry Points
-- Main site bootstrap: `site-local/assets/index.js`
-- Main site app bundle: `site-local/assets/app.js`
-- Dashboard bootstrap: `site-local/dashboard/assets/index.js`
-- Dashboard app bundle: `site-local/dashboard/assets/app.js`
-- Main site page modules: `site-local/assets/blogadmin.js`, `site-local/assets/bloglist.js`, `site-local/assets/blogpost.js`, `site-local/assets/auth.js`
+- Main site bootstrap: `site/assets/index.js`
+- Main site app bundle: `site/assets/app.js`
+- Dashboard bootstrap: `site/dashboard/assets/index.js`
+- Dashboard app bundle: `site/dashboard/assets/app.js`
+- Main site page modules: `site/assets/blogadmin.js`, `site/assets/bloglist.js`, `site/assets/blogpost.js`, `site/assets/auth.js`
 
 ## Supabase Client Locations
-- Public site client init (URL + anon key): `site-local/assets/app.js`
-- Dashboard client init (URL + anon key): `site-local/dashboard/assets/app.js`
-- Dynamic preload wrappers: `site-local/assets/supabase.js`, `site-local/dashboard/assets/supabase.js`
+- Public site client init (URL + anon key): `site/assets/app.js`
+- Dashboard client init (URL + anon key): `site/dashboard/assets/app.js`
+- Dynamic preload wrappers: `site/assets/supabase.js`, `site/dashboard/assets/supabase.js`
 
 ## Feature-to-Data Map
 - Blog and content admin:
   - Tables: `blog_posts`
-  - Files: `site-local/assets/app.js`, `site-local/assets/blogadmin.js`, `site-local/assets/bloglist.js`, `site-local/assets/blogpost.js`
+  - Files: `site/assets/app.js`, `site/assets/blogadmin.js`, `site/assets/bloglist.js`, `site/assets/blogpost.js`
   - Operations: read/create/update/delete
 - Public auth and customer bootstrap:
   - Tables: `customers`
-  - Files: `site-local/assets/app.js`, `site-local/dashboard/assets/app.js`
+  - Files: `site/assets/app.js`, `site/dashboard/assets/app.js`
   - Operations: auth sign-in/sign-up/sign-out + customer row provisioning
 - Newsletter capture:
   - Tables: `newsletter_subscribers`
-  - Files: `site-local/assets/app.js`
+  - Files: `site/assets/app.js`
   - Operations: insert
 - Dashboard core operations:
-  - Suppliers: `suppliers` in `site-local/dashboard/assets/app.js`
-  - Orders: `orders` in `site-local/dashboard/assets/app.js`
-  - Shipments: `shipments` in `site-local/dashboard/assets/app.js`
-  - Consolidations: `consolidations`, `consolidation_orders`, `consolidations_with_orders` in `site-local/dashboard/assets/app.js`
-  - Payments/ledger: `payment_transactions` in `site-local/dashboard/assets/app.js`
-  - Notifications: `notifications` in `site-local/dashboard/assets/app.js`
+  - Suppliers: `suppliers` in `site/dashboard/assets/app.js`
+  - Orders: `orders` in `site/dashboard/assets/app.js`
+  - Shipments: `shipments` in `site/dashboard/assets/app.js`
+  - Consolidations: `consolidations`, `consolidation_orders`, `consolidations_with_orders` in `site/dashboard/assets/app.js`
+  - Payments/ledger: `payment_transactions` in `site/dashboard/assets/app.js`
+  - Notifications: `notifications` in `site/dashboard/assets/app.js`
 - Dashboard metrics:
   - RPC: `admin_dashboard_metrics`
-  - File: `site-local/dashboard/assets/app.js`
+  - File: `site/dashboard/assets/app.js`
 
 ## DB Automation and Backend Logic
 - Public SQL functions include:
@@ -56,4 +56,5 @@ This map is based on `docs/supabase-map.json` and current bundle files under `si
 1. Run `npm run map:supabase` to refresh live schema and usage.
 2. Open `docs/supabase-map.md` for table columns, policies, functions, and triggers.
 3. Open this file to jump to the likely bundle file.
-4. Edit smallest page-specific file first; if logic is centralized, patch `site-local/assets/app.js` or `site-local/dashboard/assets/app.js`.
+4. Edit smallest page-specific file first; if logic is centralized, patch `site/assets/app.js` or `site/dashboard/assets/app.js`.
+

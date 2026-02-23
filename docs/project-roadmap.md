@@ -3,7 +3,7 @@
 Scope: stabilize the de-minified Netlify bundle workspace and make feature work faster and safer.
 
 ## Baseline (as of map generation)
-- App is an editable static build artifact under `site-local/` (not original source repo).
+- App is an editable static build artifact under `site/` (not original source repo).
 - Supabase is live and active with 12 `public` tables, 1 `public` view, multiple SQL functions, and application triggers.
 - Edge function exists: `cleanup-notifications`.
 - File-name integrity checks are currently clean:
@@ -50,3 +50,4 @@ Scope: stabilize the de-minified Netlify bundle workspace and make feature work 
 - Plan source-reconstruction track (optional but high ROI):
   - Recreate modular source structure (components/services) incrementally from bundle files.
   - Move from direct bundle editing to a maintainable source project when feasible.
+

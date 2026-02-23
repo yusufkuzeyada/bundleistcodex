@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { extname, join, basename } from "node:path";
 
-const ROOT = "site-local";
+const ROOT = "site";
 const TEXT_EXTS = new Set([".html", ".js", ".css"]);
 const TARGET_EXTS = new Set([".js", ".css"]);
 const HASHED_RE = /^(.*)-([A-Za-z0-9_-]{6,})$/;
@@ -66,3 +66,4 @@ for (const file of filesAfterRename) {
 
 console.log(`Renamed ${renameOps.length} files.`);
 console.log(`Updated ${replacedCount} reference(s).`);
+
