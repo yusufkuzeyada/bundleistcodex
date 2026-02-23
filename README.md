@@ -62,3 +62,8 @@ Related planning docs:
 This setup removes hash suffixes from chunk names and runs formatter on `js/css/html` so files become readable and directly editable.
 Variable/function names still come from the build output, so this is not equivalent to original source code.
 
+## Netlify
+
+- Deploy publish directory is locked in `netlify.toml` as `site`.
+- SPA rewrites are defined for both main app and dashboard routes.
+
