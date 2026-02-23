@@ -10930,30 +10930,67 @@ class zt {
     return (e || []).map(this.transformDatabaseTransaction);
   }
   async fetchPage(e) {
-    const { page: t, pageSize: r, customerId: i = null, isAdmin: n = !1 } = e,
-      o = Math.max(1, t),
-      a = Math.max(1, Math.min(100, r)),
-      c = (o - 1) * a,
-      u = c + a - 1;
-    let h = _.from("payment_transactions")
+    const {
+        page: t,
+        pageSize: r,
+        customerId: i = null,
+        isAdmin: n = !1,
+        searchTerm: o = "",
+        type: a = "all",
+      } = e,
+      c = Math.max(1, t),
+      u = Math.max(1, Math.min(100, r)),
+      h = (c - 1) * u,
+      p = h + u - 1;
+    let y = _.from("payment_transactions")
       .select("*", { count: "exact" })
       .order("date", { ascending: !1 })
-      .range(c, u);
-    if (n) i && (h = h.eq("customer_id", i));
+      .range(h, p);
+    if (n) i && (y = y.eq("customer_id", i));
     else {
       if (!i) return { transactions: [], totalCount: 0 };
-      h = h.eq("customer_id", i);
+      y = y.eq("customer_id", i);
     }
-    const { data: p, error: y, count: b } = await h;
-    if (y)
+    const b = String(o || "").trim();
+    if (b) {
+      const k = b.replace(/[%_,]/g, "\\$&"),
+        I = [`description.ilike.%${k}%`, `type.ilike.%${k}%`];
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        b,
+      ) &&
+        I.push(
+          `id.eq.${b}`,
+          `customer_id.eq.${b}`,
+          `related_order_id.eq.${b}`,
+          `related_consolidation_id.eq.${b}`,
+          `related_shipment_id.eq.${b}`,
+        );
+      y = y.or(I.join(","));
+    }
+    a && a !== "all" && (y = y.eq("type", a));
+    const { data: k, error: I, count: P } = await y;
+    if (I)
       throw (
-        console.error("Error fetching paginated transactions:", y),
+        console.error("Error fetching paginated transactions:", I),
         new Error("Failed to fetch paginated transactions")
       );
     return {
-      transactions: (p || []).map(this.transformDatabaseTransaction),
-      totalCount: b || 0,
+      transactions: (k || []).map(this.transformDatabaseTransaction),
+      totalCount: P || 0,
     };
+  }
+  async getByCustomerId(e) {
+    if (!e) return [];
+    const { data: t, error: r } = await _.from("payment_transactions")
+      .select("*")
+      .eq("customer_id", e)
+      .order("date", { ascending: !1 });
+    if (r)
+      throw (
+        console.error("Error fetching customer transactions:", r),
+        new Error("Failed to fetch customer transactions")
+      );
+    return (t || []).map(this.transformDatabaseTransaction);
   }
   async deleteTransaction(e) {
     const { error: t } = await _.from("payment_transactions")
@@ -11202,28 +11239,40 @@ class Gt {
         pageSize: r,
         currentCustomerId: i = null,
         isAdmin: n = !1,
+        query: o = "",
+        type: a = "all",
+        customerFilterId: c = null,
       } = e,
-      o = Math.max(1, t),
-      a = Math.max(1, Math.min(100, r)),
-      c = (o - 1) * a,
-      u = c + a - 1;
-    let h = _.from("shipments")
+      u = Math.max(1, t),
+      h = Math.max(1, Math.min(100, r)),
+      p = (u - 1) * h,
+      y = p + h - 1;
+    let b = _.from("shipments")
       .select("*", { count: "exact" })
       .order("shipped_date", { ascending: !1 })
-      .range(c, u);
+      .range(p, y);
     if (!n) {
       if (!i) return { shipments: [], totalCount: 0 };
-      h = h.or(`customer_id.eq.${i},involved_customer_ids.cs.{${i}}`);
+      b = b.or(`customer_id.eq.${i},involved_customer_ids.cs.{${i}}`);
+    } else
+      c &&
+        c !== "all" &&
+        (b = b.or(`customer_id.eq.${c},involved_customer_ids.cs.{${c}}`));
+    a && a !== "all" && (b = b.eq("type", a));
+    const k = String(o || "").trim();
+    if (k) {
+      const I = k.replace(/[%_,]/g, "\\$&");
+      b = b.ilike("description", `%${I}%`);
     }
-    const { data: p, error: y, count: b } = await h;
-    if (y)
+    const { data: I, error: P, count: L } = await b;
+    if (P)
       throw (
-        console.error("Error fetching paginated shipments:", y),
+        console.error("Error fetching paginated shipments:", P),
         new Error("Failed to fetch paginated shipments")
       );
     return {
-      shipments: (p || []).map(this.transformDatabaseShipment),
-      totalCount: b || 0,
+      shipments: (I || []).map(this.transformDatabaseShipment),
+      totalCount: L || 0,
     };
   }
   async create(e) {
@@ -11803,6 +11852,19 @@ class Kt {
         new Error("Failed to fetch consolidations")
       );
     return (e || []).map(this.transformDatabaseConsolidation);
+  }
+  async getByCustomerId(e) {
+    if (!e) return [];
+    const { data: t, error: r } = await _.from("consolidations_with_orders")
+      .select("*")
+      .or(`customer_id.eq.${e},involved_customer_ids.cs.{${e}}`)
+      .order("creation_date", { ascending: !1 });
+    if (r)
+      throw (
+        console.error("Error fetching customer consolidations:", r),
+        new Error("Failed to fetch customer consolidations")
+      );
+    return (t || []).map(this.transformDatabaseConsolidation);
   }
   async create(e, t, r, i, n, o) {
     console.log("🏗️ CREATING CONSOLIDATION:", {
@@ -14144,8 +14206,19 @@ const hc = Qt.getInstance(),
       As = x.useCallback(async () => {
         b(!0);
         try {
-          const f = await uc.fetchAll();
-          p(f);
+          if (!(s != null && s.id)) {
+            p([]);
+            return;
+          }
+          const f = await uc.getById(s.id);
+          if (!f) {
+            p([]);
+            return;
+          }
+          if (f.role === "admin") {
+            const g = await uc.fetchAll();
+            p(g);
+          } else p([f]);
         } catch (f) {
           (console.error("Error fetching customers:", f),
             setCustomersError(
@@ -14154,58 +14227,30 @@ const hc = Qt.getInstance(),
         } finally {
           b(!1);
         }
-      }, []),
-      at = x.useCallback(async () => {
+      }, [s == null ? void 0 : s.id]),
+      at = x.useCallback(async (f = null) => {
         (oe(!0), ye(null));
         try {
-          const f = await He.fetchAllTransactions();
-          ue(f);
-        } catch (f) {
-          (console.error("Exception fetching payment transactions:", f),
+          const g = f
+            ? await He.getByCustomerId(f)
+            : await He.fetchAllTransactions();
+          ue(g);
+        } catch (g) {
+          (console.error("Exception fetching payment transactions:", g),
             ye(
-              f instanceof Error
-                ? f.message
+              g instanceof Error
+                ? g.message
                 : "Failed to fetch payment transactions",
             ));
         }
         oe(!1);
       }, []),
-      Ds = x.useCallback(async (f) => {
-        (oe(!0), ye(null));
-        try {
-          const { data: g, error: v } = await _.from("payment_transactions")
-            .select(
-              "id,customer_id,date,type,description,amount,related_order_id,related_consolidation_id,related_shipment_id",
-            )
-            .eq("customer_id", f)
-            .order("date", { ascending: !1 })
-            .limit(250);
-          if (v) throw v;
-          const w = (g || []).map((C) => ({
-            id: C.id,
-            customerId: C.customer_id,
-            date: C.date,
-            type: C.type,
-            description: C.description,
-            amount: C.amount,
-            relatedOrderId: C.related_order_id,
-            relatedConsolidationId: C.related_consolidation_id,
-            relatedShipmentId: C.related_shipment_id,
-          }));
-          ue(w);
-        } catch (g) {
-          (console.error(
-            "Exception fetching customer payment transactions:",
-            g,
-          ),
-            ye(
-              g instanceof Error
-                ? g.message
-                : "Failed to fetch customer payment transactions",
-            ));
-        }
-        oe(!1);
-      }, []);
+      Ds = x.useCallback(
+        async (f) => {
+          await at(f);
+        },
+        [at],
+      );
     x.useEffect(() => {
       s && As();
     }, [s, As]);
@@ -14371,14 +14416,37 @@ const hc = Qt.getInstance(),
           (console.error("Error during logout:", f), u(!1));
         }
       },
-      It = x.useCallback(async () => {
+      It = x.useCallback(async (f = null) => {
         (L(!0), O(null));
         try {
-          const f = await hc.fetchAll();
-          I(f);
-        } catch (f) {
-          (console.error("Error fetching suppliers:", f),
-            O(f instanceof Error ? f.message : "Failed to fetch suppliers"));
+          if (f) {
+            const g = await Rr.getByCustomerId(f),
+              v = [...new Set(g.map((w) => w.supplierId).filter(Boolean))];
+            if (v.length === 0) {
+              I([]);
+              return;
+            }
+            const { data: w, error: C } = await _.from("suppliers")
+              .select("*")
+              .in("id", v);
+            if (C) throw C;
+            I(
+              (w || []).map((M) => ({
+                id: M.id,
+                name: M.name,
+                companyLocation: M.company_location,
+                phoneNumber: M.phone_number,
+                contactPerson: M.contact_person,
+                rating: M.rating,
+              })),
+            );
+            return;
+          }
+          const g = await hc.fetchAll();
+          I(g);
+        } catch (g) {
+          (console.error("Error fetching suppliers:", g),
+            O(g instanceof Error ? g.message : "Failed to fetch suppliers"));
         } finally {
           L(!1);
         }
@@ -14439,14 +14507,14 @@ const hc = Qt.getInstance(),
           ? r("Delete Error", "Error deleting supplier: " + g.message)
           : I((v) => v.filter((w) => w.id !== f));
       },
-      tt = x.useCallback(async () => {
+      tt = x.useCallback(async (f = null) => {
         (te(!0), he(null));
         try {
-          const f = await Rr.fetchAll();
-          H(f);
-        } catch (f) {
-          (console.error("Error fetching orders:", f),
-            he(f instanceof Error ? f.message : "Failed to fetch orders"));
+          const g = f ? await Rr.getByCustomerId(f) : await Rr.fetchAll();
+          H(g);
+        } catch (g) {
+          (console.error("Error fetching orders:", g),
+            he(g instanceof Error ? g.message : "Failed to fetch orders"));
         } finally {
           te(!1);
         }
@@ -14942,13 +15010,13 @@ const hc = Qt.getInstance(),
           tr(null);
         }
       },
-      Ge = x.useCallback(async () => {
+      Ge = x.useCallback(async (f = null) => {
         try {
-          const f = await yt.fetchAll();
-          W(f);
-        } catch (f) {
-          (console.error("Error fetching shipments:", f),
-            r("Fetch Error", "Error fetching shipments: " + f));
+          const g = f ? await yt.getByCustomerId(f) : await yt.fetchAll();
+          W(g);
+        } catch (g) {
+          (console.error("Error fetching shipments:", g),
+            r("Fetch Error", "Error fetching shipments: " + g));
         }
       }, [r]),
       Mn = async (f, g, v, w, C, M, E) => {
@@ -15112,15 +15180,15 @@ const hc = Qt.getInstance(),
             tt());
         }
       },
-      Ke = x.useCallback(async () => {
+      Ke = x.useCallback(async (f = null) => {
         (Re(!0), Ee(null));
         try {
-          const f = await lr.fetchAll();
-          ge(f);
-        } catch (f) {
-          (console.error("Error fetching consolidations:", f),
+          const g = f ? await lr.getByCustomerId(f) : await lr.fetchAll();
+          ge(g);
+        } catch (g) {
+          (console.error("Error fetching consolidations:", g),
             Ee(
-              f instanceof Error ? f.message : "Failed to fetch consolidations",
+              g instanceof Error ? g.message : "Failed to fetch consolidations",
             ));
         } finally {
           Re(!1);
@@ -16162,9 +16230,10 @@ const hc = Qt.getInstance(),
               const C = Ds(f),
                 [M, E, D] = await Promise.all([
                   Rr.getByCustomerId(f),
-                  yt.fetchAll(),
+                  yt.getByCustomerId(f),
                   _.from("consolidations_with_orders")
                     .select("*")
+                    .or(`customer_id.eq.${f},involved_customer_ids.cs.{${f}}`)
                     .in("status", w)
                     .order("creation_date", { ascending: !1 }),
                 ]);
@@ -16208,10 +16277,13 @@ const hc = Qt.getInstance(),
         if (!f) return;
         (async () => {
           try {
-            (Fe === "dashboard"
-              ? (await Vs(s.id, g),
-                g && Promise.allSettled([tt(), It(), Ke(), Ge(), at()]))
-              : Fe === "orders"
+            if (Fe === "dashboard")
+              g
+                ? (await Vs(s.id, !0),
+                  await Promise.allSettled([tt(), It(), Ke(), Ge(), at()]))
+                : await Vs(s.id, !1);
+            else if (g)
+              Fe === "orders"
                 ? await Promise.all([tt(), It(), Ke(), Ge(), at()])
                 : Fe === "consolidations"
                   ? await Promise.all([Ke(), tt(), It(), Ge(), at()])
@@ -16222,8 +16294,44 @@ const hc = Qt.getInstance(),
                       : Fe === "payments"
                         ? await Promise.all([tt(), Ke(), at()])
                         : Fe === "shipments" &&
-                          (await Promise.all([Ge(), tt(), Ke()])),
-              Is((w) => ({ ...w, [Fe]: !0 })));
+                          (await Promise.all([Ge(), tt(), Ke()]));
+            else
+              Fe === "orders"
+                ? await Promise.all([
+                    tt(s.id),
+                    It(s.id),
+                    Ke(s.id),
+                    Ge(s.id),
+                    at(s.id),
+                  ])
+                : Fe === "consolidations"
+                  ? await Promise.all([
+                      Ke(s.id),
+                      tt(s.id),
+                      It(s.id),
+                      Ge(s.id),
+                      at(s.id),
+                    ])
+                  : Fe === "suppliers"
+                    ? await Promise.all([It(s.id), tt(s.id)])
+                    : Fe === "customers"
+                      ? await Promise.all([
+                          tt(s.id),
+                          It(s.id),
+                          Ge(s.id),
+                          Ke(s.id),
+                          at(s.id),
+                        ])
+                      : Fe === "payments"
+                        ? await Promise.all([tt(s.id), Ke(s.id), at(s.id)])
+                        : Fe === "shipments" &&
+                          (await Promise.all([
+                            Ge(s.id),
+                            tt(s.id),
+                            Ke(s.id),
+                            at(s.id),
+                          ]));
+            Is((w) => ({ ...w, [Fe]: !0 }));
           } catch (w) {
             console.error(`Error loading data for page "${Fe}":`, w);
           }

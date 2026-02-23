@@ -185,6 +185,8 @@ const V = 20,
               pageSize: V,
               customerId: l ? D || null : R,
               isAdmin: l,
+              searchTerm: $,
+              type: M,
             });
             (Be(r.transactions), Ae(r.totalCount), Ne(new Date()));
           } catch (r) {
@@ -195,9 +197,10 @@ const V = 20,
             oe(!1);
           }
         })();
-      }, [b, l, R, D, et, S, H, de, J]));
+      }, [b, l, R, D, et, S, H, de, J, $, M]));
     const T = (t) => t.replace(/([A-Z])/g, " $1").trim(),
       F = i.useMemo(() => {
+        if (!(l && S === "entity")) return ae;
         const t = $.trim().toLowerCase();
         return ae.filter((r) =>
           M !== "all" && r.type !== M
@@ -208,7 +211,7 @@ const V = 20,
                   .includes(t)
               : !0,
         );
-      }, [ae, $, M]),
+      }, [ae, $, M, l, S]),
       s = i.useMemo(
         () =>
           F.length === 0
@@ -602,7 +605,9 @@ const V = 20,
                           children: [
                             e.jsx("input", {
                               value: $,
-                              onChange: (t) => w(t.target.value),
+                              onChange: (t) => {
+                                (w(t.target.value), f(1));
+                              },
                               className: "ui-field ui-field--sm pl-10 pr-3",
                               placeholder: "Search description, type...",
                             }),
@@ -694,7 +699,9 @@ const V = 20,
                             : e.jsx("div", { className: "hidden sm:block" }),
                           e.jsxs("select", {
                             value: M,
-                            onChange: (t) => ue(t.target.value),
+                            onChange: (t) => {
+                              (ue(t.target.value), f(1));
+                            },
                             className:
                               "px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800",
                             title: "Filter by type",
@@ -717,6 +724,7 @@ const V = 20,
                             onClick: () => {
                               (w(""),
                                 ue("all"),
+                                f(1),
                                 l && (P(""), ce(""), We("order")));
                             },
                             className:

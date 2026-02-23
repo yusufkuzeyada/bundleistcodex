@@ -96,17 +96,7 @@ const F = 20,
         } catch {}
       }, []));
     const U = Q,
-      m = U.filter((t) => {
-        const a =
-            !S.trim() ||
-            t.description.toLowerCase().includes(S.trim().toLowerCase()),
-          l = I === "all" || t.type === I,
-          i =
-            !u || !b || b === "all" || t.customerId === b
-              ? !0
-              : (t.involvedCustomerIds || []).includes(b);
-        return a && l && i;
-      }),
+      m = U,
       w = Math.max(1, Math.ceil(G / F)),
       be = D && m.length === 0,
       Ne = m.filter(
@@ -234,25 +224,44 @@ const F = 20,
         return a.length > 2
           ? `${a.slice(0, 2).join(", ")} & ${a.length - 2} more`
           : a.join(", ");
+      },
+      shipmentPrimaryLabel = (t) => `Shipment ${f(t.id, "shipment")}`,
+      shipmentSecondaryLabel = (t) => {
+        const a = C(t),
+          l = T(t);
+        return a
+          ? `Consolidation ${f(a.id, "consolidation")}`
+          : l
+            ? `Order ${f(l.id, "order")}`
+            : t.description || "";
       };
     function C(t) {
       if (t.type !== "consolidation") return null;
-      const a = W.find((l) => l.id === t.relatedId);
-      return a ? { name: a.name, id: a.id } : null;
+      const a = t.relatedId || t.consolidationId;
+      if (!a) return null;
+      const l = W.find((i) => i.id === a);
+      return l
+        ? { name: l.name, id: l.id }
+        : { name: f(a, "consolidation"), id: a };
     }
     function T(t) {
       if (t.type !== "individual") return null;
-      const a = J.find((l) => l.id === t.relatedId);
-      return a ? { description: a.description, id: a.id } : null;
+      const a = t.relatedId || t.orderId;
+      if (!a) return null;
+      const l = J.find((i) => i.id === a);
+      return l
+        ? { description: l.description, id: l.id }
+        : { description: f(a, "order"), id: a };
     }
     const N = (t) => {
         var i;
         if (t.type !== "consolidation") return [];
-        const a = W.find((c) => c.id === t.relatedId);
-        if (!((i = a == null ? void 0 : a.orderIds) != null && i.length))
+        const a = t.relatedId || t.consolidationId,
+          l = W.find((c) => c.id === a);
+        if (!((i = l == null ? void 0 : l.orderIds) != null && i.length))
           return [];
-        const l = new Map(J.map((c) => [c.id, c]));
-        return a.orderIds.map((c) => l.get(c)).filter(Boolean);
+        const c = new Map(J.map((_) => [_.id, _]));
+        return l.orderIds.map((_) => c.get(_)).filter(Boolean);
       },
       De = r.useMemo(() => {
         if (!s) return [];
@@ -279,6 +288,8 @@ const F = 20,
         s == null ? void 0 : s.id,
         s == null ? void 0 : s.type,
         s == null ? void 0 : s.relatedId,
+        s == null ? void 0 : s.consolidationId,
+        s == null ? void 0 : s.orderId,
         o,
       ]),
       B = r.useMemo(() => {
@@ -355,6 +366,8 @@ const F = 20,
         s == null ? void 0 : s.id,
         s == null ? void 0 : s.type,
         s == null ? void 0 : s.relatedId,
+        s == null ? void 0 : s.consolidationId,
+        s == null ? void 0 : s.orderId,
         s == null ? void 0 : s.status,
         s == null ? void 0 : s.carrier,
         s == null ? void 0 : s.estimatedDelivery,
@@ -381,7 +394,7 @@ const F = 20,
     return (
       r.useEffect(() => {
         g(1);
-      }, [R, u]),
+      }, [R, u, S, I, b]),
       r.useEffect(() => {
         if (!n || v.length === 0) return;
         const a = [...v]
@@ -405,6 +418,9 @@ const F = 20,
                 pageSize: F,
                 currentCustomerId: R,
                 isAdmin: u,
+                query: S,
+                type: I,
+                customerFilterId: u ? b : null,
               }),
               l = a.totalCount ?? 0,
               i = Math.max(1, Math.ceil(l / F));
@@ -421,7 +437,7 @@ const F = 20,
             le(!1);
           }
         })();
-      }, [p, R, u]),
+      }, [p, R, u, S, I, b]),
       r.useEffect(() => {
         if (!v || v.length === 0 || Q.length === 0) return;
         const t = new Map(v.map((a) => [a.id, a]));
@@ -721,7 +737,8 @@ const F = 20,
                                                   : P[t.status],
                                               l =
                                                 (s == null ? void 0 : s.id) ===
-                                                t.id;
+                                                t.id,
+                                              i = shipmentSecondaryLabel(t);
                                             return e.jsx(
                                               "button",
                                               {
@@ -779,12 +796,20 @@ const F = 20,
                                                           className:
                                                             "font-semibold text-slate-900 break-words",
                                                           children:
-                                                            t.description,
+                                                            shipmentPrimaryLabel(
+                                                              t,
+                                                            ),
                                                         }),
                                                         e.jsxs("div", {
                                                           className:
                                                             "mt-1 text-xs text-slate-600 flex flex-wrap gap-x-3 gap-y-1",
                                                           children: [
+                                                            i &&
+                                                              e.jsx("span", {
+                                                                className:
+                                                                  "text-slate-700",
+                                                                children: i,
+                                                              }),
                                                             e.jsx("span", {
                                                               children:
                                                                 new Date(
@@ -887,7 +912,18 @@ const F = 20,
                                                       e.jsx("div", {
                                                         className:
                                                           "text-lg font-extrabold tracking-tight text-slate-900 break-words",
-                                                        children: s.description,
+                                                        children:
+                                                          shipmentPrimaryLabel(
+                                                            s,
+                                                          ),
+                                                      }),
+                                                      e.jsx("div", {
+                                                        className:
+                                                          "mt-1 text-sm text-slate-600",
+                                                        children:
+                                                          shipmentSecondaryLabel(
+                                                            s,
+                                                          ),
                                                       }),
                                                       e.jsxs("div", {
                                                         className:
@@ -1467,8 +1503,16 @@ const F = 20,
                                             e.jsx("h3", {
                                               className:
                                                 "text-sm font-medium text-gray-900 leading-5",
-                                              children: t.description,
+                                              children:
+                                                shipmentPrimaryLabel(t),
                                             }),
+                                            shipmentSecondaryLabel(t) &&
+                                              e.jsx("div", {
+                                                className:
+                                                  "mt-1 text-xs text-gray-600",
+                                                children:
+                                                  shipmentSecondaryLabel(t),
+                                              }),
                                             t.type === "consolidation" &&
                                               e.jsxs("div", {
                                                 className:
@@ -1746,7 +1790,7 @@ const F = 20,
                           className: "text-sm text-gray-600 mb-2",
                           children: e.jsx("span", {
                             className: "font-medium",
-                            children: x.description,
+                            children: shipmentPrimaryLabel(x),
                           }),
                         }),
                         e.jsxs("p", {
