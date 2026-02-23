@@ -705,7 +705,11 @@ const ht = ({
               ),
           ),
         s = (n) =>
-          M.some((v) => v.type === "consolidation" && v.relatedId === n),
+          M.some(
+            (v) =>
+              v.type === "consolidation" &&
+              (v.relatedId === n || v.consolidationId === n),
+          ),
         c = l
           .filter((n) => n.status === k.ReadyToShip && !s(n.id))
           .sort((n, v) => _(n.departureDate) - _(v.departureDate)),
@@ -1045,6 +1049,13 @@ const ht = ({
         if (x.length === 0) continue;
         const o = x.reduce((p, B) => p + Math.abs(Number(B.amount || 0)), 0),
           n = Number(s.shippingCost || 0) > 0 ? Number(s.shippingCost || 0) : o,
+          v = String(s.costDistributionMethod || "volume_proportional"),
+          w =
+            v === "fixed_rate_m3"
+              ? Number(s.totalBilledAmount || 0) > 0
+                ? Number(s.totalBilledAmount || 0)
+                : o
+              : n,
           ae = (s.orderIds || [])
             .map((p) => r.get(p))
             .filter(Boolean)
@@ -1064,7 +1075,7 @@ const ht = ({
         }
         let q = 0;
         for (const [p, B] of Y) {
-          const Ge = n * (B / ce),
+          const Ge = w * (B / ce),
             Je = xe.get(p) || 0;
           q = Math.max(q, Math.abs(Je - Ge));
         }
@@ -1197,11 +1208,11 @@ const ht = ({
             o = c.dueInDays ?? 999;
           return x !== o ? x - o : s.title.localeCompare(c.title);
         }),
-        t.slice(0, 24)
+        t
       );
     }, [F, N, w, T, O, z, I, G]),
     ee = j.useMemo(
-      () => (f === "all" ? E : E.filter((t) => t.category === f)),
+      () => (f === "all" ? E : E.filter((t) => t.category === f)).slice(0, 24),
       [E, f],
     ),
     D = j.useMemo(() => (b ? O.filter((t) => t.customerId === b) : []), [O, b]),

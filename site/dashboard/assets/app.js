@@ -10954,7 +10954,9 @@ class zt {
     const b = String(o || "").trim();
     if (b) {
       const k = b.replace(/[%_,]/g, "\\$&"),
-        I = [`description.ilike.%${k}%`, `type.ilike.%${k}%`];
+        I = [`description.ilike.%${k}%`];
+      for (const P of Object.values(ee))
+        P.toLowerCase().includes(b.toLowerCase()) && I.push(`type.eq.${P}`);
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         b,
       ) &&
@@ -11520,14 +11522,16 @@ class Gt {
     });
   }
   async existsForRelatedId(e, t) {
-    const { data: r, error: i } = await _.from("shipments")
-      .select("id")
-      .eq("related_id", e)
-      .eq("type", t)
-      .limit(1);
-    return i
-      ? (console.error("Error checking shipment existence:", i), !1)
-      : (r || []).length > 0;
+    let r = _.from("shipments").select("id").eq("type", t).limit(1);
+    t === "consolidation"
+      ? (r = r.or(`related_id.eq.${e},consolidation_id.eq.${e}`))
+      : t === "individual"
+        ? (r = r.or(`related_id.eq.${e},order_id.eq.${e}`))
+        : (r = r.eq("related_id", e));
+    const { data: i, error: n } = await r;
+    return n
+      ? (console.error("Error checking shipment existence:", n), !1)
+      : (i || []).length > 0;
   }
   async getStatistics() {
     const [e, t, r, i, n] = await Promise.all([
@@ -12067,24 +12071,32 @@ class Kt {
           .single(),
         I = k == null ? void 0 : k.id,
         P = `Shipping cost updated from $${n || 0} to $${t}`;
-      (r.isMixed
-        ? await He.distributeShippingCost(e, t, r, i, I, !0, P)
-        : r.customerId &&
-          t > 0 &&
-          (await He.createTransaction(
-            {
-              customerId: r.customerId,
-              type: "ShippingCost",
-              description: `Shipping cost for consolidation: ${Se(r.id, "consolidation")}`,
-              amount: -Math.abs(t),
-              relatedConsolidationId: e,
-              relatedShipmentId: I,
-              idempotencyKey: `shipping-charge:shipment:${I || "none"}:single_customer:${r.customerId}:adjustment:${Math.abs(t).toFixed(2)}`,
-            },
-            !0,
-            P,
-          )),
-        await this.update(e, { shippingCostDistributed: !0 }),
+      let L = !1;
+      const G =
+        r.customerId ||
+        ((r.involvedCustomerIds || []).filter(Boolean).length === 1
+          ? (r.involvedCustomerIds || []).filter(Boolean)[0]
+          : null);
+      (t > 0 &&
+        (r.isMixed
+          ? (await He.distributeShippingCost(e, t, r, i, I, !0, P),
+            (L = !0))
+          : G &&
+            (await He.createTransaction(
+              {
+                customerId: G,
+                type: "ShippingCost",
+                description: `Shipping cost for consolidation: ${Se(r.id, "consolidation")}`,
+                amount: -Math.abs(t),
+                relatedConsolidationId: e,
+                relatedShipmentId: I,
+                idempotencyKey: `shipping-charge:shipment:${I || "none"}:single_customer:${G}:adjustment:${Math.abs(t).toFixed(2)}`,
+              },
+              !0,
+              P,
+            ),
+            (L = !0))),
+        L && (await this.update(e, { shippingCostDistributed: !0 })),
         await $e.logCostRedistribution(e, n || 0, t, new Map(), new Map()));
     } catch (y) {
       throw (
@@ -12298,25 +12310,28 @@ class Kt {
       );
     const Re = (ge == null ? void 0 : ge.shipping_cost_distributed) === !0;
     try {
+      let ue = Re;
       (t > 0 &&
         !Re &&
-        (c.isMixed
-          ? await He.distributeShippingCost(e, t, c, u, ce.id, I, P)
-          : c.customerId &&
+        (O
+          ? (await He.distributeShippingCost(e, t, c, u, ce.id, I, P),
+            (ue = !0))
+          : G &&
             (await He.createTransaction(
               {
-                customerId: c.customerId,
+                customerId: G,
                 type: "ShippingCost",
                 description: `Shipping cost for consolidation: ${Se(c.id, "consolidation")}`,
                 amount: -Math.abs(t),
                 relatedConsolidationId: e,
                 relatedShipmentId: ce.id,
-                idempotencyKey: `shipping-charge:shipment:${ce.id}:single_customer:${c.customerId}:initial:${Math.abs(t).toFixed(2)}`,
+                idempotencyKey: `shipping-charge:shipment:${ce.id}:single_customer:${G}:initial:${Math.abs(t).toFixed(2)}`,
               },
               I,
               P,
-            ))),
-        Re || (await this.update(e, { shippingCostDistributed: !0 })));
+            ),
+            (ue = !0))),
+        !Re && ue && (await this.update(e, { shippingCostDistributed: !0 })));
     } catch (R) {
       if (he) {
         const { error: ue } = await _.from("payment_transactions")
@@ -14780,18 +14795,23 @@ const hc = Qt.getInstance(),
           return;
         }
         try {
+          const B =
+              $.contractType === qe.Trial && $.hasUsedTrialFee
+                ? qe.Growth
+                : $.contractType,
+            Q =
+              {
+                [qe.Trial]: "Trial",
+                [qe.Growth]: "Growth",
+                [qe.Corporate]: "Corporate",
+              }[B] || "Standard",
+            j =
+              $.contractType === qe.Trial
+                ? $.hasUsedTrialFee
+                  ? { contractType: qe.Growth }
+                  : { hasUsedTrialFee: !0, contractType: qe.Growth }
+                : null;
           if (
-            ($.contractType === qe.Trial &&
-              $.hasUsedTrialFee &&
-              (await Vr(g.customerId, { contractType: qe.Growth }),
-              p((j) =>
-                j.map((de) =>
-                  de.id === g.customerId
-                    ? { ...de, contractType: qe.Growth }
-                    : de,
-                ),
-              ),
-              ($.contractType = qe.Growth)),
             !(await Sr({
               customerId: g.customerId,
               amount: -Math.abs(g.value),
@@ -14799,44 +14819,61 @@ const hc = Qt.getInstance(),
               type: ee.OrderCost,
               relatedOrderId: g.id,
               idempotencyKey: `order-charge:${g.id}:order-cost`,
-            })))
+            }))
           )
             throw new Error("Failed to persist order cost transaction");
-          const B = Yi[$.contractType];
-          let Q = 0;
+          let de = Number(Ut.calculateServiceFee(g.value, B) || 0);
+          (Number.isFinite(de) || (de = 0), (de = Math.max(0, de)));
           if (
-            (B.oneTimeFee && !$.hasUsedTrialFee && $.contractType === qe.Trial
-              ? ((Q = B.oneTimeFee),
-                await Vr(g.customerId, {
-                  hasUsedTrialFee: !0,
-                  contractType: qe.Growth,
-                }),
-                ($.hasUsedTrialFee = !0),
-                ($.contractType = qe.Growth))
-              : B.percentageFee && (Q = g.value * B.percentageFee),
-            Q > 0 &&
+            de > 0 &&
               !(await Sr({
                 customerId: g.customerId,
-                amount: -Math.abs(Q),
-                description: `Service fee for order ${Se(g.id, "order")} (${B.name} contract)`,
+                amount: -Math.abs(de),
+                description: `Service fee for order ${Se(g.id, "order")} (${Q} contract)`,
                 type: ee.ServiceFee,
                 relatedOrderId: g.id,
                 idempotencyKey: `order-charge:${g.id}:service-fee`,
-              })))
+              }))
           )
-            throw new Error("Failed to persist service fee transaction");
+            if (
+              !(await Sr({
+                customerId: g.customerId,
+                amount: Math.abs(g.value),
+                description: `Order cost rollback after failed service fee for order ${Se(g.id, "order")}`,
+                type: ee.OrderCostReversal,
+                relatedOrderId: g.id,
+                idempotencyKey: `order-charge:${g.id}:order-cost-rollback-service-fee`,
+              }))
+            )
+              throw new Error(
+                "Failed to persist service fee transaction and failed to rollback order cost. Manual review required.",
+              );
+            else
+              throw new Error(
+                "Failed to persist service fee transaction. Order cost was rolled back automatically.",
+              );
+          j &&
+            (await Vr(g.customerId, j),
+            p((se) =>
+              se.map((Y) =>
+                Y.id === g.customerId ? { ...Y, ...j } : Y,
+              ),
+            ),
+            j.contractType !== void 0 && ($.contractType = j.contractType),
+            j.hasUsedTrialFee !== void 0 &&
+              ($.hasUsedTrialFee = j.hasUsedTrialFee));
           try {
             await We(f, { chargesApplied: !0 });
-          } catch (j) {
-            if (j instanceof Error && j.message.includes("charges_applied"))
+          } catch (se) {
+            if (se instanceof Error && se.message.includes("charges_applied"))
               console.log(
                 "[DEBUG] chargesApplied column not yet added to database - using transaction-based duplicate detection",
               );
-            else throw j;
+            else throw se;
           }
           (await ie.createNotification({
             userId: g.customerId,
-            message: `Order "${g.description}" has been confirmed. Order cost: $${g.value.toFixed(2)}${Q > 0 ? `, Service fee: $${Q.toFixed(2)}` : ""}`,
+            message: `Order "${g.description}" has been confirmed. Order cost: $${g.value.toFixed(2)}${de > 0 ? `, Service fee: $${de.toFixed(2)}` : ""}`,
             linkToPage: "orders",
             linkToId: g.id,
             importance: K.High,
@@ -15996,8 +16033,13 @@ const hc = Qt.getInstance(),
                         "id,description,value,supplier_id,volume_m3,weight_kg,customer_id,status,notes,creation_date",
                       )
                       .order("creation_date", { ascending: !1 })
-                      .limit(20)
-                      .in("status", [d.Pending, d.Processing]);
+                      .limit(5e3)
+                      .in("status", [
+                        d.Pending,
+                        d.Processing,
+                        d.QualityCheck,
+                        d.ReadyToShip,
+                      ]);
                   })(),
                   _.from("consolidations_with_orders")
                     .select(
@@ -16005,13 +16047,13 @@ const hc = Qt.getInstance(),
                     )
                     .in("status", w)
                     .order("creation_date", { ascending: !1 })
-                    .limit(12),
+                    .limit(5e3),
                   _.from("shipments")
                     .select(
                       "id,type,related_id,shipped_date,carrier,tracking_url,estimated_delivery,actual_delivery,description,status,customer_id,involved_customer_ids,is_mixed,origin,destination,order_id,consolidation_id",
                     )
                     .order("shipped_date", { ascending: !1 })
-                    .limit(20),
+                    .limit(5e3),
                 ]);
               (E.error &&
                 console.error(
@@ -16119,7 +16161,7 @@ const hc = Qt.getInstance(),
                         .select("id")
                         .eq("status", m.ReadyToShip),
                       _.from("shipments")
-                        .select("related_id")
+                        .select("related_id,consolidation_id")
                         .eq("type", "consolidation"),
                       _.from("payment_transactions").select(
                         "customer_id,amount",
@@ -16127,7 +16169,9 @@ const hc = Qt.getInstance(),
                     ]),
                   Tr = new Set((Ae.data || []).map((it) => it.id)),
                   lt = new Set(
-                    (Ve.data || []).map((it) => it.related_id).filter(Boolean),
+                    (Ve.data || [])
+                      .map((it) => it.related_id || it.consolidation_id)
+                      .filter(Boolean),
                   );
                 let ct = 0;
                 for (const it of Tr) lt.has(it) || (ct += 1);
