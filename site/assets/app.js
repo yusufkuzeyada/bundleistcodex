@@ -5148,23 +5148,30 @@ const Ge = "bundleist_language_mode",
           }
           c(!0);
           try {
-            const { error: o } = await q
-              .from("newsletter_subscribers")
-              .insert([{ email: r }]);
-            if (o) {
-              if (
-                o.message.includes(
-                  "duplicate key value violates unique constraint",
-                ) ||
-                o.message.includes("newsletter_subscribers_email_key")
-              ) {
+            const o = await fetch("/.netlify/functions/newsletter-subscribe", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: r }),
+            });
+            let p = null;
+            try {
+              p = await o.json();
+            } catch {}
+            if (!o.ok) {
+              if ((p == null ? void 0 : p.code) === "already_subscribed") {
                 d(e("emailAlreadySubscribed"));
+                return;
+              }
+              if ((p == null ? void 0 : p.code) === "invalid_email") {
+                d(e("invalidEmailAddress"));
                 return;
               }
               d(e("genericTryAgain"));
               return;
             }
             (n(!0), a(""));
+          } catch {
+            d(e("genericTryAgain"));
           } finally {
             c(!1);
           }

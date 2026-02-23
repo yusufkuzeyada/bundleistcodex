@@ -6,3 +6,6 @@ npm-debug.log*
 *.log
 *.zip
 .dev-server.log
+
+# Local Netlify folder
+.netlify

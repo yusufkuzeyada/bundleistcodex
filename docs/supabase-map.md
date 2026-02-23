@@ -1,6 +1,6 @@
 # Supabase Map
 
-Generated (UTC): 2026-02-23T08:17:00.511Z
+Generated (UTC): 2026-02-23T10:08:47.936Z
 
 ## Project
 - Project: `fbpemdlnlsgqkovnatro` (v4newsupa) | Region: `eu-north-1` | Status: `ACTIVE_HEALTHY`
@@ -8,16 +8,16 @@ Generated (UTC): 2026-02-23T08:17:00.511Z
 - Created at: 2025-07-13T13:41:39.418238Z
 
 ## Folder Snapshot
-- Top level: file: `.dev-server.log`, file: `.env`, file: `.env.codex.supabase.txt`, file: `.env.example`, file: `.gitignore`, dir: `docs`, dir: `node_modules`, file: `package-lock.json`, file: `package.json`, file: `README.md`, dir: `scripts`, dir: `site`
+- Top level: file: `.dev-server.log`, file: `.env`, file: `.env.codex.supabase.txt`, file: `.env.example`, file: `.gitignore`, dir: `.netlify`, dir: `docs`, dir: `netlify`, file: `netlify.toml`, dir: `node_modules`, file: `package-lock.json`, file: `package.json`, file: `README.md`, dir: `scripts`, dir: `site`
 - Files under `site/`: 40
-- Largest JS bundles: `site/dashboard/assets/app.js` (563622 bytes), `site/dashboard/assets/consolidationspage.js` (316834 bytes), `site/assets/react.js` (265456 bytes), `site/dashboard/assets/react.js` (256431 bytes), `site/assets/app.js` (255639 bytes)
+- Largest JS bundles: `site/dashboard/assets/app.js` (563622 bytes), `site/dashboard/assets/consolidationspage.js` (316834 bytes), `site/assets/react.js` (265456 bytes), `site/dashboard/assets/react.js` (256431 bytes), `site/assets/app.js` (255913 bytes)
 
 ## Schema Summary
 | Schema | Object Type | Count |
 | --- | --- | --- |
 | `auth` | BASE TABLE | 20 |
 | `extensions` | VIEW | 2 |
-| `public` | BASE TABLE | 12 |
+| `public` | BASE TABLE | 11 |
 | `public` | VIEW | 1 |
 | `realtime` | BASE TABLE | 3 |
 | `storage` | BASE TABLE | 8 |
@@ -33,14 +33,6 @@ Generated (UTC): 2026-02-23T08:17:00.511Z
 - RLS policies: `blog_posts_admin_delete`, `blog_posts_admin_insert`, `blog_posts_admin_select_all`, `blog_posts_admin_update`, `blog_posts_public_select_published`
 - Triggers: none
 - Frontend usage: surfaces=site | ops=delete:1, insert:2, select:7, update:1 | files=`site/assets/app.js`, `site/assets/blogadmin.js`, `site/assets/bloglist.js`, `site/assets/blogpost.js`
-
-### client_error_events
-- Columns (14): `id:uuid`, `reported_at:timestamptz`, `correlation_id:text`, `area:text`, `message:text`, `error_name:text`, `error_stack:text`, `url:text`, `user_agent:text`, `app_release:text`, `tags:jsonb`, `extra:jsonb`, `source:text`, `auth_user_id:uuid`
-- Primary key: `id`
-- Foreign keys: none
-- RLS policies: `client_error_events_admin_select`, `client_error_events_insert_public`
-- Triggers: none
-- Frontend usage: none detected in local bundle.
 
 ### consolidation_orders
 - Columns (2): `consolidation_id:uuid`, `order_id:uuid`
@@ -80,7 +72,7 @@ Generated (UTC): 2026-02-23T08:17:00.511Z
 - Foreign keys: none
 - RLS policies: `newsletter_subscribers_admin_delete`, `newsletter_subscribers_admin_select`, `newsletter_subscribers_insert_public`
 - Triggers: none
-- Frontend usage: surfaces=site | ops=insert:1 | files=`site/assets/app.js`
+- Frontend usage: none detected in local bundle.
 
 ### notifications
 - Columns (13): `id:uuid`, `message:text`, `timestamp:timestamptz`, `user_id:uuid`, `is_read:bool`, `link_to_page:text`, `link_to_id:uuid`, `importance:text`, `metadata:jsonb`, `event_type:text`, `related_entity_type:text`, `related_entity_id:text`, `target_audience:text`
@@ -136,10 +128,7 @@ Generated (UTC): 2026-02-23T08:17:00.511Z
 ## Public Functions
 | Function | Args | Returns | Language | Security Definer |
 | --- | --- | --- | --- | --- |
-| `admin_client_error_area_breakdown` | `window_days integer, max_items integer` | `TABLE(area_label text, total_events bigint, last_24h bigint, last_seen timestamp with time zone)` | `plpgsql` | no |
-| `admin_client_error_trends` | `window_days integer, max_releases integer` | `TABLE(release_label text, total_events bigint, last_24h bigint, last_seen timestamp with time zone, daily_counts integer[])` | `plpgsql` | no |
 | `admin_dashboard_metrics` | `window_days integer, balance_threshold numeric` | `TABLE(total_suppliers bigint, total_orders bigint, total_shipments bigint, total_active_consolidations bigint, pending_orders bigint, in_progress_orders bigint, ready_orders bigint, departing_soon bigint, capacity_risk bigint, missing_tracking bigint, missing_shipment bigint, negative_balances bigint)` | `plpgsql` | no |
-| `admin_recent_client_errors` | `limit_rows integer` | `TABLE(reported_at timestamp with time zone, correlation_id text, area text, app_release text, message text)` | `plpgsql` | no |
 | `calculate_cost_variance` | `` | `trigger` | `plpgsql` | no |
 | `check_duplicate_payment_transaction` | `p_customer_id uuid, p_related_consolidation_id uuid, p_type transaction_type, p_amount numeric, p_description text` | `boolean` | `plpgsql` | no |
 | `check_notification_exists` | `p_user_id uuid, p_event_type text, p_related_entity_type text, p_related_entity_id text, p_hours_back integer` | `boolean` | `plpgsql` | no |
@@ -148,7 +137,6 @@ Generated (UTC): 2026-02-23T08:17:00.511Z
 | `create_customer_on_signup` | `` | `trigger` | `plpgsql` | yes |
 | `enforce_shipment_write_guards` | `` | `trigger` | `plpgsql` | no |
 | `is_admin` | `` | `boolean` | `sql` | yes |
-| `purge_old_client_error_events` | `retention_days integer` | `bigint` | `plpgsql` | yes |
 | `update_updated_at_column` | `` | `trigger` | `plpgsql` | no |
 
 ## Application Triggers

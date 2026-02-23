@@ -40,9 +40,9 @@ This map is based on `docs/supabase-map.json` and current bundle files under `si
 
 ## DB Automation and Backend Logic
 - Public SQL functions include:
-  - Metrics and error reporting: `admin_dashboard_metrics`, `admin_client_error_trends`, `admin_client_error_area_breakdown`, `admin_recent_client_errors`
+  - Metrics: `admin_dashboard_metrics`
   - Shipment/consolidation helpers: `create_consolidation_shipment_core`, `calculate_cost_variance`, `enforce_shipment_write_guards`
-  - Operational cleanup: `cleanup_old_notifications`, `purge_old_client_error_events`
+  - Operational cleanup: `cleanup_old_notifications`
   - Auth helper: `is_admin`, `create_customer_on_signup`
 - Application triggers include:
   - `auth.users` -> `public.create_customer_on_signup`

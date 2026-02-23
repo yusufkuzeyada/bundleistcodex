@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-02-23T08:17:00.511Z",
+  "generated_at_utc": "2026-02-23T10:08:47.936Z",
   "project": {
     "id": "fbpemdlnlsgqkovnatro",
     "ref": "fbpemdlnlsgqkovnatro",
@@ -45,7 +45,7 @@
       {
         "table_schema": "public",
         "table_type": "BASE TABLE",
-        "count": 12
+        "count": 11
       },
       {
         "table_schema": "public",
@@ -81,10 +81,6 @@
     "public_objects": [
       {
         "table_name": "blog_posts",
-        "table_type": "BASE TABLE"
-      },
-      {
-        "table_name": "client_error_events",
         "table_type": "BASE TABLE"
       },
       {
@@ -303,132 +299,6 @@
         "udt_name": "text",
         "is_nullable": "YES",
         "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 1,
-        "column_name": "id",
-        "data_type": "uuid",
-        "udt_name": "uuid",
-        "is_nullable": "NO",
-        "column_default": "gen_random_uuid()"
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 2,
-        "column_name": "reported_at",
-        "data_type": "timestamp with time zone",
-        "udt_name": "timestamptz",
-        "is_nullable": "NO",
-        "column_default": "now()"
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 3,
-        "column_name": "correlation_id",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "NO",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 4,
-        "column_name": "area",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "NO",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 5,
-        "column_name": "message",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "NO",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 6,
-        "column_name": "error_name",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "YES",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 7,
-        "column_name": "error_stack",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "YES",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 8,
-        "column_name": "url",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "YES",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 9,
-        "column_name": "user_agent",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "YES",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 10,
-        "column_name": "app_release",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "YES",
-        "column_default": null
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 11,
-        "column_name": "tags",
-        "data_type": "jsonb",
-        "udt_name": "jsonb",
-        "is_nullable": "NO",
-        "column_default": "'{}'::jsonb"
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 12,
-        "column_name": "extra",
-        "data_type": "jsonb",
-        "udt_name": "jsonb",
-        "is_nullable": "NO",
-        "column_default": "'{}'::jsonb"
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 13,
-        "column_name": "source",
-        "data_type": "text",
-        "udt_name": "text",
-        "is_nullable": "NO",
-        "column_default": "'frontend_web'::text"
-      },
-      {
-        "table_name": "client_error_events",
-        "ordinal_position": 14,
-        "column_name": "auth_user_id",
-        "data_type": "uuid",
-        "udt_name": "uuid",
-        "is_nullable": "YES",
-        "column_default": "auth.uid()"
       },
       {
         "table_name": "consolidation_orders",
@@ -1652,11 +1522,6 @@
         "columns": "id"
       },
       {
-        "table_name": "client_error_events",
-        "constraint_name": "client_error_events_pkey",
-        "columns": "id"
-      },
-      {
         "table_name": "consolidation_orders",
         "constraint_name": "consolidation_orders_pkey",
         "columns": "consolidation_id, order_id"
@@ -1836,26 +1701,6 @@
         "table_name": "blog_posts",
         "index_name": "idx_blog_posts_author_id",
         "index_definition": "CREATE INDEX idx_blog_posts_author_id ON public.blog_posts USING btree (author_id)"
-      },
-      {
-        "table_name": "client_error_events",
-        "index_name": "client_error_events_correlation_id_key",
-        "index_definition": "CREATE UNIQUE INDEX client_error_events_correlation_id_key ON public.client_error_events USING btree (correlation_id)"
-      },
-      {
-        "table_name": "client_error_events",
-        "index_name": "client_error_events_pkey",
-        "index_definition": "CREATE UNIQUE INDEX client_error_events_pkey ON public.client_error_events USING btree (id)"
-      },
-      {
-        "table_name": "client_error_events",
-        "index_name": "client_error_events_release_reported_at_idx",
-        "index_definition": "CREATE INDEX client_error_events_release_reported_at_idx ON public.client_error_events USING btree (app_release, reported_at DESC)"
-      },
-      {
-        "table_name": "client_error_events",
-        "index_name": "client_error_events_reported_at_idx",
-        "index_definition": "CREATE INDEX client_error_events_reported_at_idx ON public.client_error_events USING btree (reported_at DESC)"
       },
       {
         "table_name": "consolidation_orders",
@@ -2180,30 +2025,9 @@
     ],
     "public_functions": [
       {
-        "function_name": "admin_client_error_area_breakdown",
-        "args": "window_days integer, max_items integer",
-        "return_type": "TABLE(area_label text, total_events bigint, last_24h bigint, last_seen timestamp with time zone)",
-        "language": "plpgsql",
-        "security_definer": false
-      },
-      {
-        "function_name": "admin_client_error_trends",
-        "args": "window_days integer, max_releases integer",
-        "return_type": "TABLE(release_label text, total_events bigint, last_24h bigint, last_seen timestamp with time zone, daily_counts integer[])",
-        "language": "plpgsql",
-        "security_definer": false
-      },
-      {
         "function_name": "admin_dashboard_metrics",
         "args": "window_days integer, balance_threshold numeric",
         "return_type": "TABLE(total_suppliers bigint, total_orders bigint, total_shipments bigint, total_active_consolidations bigint, pending_orders bigint, in_progress_orders bigint, ready_orders bigint, departing_soon bigint, capacity_risk bigint, missing_tracking bigint, missing_shipment bigint, negative_balances bigint)",
-        "language": "plpgsql",
-        "security_definer": false
-      },
-      {
-        "function_name": "admin_recent_client_errors",
-        "args": "limit_rows integer",
-        "return_type": "TABLE(reported_at timestamp with time zone, correlation_id text, area text, app_release text, message text)",
         "language": "plpgsql",
         "security_definer": false
       },
@@ -2261,13 +2085,6 @@
         "args": "",
         "return_type": "boolean",
         "language": "sql",
-        "security_definer": true
-      },
-      {
-        "function_name": "purge_old_client_error_events",
-        "args": "retention_days integer",
-        "return_type": "bigint",
-        "language": "plpgsql",
         "security_definer": true
       },
       {
@@ -2397,24 +2214,6 @@
         "cmd": "SELECT",
         "qual": "(published = true)",
         "with_check": null
-      },
-      {
-        "table_name": "client_error_events",
-        "policy_name": "client_error_events_admin_select",
-        "permissive": "PERMISSIVE",
-        "roles": "{authenticated}",
-        "cmd": "SELECT",
-        "qual": "is_admin()",
-        "with_check": null
-      },
-      {
-        "table_name": "client_error_events",
-        "policy_name": "client_error_events_insert_public",
-        "permissive": "PERMISSIVE",
-        "roles": "{anon,authenticated}",
-        "cmd": "INSERT",
-        "qual": null,
-        "with_check": "(((length(correlation_id) >= 8) AND (length(correlation_id) <= 120)) AND ((length(area) >= 1) AND (length(area) <= 120)) AND ((length(message) >= 1) AND (length(message) <= 4000)) AND (COALESCE(length(app_release), 0) <= 120) AND (COALESCE(length(url), 0) <= 2048) AND (COALESCE(length(user_agent), 0) <= 1024))"
       },
       {
         "table_name": "consolidation_orders",
@@ -2672,10 +2471,6 @@
         "estimated_rows": 1
       },
       {
-        "table_name": "client_error_events",
-        "estimated_rows": 1
-      },
-      {
         "table_name": "consolidation_orders",
         "estimated_rows": 2
       },
@@ -2693,7 +2488,7 @@
       },
       {
         "table_name": "newsletter_subscribers",
-        "estimated_rows": 0
+        "estimated_rows": 4
       },
       {
         "table_name": "notifications",
@@ -2929,18 +2724,6 @@
           "insert": 6,
           "select": 13,
           "update": 3
-        }
-      },
-      {
-        "name": "newsletter_subscribers",
-        "files": [
-          "site/assets/app.js"
-        ],
-        "surfaces": [
-          "site"
-        ],
-        "operations": {
-          "insert": 1
         }
       },
       {
@@ -3194,8 +2977,20 @@
         "type": "file"
       },
       {
+        "name": ".netlify",
+        "type": "dir"
+      },
+      {
         "name": "docs",
         "type": "dir"
+      },
+      {
+        "name": "netlify",
+        "type": "dir"
+      },
+      {
+        "name": "netlify.toml",
+        "type": "file"
       },
       {
         "name": "node_modules",
@@ -3245,7 +3040,7 @@
       },
       {
         "file": "site/assets/app.js",
-        "bytes": 255639
+        "bytes": 255913
       },
       {
         "file": "site/assets/supabase.js",
