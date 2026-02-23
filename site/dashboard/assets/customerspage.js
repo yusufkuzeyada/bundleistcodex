@@ -227,6 +227,49 @@ const $t = ({
       }
       return t;
     }, [u, Ne, K, U]),
+    Rt = n.useMemo(() => {
+      const t = new Map();
+      for (const s of R || []) {
+        const m = s.relatedOrderId;
+        if (!m) continue;
+        if (!t.has(m))
+          t.set(m, {
+            orderCost: 0,
+            orderCostReversal: 0,
+            serviceFee: 0,
+            serviceFeeReversal: 0,
+            hasActiveOrderCost: !1,
+            hasActiveServiceFee: !1,
+            hadServiceFeeActivity: !1,
+          });
+        const o = t.get(m),
+          a = Math.abs(Number(s.amount || 0));
+        if (!o || !Number.isFinite(a) || a <= 0) continue;
+        switch (s.type) {
+          case B.OrderCost:
+            o.orderCost += a;
+            break;
+          case B.OrderCostReversal:
+            o.orderCostReversal += a;
+            break;
+          case B.ServiceFee:
+            o.serviceFee += a;
+            break;
+          case B.ServiceFeeReversal:
+            o.serviceFeeReversal += a;
+            break;
+        }
+      }
+      for (const s of t.values()) {
+        const m = Math.max(0, s.orderCost - s.orderCostReversal),
+          o = Math.max(0, s.serviceFee - s.serviceFeeReversal);
+        (s.hasActiveOrderCost = m > 0.01),
+          (s.hasActiveServiceFee = o > 0.01),
+          (s.hadServiceFeeActivity =
+            s.serviceFee > 0.01 || s.serviceFeeReversal > 0.01);
+      }
+      return t;
+    }, [R]),
     ee = n.useMemo(() => {
       if (!u) return new Map();
       const t = new Map();
@@ -278,39 +321,60 @@ const $t = ({
       const t = new Map(),
         s = Date.now(),
         m = (o) => {
-          const a = o.status;
-          if (a !== nt.Processing && a !== nt.QualityCheck) return !1;
-          const d = new Date(o.creationDate || "").getTime();
-          return !d || Number.isNaN(d)
+          const a = String(o.status || "").trim();
+          return !(
+            a === String(nt.Pending) ||
+            a === "Pending" ||
+            a === "Draft" ||
+            a === "Submitted" ||
+            a === String(nt.Cancelled) ||
+            a === "Cancelled" ||
+            a === "Canceled"
+          );
+        },
+        o = (a) => {
+          const d = a.status;
+          if (d !== nt.Processing && d !== nt.QualityCheck) return !1;
+          const b = new Date(a.creationDate || "").getTime();
+          return !b || Number.isNaN(b)
             ? !1
-            : (s - d) / (1e3 * 60 * 60 * 24) >= 14;
+            : (s - b) / (1e3 * 60 * 60 * 24) >= 14;
         };
-      for (const o of D) {
-        const a = o.id,
-          d = ee.get(a) || 0,
-          b = z.get(a) || [],
-          i = J.get(a) || [],
-          k = b.filter((p) => {
+      for (const a of D) {
+        const d = a.id,
+          b = ee.get(d) || 0,
+          i = z.get(d) || [],
+          k = J.get(d) || [],
+          j = i.filter((p) => {
             const g = String(p.status || "");
             return g === "Delivered" || g === "Completed" || !!p.actualDelivery
               ? !1
               : !String(p.trackingUrl || "").trim();
           }).length,
-          j = i.filter(
+          se = k.filter(
             (p) => Number(p.volumeM3 || 0) <= 0 || Number(p.weightKG || 0) <= 0,
           ).length,
-          se = i.filter((p) => p.chargesApplied !== !0).length,
-          c = i.filter(m).length;
-        t.set(a, {
-          negativeBalance: d < 0,
-          missingTracking: k,
-          missingDims: j,
-          chargesNotApplied: se,
-          stuckOrders: c,
+          c = k.filter((p) => {
+            if (!m(p)) return !1;
+            const g = Rt.get(p.id);
+            if (g)
+              return (
+                !g.hasActiveOrderCost ||
+                (g.hadServiceFeeActivity && !g.hasActiveServiceFee)
+              );
+            return p.chargesApplied !== !0;
+          }).length,
+          l = k.filter(o).length;
+        t.set(d, {
+          negativeBalance: b < 0,
+          missingTracking: j,
+          missingDims: se,
+          chargesNotApplied: c,
+          stuckOrders: l,
         });
       }
       return t;
-    }, [D, ee, z, J]),
+    }, [D, ee, z, J, Rt]),
     y = n.useMemo(() => {
       if (!u) return { rows: [], total: 0, totalPages: 1, page: 1, all: [] };
       const t = (c) => c.toLowerCase(),

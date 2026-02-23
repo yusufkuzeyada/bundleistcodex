@@ -288,6 +288,8 @@ const ht = ({
           return "Missing tracking";
         case "capacity_risk":
           return "Capacity risk";
+        case "high_variance_risk":
+          return "High variance risk";
         case "negative_balance":
           return "Negative balances";
         case "distribution_mismatch":
@@ -704,6 +706,24 @@ const ht = ({
                 n.containerWeightFilledPercentage || 0,
               ),
           ),
+        n = l
+          .filter((v) => {
+            const ae = Number(v.estimatedShippingCost || 0);
+            if (!(ae > 0)) return !1;
+            const ce = Number(v.costVariancePercentage);
+            let Y = Number.isFinite(ce) ? Math.abs(ce) : Number.NaN;
+            if (!Number.isFinite(Y)) {
+              const xe = Number(v.shippingCost || 0);
+              if (!(xe > 0)) return !1;
+              Y = Math.abs(((xe - ae) / ae) * 100);
+            }
+            return Y >= 25;
+          })
+          .sort(
+            (v, ae) =>
+              Math.abs(Number(ae.costVariancePercentage || 0)) -
+              Math.abs(Number(v.costVariancePercentage || 0)),
+          ),
         s = (n) =>
           M.some(
             (v) =>
@@ -727,6 +747,7 @@ const ht = ({
           readyOrders: r.length,
           departingSoon: g.length,
           capacityRisk: d.length,
+          highVarianceRisk: n.length,
           missingShipment: c.length,
           missingTracking: x.length,
           negativeBalances: o.length,
@@ -736,6 +757,7 @@ const ht = ({
         readyOrders: r,
         departingSoon: g,
         capacityRisk: d,
+        highVarianceRisk: n,
         missingShipment: c,
         missingTracking: x,
         negativeBalances: o,
@@ -883,6 +905,68 @@ const ht = ({
                       "rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900",
                     children:
                       "This consolidation is close to (or over) capacity. Consider moving orders, splitting the load, or changing container type.",
+                  }),
+                ],
+              }),
+            ),
+        });
+      }
+      for (const s of N.highVarianceRisk.slice(0, 10)) {
+        const c = Number(s.estimatedShippingCost || 0),
+          x = Number(s.shippingCost || 0),
+          o = Number(s.costVariancePercentage),
+          n = Number.isFinite(o)
+            ? Math.abs(o)
+            : c > 0 && Number.isFinite(x)
+              ? Math.abs(((x - c) / c) * 100)
+              : 0,
+          v = n >= 50 ? "critical" : "high";
+        t.push({
+          id: `variance-risk:${s.id}`,
+          severity: v,
+          category: "high_variance_risk",
+          title: `High variance risk: ${s.name}`,
+          subtitle: `${s.route} | est $${c.toLocaleString(void 0, { maximumFractionDigits: 2 })} vs actual $${x.toLocaleString(void 0, { maximumFractionDigits: 2 })} | ${n.toFixed(1)}%`,
+          entityType: "consolidation",
+          entityId: s.id,
+          primaryActionLabel: "Open Consolidation",
+          onPrimaryAction: () => w("consolidations", s.id),
+          secondaryActionLabel: "Details",
+          onSecondaryAction: () =>
+            u(
+              `High variance risk: ${s.name}`,
+              e.jsxs("div", {
+                className: "space-y-4",
+                children: [
+                  e.jsxs(S, {
+                    title: "Summary",
+                    children: [
+                      e.jsx(a, { label: "Consolidation", value: s.name }),
+                      e.jsx(a, {
+                        label: "ID",
+                        value: h(s.id, "consolidation"),
+                      }),
+                      e.jsx(a, { label: "Status", value: String(s.status) }),
+                      e.jsx(a, { label: "Route", value: s.route }),
+                      e.jsx(a, {
+                        label: "Estimated cost",
+                        value: `$${c.toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                      }),
+                      e.jsx(a, {
+                        label: "Actual cost",
+                        value: `$${x.toLocaleString(void 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                      }),
+                      e.jsx(a, {
+                        label: "Variance",
+                        value: `${n.toFixed(1)}%`,
+                      }),
+                    ],
+                  }),
+                  e.jsx("div", {
+                    className:
+                      "rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900",
+                    children:
+                      "Estimated vs actual shipping cost variance is above 25%. Review pricing assumptions, route/carrier changes, and cost updates.",
                   }),
                 ],
               }),
@@ -1639,6 +1723,22 @@ const ht = ({
                                 children:
                                   (i == null ? void 0 : i.capacityRisk) ??
                                   N.counts.capacityRisk,
+                              }),
+                            ],
+                          }),
+                          e.jsxs("button", {
+                            type: "button",
+                            onClick: () => A("high_variance_risk"),
+                            className: `flex-shrink-0 px-3 py-2 rounded-xl border text-sm font-semibold transition-colors ${f === "high_variance_risk" ? "bg-rose-100 border-rose-200 text-rose-900" : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"}`,
+                            title:
+                              "Active consolidations where estimated vs actual shipping cost variance is at least 25%",
+                            children: [
+                              "High Variance Risk: ",
+                              e.jsx("span", {
+                                className: "font-bold",
+                                children:
+                                  (i == null ? void 0 : i.highVarianceRisk) ??
+                                  N.counts.highVarianceRisk,
                               }),
                             ],
                           }),

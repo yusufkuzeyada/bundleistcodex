@@ -226,12 +226,35 @@ const st = a.forwardRef(tt),
     containerClassName: o = "",
     inputClassName: m = "",
     suffixClassName: u = "",
-    ...M
-  }) =>
-    e.jsxs("div", {
+    onChange: M,
+    type: z = "text",
+    inputMode: w,
+    pattern: W,
+    ...I
+  }) => {
+    const f = z === "number",
+      L = (h) => {
+        if (typeof M != "function") return;
+        if (!f) {
+          M(h);
+          return;
+        }
+        const b = String((h == null ? void 0 : h.target.value) || "")
+          .replace(",", ".")
+          .replace(/\s+/g, "");
+        (b === "" || /^\d*\.?\d*$/.test(b)) && M({ target: { value: b } });
+      };
+    return e.jsxs("div", {
       className: ["relative", o].join(" "),
       children: [
-        e.jsx("input", { ...M, className: ["ui-field pr-14", m].join(" ") }),
+        e.jsx("input", {
+          ...I,
+          type: f ? "text" : z,
+          inputMode: f ? "decimal" : w,
+          pattern: f ? "[0-9]*[.,]?[0-9]*" : W,
+          onChange: L,
+          className: ["ui-field pr-14", m].join(" "),
+        }),
         e.jsx("div", {
           className: [
             "pointer-events-none absolute inset-y-0 right-3 flex items-center",
@@ -241,7 +264,29 @@ const st = a.forwardRef(tt),
           children: t,
         }),
       ],
-    }),
+    });
+  },
+  normalizeLocationValue = (t) =>
+    String(t == null ? "" : t)
+      .replace(/\s+/g, " ")
+      .trim(),
+  hasLocationValue = (t) => normalizeLocationValue(t) !== "",
+  buildOrderRouteSummary = (t) => {
+    const o = [];
+    (hasLocationValue(t.originCity) && o.push(normalizeLocationValue(t.originCity)),
+      hasLocationValue(t.originCountry) &&
+        o.push(normalizeLocationValue(t.originCountry)));
+    const m = [];
+    (hasLocationValue(t.destinationCity) &&
+      m.push(normalizeLocationValue(t.destinationCity)),
+      hasLocationValue(t.destinationPort) &&
+        m.push(`${normalizeLocationValue(t.destinationPort)} Port`),
+      hasLocationValue(t.destinationCountry) &&
+        m.push(normalizeLocationValue(t.destinationCountry)));
+    const u = o.join(", "),
+      M = m.join(", ");
+    return u || M ? `${u || "Origin TBD"} -> ${M || "Destination TBD"}` : "N/A";
+  },
   it = ({
     order: t,
     isOpen: o,
@@ -259,6 +304,18 @@ const st = a.forwardRef(tt),
       [F, K] = a.useState(t.weightKG.toString()),
       [D, E] = a.useState(t.supplierId),
       [n, r] = a.useState(t.notes || ""),
+      [originCountry, setOriginCountry] = a.useState(t.originCountry || ""),
+      [originCity, setOriginCity] = a.useState(t.originCity || ""),
+      [destinationCountry, setDestinationCountry] = a.useState(
+        t.destinationCountry || "",
+      ),
+      [destinationCity, setDestinationCity] = a.useState(
+        t.destinationCity || "",
+      ),
+      [destinationPort, setDestinationPort] = a.useState(
+        t.destinationPort || "",
+      ),
+      [readyDate, setReadyDate] = a.useState(t.readyDate || ""),
       { showError: d } = xe();
     if (
       (a.useEffect(() => {
@@ -268,7 +325,13 @@ const st = a.forwardRef(tt),
           S(t.volumeM3.toString()),
           K(t.weightKG.toString()),
           E(t.supplierId),
-          r(t.notes || ""));
+          r(t.notes || ""),
+          setOriginCountry(t.originCountry || ""),
+          setOriginCity(t.originCity || ""),
+          setDestinationCountry(t.destinationCountry || ""),
+          setDestinationCity(t.destinationCity || ""),
+          setDestinationPort(t.destinationPort || ""),
+          setReadyDate(t.readyDate || ""));
       }, [t, o]),
       !o)
     )
@@ -296,6 +359,18 @@ const st = a.forwardRef(tt),
         d("Invalid Weight", "Order weight must be positive.");
         return;
       }
+      if (
+        !hasLocationValue(originCountry) ||
+        !hasLocationValue(originCity) ||
+        !hasLocationValue(destinationCountry) ||
+        !hasLocationValue(destinationCity)
+      ) {
+        d(
+          "Missing Route Fields",
+          "Origin country/city and destination country/city are required.",
+        );
+        return;
+      }
       (u(t.id, {
         description: f,
         value: x,
@@ -303,6 +378,12 @@ const st = a.forwardRef(tt),
         weightKG: B,
         supplierId: D,
         notes: n,
+        originCountry: normalizeLocationValue(originCountry),
+        originCity: normalizeLocationValue(originCity),
+        destinationCountry: normalizeLocationValue(destinationCountry),
+        destinationCity: normalizeLocationValue(destinationCity),
+        destinationPort: normalizeLocationValue(destinationPort),
+        readyDate: readyDate || "",
       }),
         m());
     };
@@ -444,6 +525,159 @@ const st = a.forwardRef(tt),
                 ],
               }),
               e.jsxs("div", {
+                className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+                children: [
+                  e.jsxs("div", {
+                    children: [
+                      e.jsx("label", {
+                        htmlFor: "editOrderOriginCountry",
+                        className:
+                          "block text-sm font-semibold text-gray-700 mb-2",
+                        children: "Origin Country",
+                      }),
+                      e.jsx("input", {
+                        type: "text",
+                        id: "editOrderOriginCountry",
+                        value: originCountry,
+                        onChange: (x) => setOriginCountry(x.target.value),
+                        className: "ui-field",
+                        placeholder: "e.g., China",
+                      }),
+                    ],
+                  }),
+                  e.jsxs("div", {
+                    children: [
+                      e.jsx("label", {
+                        htmlFor: "editOrderOriginCity",
+                        className:
+                          "block text-sm font-semibold text-gray-700 mb-2",
+                        children: "Origin City",
+                      }),
+                      e.jsx("input", {
+                        type: "text",
+                        id: "editOrderOriginCity",
+                        value: originCity,
+                        onChange: (x) => setOriginCity(x.target.value),
+                        className: "ui-field",
+                        placeholder: "e.g., Shenzhen",
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+              e.jsxs("div", {
+                className: "grid grid-cols-1 md:grid-cols-3 gap-4",
+                children: [
+                  e.jsxs("div", {
+                    children: [
+                      e.jsxs("label", {
+                        htmlFor: "editOrderDestinationCountry",
+                        className:
+                          "block text-sm font-semibold text-gray-700 mb-2",
+                        children: [
+                          "Destination Country ",
+                          e.jsx("span", {
+                            className: "text-red-500",
+                            children: "*",
+                          }),
+                        ],
+                      }),
+                      e.jsx("input", {
+                        type: "text",
+                        id: "editOrderDestinationCountry",
+                        value: destinationCountry,
+                        onChange: (x) => setDestinationCountry(x.target.value),
+                        className: "ui-field",
+                        placeholder: "e.g., DR Congo",
+                        required: !0,
+                      }),
+                    ],
+                  }),
+                  e.jsxs("div", {
+                    children: [
+                      e.jsxs("label", {
+                        htmlFor: "editOrderDestinationCity",
+                        className:
+                          "block text-sm font-semibold text-gray-700 mb-2",
+                        children: [
+                          "Destination City ",
+                          e.jsx("span", {
+                            className: "text-red-500",
+                            children: "*",
+                          }),
+                        ],
+                      }),
+                      e.jsx("input", {
+                        type: "text",
+                        id: "editOrderDestinationCity",
+                        value: destinationCity,
+                        onChange: (x) => setDestinationCity(x.target.value),
+                        className: "ui-field",
+                        placeholder: "e.g., Matadi",
+                        required: !0,
+                      }),
+                    ],
+                  }),
+                  e.jsxs("div", {
+                    children: [
+                      e.jsx("label", {
+                        htmlFor: "editOrderDestinationPort",
+                        className:
+                          "block text-sm font-semibold text-gray-700 mb-2",
+                        children: "Destination Port",
+                      }),
+                      e.jsx("input", {
+                        type: "text",
+                        id: "editOrderDestinationPort",
+                        value: destinationPort,
+                        onChange: (x) => setDestinationPort(x.target.value),
+                        className: "ui-field",
+                        placeholder: "e.g., Matadi",
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+              e.jsxs("div", {
+                className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+                children: [
+                  e.jsxs("div", {
+                    children: [
+                      e.jsx("label", {
+                        htmlFor: "editOrderReadyDate",
+                        className:
+                          "block text-sm font-semibold text-gray-700 mb-2",
+                        children: "Ready Date",
+                      }),
+                      e.jsx("input", {
+                        type: "date",
+                        id: "editOrderReadyDate",
+                        value: readyDate,
+                        onChange: (x) => setReadyDate(x.target.value),
+                        className: "ui-field",
+                      }),
+                    ],
+                  }),
+                  e.jsxs("div", {
+                    className:
+                      "rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700",
+                    children: [
+                      e.jsx("div", {
+                        className: "font-semibold text-slate-800 mb-1",
+                        children: "Route Preview",
+                      }),
+                      buildOrderRouteSummary({
+                        originCountry,
+                        originCity,
+                        destinationCountry,
+                        destinationCity,
+                        destinationPort,
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+              e.jsxs("div", {
                 className: "grid grid-cols-1 md:grid-cols-3 gap-4",
                 children: [
                   e.jsxs("div", {
@@ -564,6 +798,12 @@ const st = a.forwardRef(tt),
       [h, v] = a.useState(""),
       [b, S] = a.useState(""),
       [F, K] = a.useState(""),
+      [originCountry, setOriginCountry] = a.useState(""),
+      [originCity, setOriginCity] = a.useState(""),
+      [destinationCountry, setDestinationCountry] = a.useState(""),
+      [destinationCity, setDestinationCity] = a.useState(""),
+      [destinationPort, setDestinationPort] = a.useState(""),
+      [readyDate, setReadyDate] = a.useState(""),
       [D, E] = a.useState(o.length > 0 ? o[0].id : ""),
       [n, r] = a.useState(u ? (m.length > 0 ? m[0].id : "") : M || ""),
       [d, U] = a.useState(!1),
@@ -580,6 +820,12 @@ const st = a.forwardRef(tt),
           v(""),
           S(""),
           K(""),
+          setOriginCountry(""),
+          setOriginCity(""),
+          setDestinationCountry(""),
+          setDestinationCity(""),
+          setDestinationPort(""),
+          setReadyDate(""),
           E(o.length > 0 ? o[0].id : ""),
           r(u ? (m.length > 0 ? m[0].id : "") : M || ""));
       },
@@ -593,6 +839,18 @@ const st = a.forwardRef(tt),
           B("Missing Fields", "Please fill in all fields.");
           return;
         }
+        if (
+          !hasLocationValue(originCountry) ||
+          !hasLocationValue(originCity) ||
+          !hasLocationValue(destinationCountry) ||
+          !hasLocationValue(destinationCity)
+        ) {
+          B(
+            "Missing Route Fields",
+            "Origin country/city and destination country/city are required.",
+          );
+          return;
+        }
         C(!0);
         try {
           (await Promise.resolve(
@@ -604,6 +862,12 @@ const st = a.forwardRef(tt),
                 weightKG: parseFloat(b),
                 supplierId: D,
                 notes: F,
+                originCountry: normalizeLocationValue(originCountry),
+                originCity: normalizeLocationValue(originCity),
+                destinationCountry: normalizeLocationValue(destinationCountry),
+                destinationCity: normalizeLocationValue(destinationCity),
+                destinationPort: normalizeLocationValue(destinationPort),
+                readyDate: readyDate || "",
               },
               ee,
             ),
@@ -700,6 +964,105 @@ const st = a.forwardRef(tt),
                     required: !0,
                   }),
                 }),
+              }),
+              e.jsxs("div", {
+                className: "grid grid-cols-1 md:grid-cols-2 gap-6 mt-6",
+                children: [
+                  e.jsx(Y, {
+                    label: "Origin Country",
+                    help: "Optional but recommended for route matching",
+                    children: e.jsx("input", {
+                      type: "text",
+                      value: originCountry,
+                      onChange: (c) => setOriginCountry(c.target.value),
+                      className: "ui-field",
+                      placeholder: "e.g., China",
+                    }),
+                  }),
+                  e.jsx(Y, {
+                    label: "Origin City",
+                    help: "Optional but recommended for route matching",
+                    children: e.jsx("input", {
+                      type: "text",
+                      value: originCity,
+                      onChange: (c) => setOriginCity(c.target.value),
+                      className: "ui-field",
+                      placeholder: "e.g., Shenzhen",
+                    }),
+                  }),
+                ],
+              }),
+              e.jsxs("div", {
+                className: "grid grid-cols-1 md:grid-cols-3 gap-6 mt-6",
+                children: [
+                  e.jsx(Y, {
+                    label: "Destination Country",
+                    required: !0,
+                    children: e.jsx("input", {
+                      type: "text",
+                      value: destinationCountry,
+                      onChange: (c) => setDestinationCountry(c.target.value),
+                      className: "ui-field",
+                      placeholder: "e.g., DR Congo",
+                      required: !0,
+                    }),
+                  }),
+                  e.jsx(Y, {
+                    label: "Destination City",
+                    required: !0,
+                    children: e.jsx("input", {
+                      type: "text",
+                      value: destinationCity,
+                      onChange: (c) => setDestinationCity(c.target.value),
+                      className: "ui-field",
+                      placeholder: "e.g., Matadi",
+                      required: !0,
+                    }),
+                  }),
+                  e.jsx(Y, {
+                    label: "Destination Port",
+                    help: "Optional",
+                    children: e.jsx("input", {
+                      type: "text",
+                      value: destinationPort,
+                      onChange: (c) => setDestinationPort(c.target.value),
+                      className: "ui-field",
+                      placeholder: "e.g., Matadi",
+                    }),
+                  }),
+                ],
+              }),
+              e.jsxs("div", {
+                className: "grid grid-cols-1 md:grid-cols-2 gap-6 mt-6",
+                children: [
+                  e.jsx(Y, {
+                    label: "Ready Date",
+                    help: "Optional. Used to match orders to departure dates.",
+                    children: e.jsx("input", {
+                      type: "date",
+                      value: readyDate,
+                      onChange: (c) => setReadyDate(c.target.value),
+                      className: "ui-field",
+                    }),
+                  }),
+                  e.jsxs("div", {
+                    className:
+                      "rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700",
+                    children: [
+                      e.jsx("div", {
+                        className: "font-semibold text-slate-800 mb-1",
+                        children: "Route Preview",
+                      }),
+                      buildOrderRouteSummary({
+                        originCountry,
+                        originCity,
+                        destinationCountry,
+                        destinationCity,
+                        destinationPort,
+                      }),
+                    ],
+                  }),
+                ],
               }),
               e.jsxs("div", {
                 className: "grid grid-cols-1 md:grid-cols-3 gap-6 mt-6",

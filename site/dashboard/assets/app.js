@@ -10679,6 +10679,27 @@ const $e = Ht.getInstance(),
         return (console.error("Clipboard copy failed:", r), !1);
       }
     }
+  },
+  formatGeoText = (s) =>
+    String(s == null ? "" : s)
+      .replace(/\s+/g, " ")
+      .trim(),
+  normalizeGeoText = (s) => formatGeoText(s).toLowerCase(),
+  hasGeoText = (s) => normalizeGeoText(s) !== "",
+  buildStandardRouteLabel = (s) => {
+    const e = [];
+    (hasGeoText(s.originCity) && e.push(formatGeoText(s.originCity)),
+      hasGeoText(s.originCountry) && e.push(formatGeoText(s.originCountry)));
+    const t = [];
+    (hasGeoText(s.destinationCity) &&
+      t.push(formatGeoText(s.destinationCity)),
+      hasGeoText(s.destinationPort) &&
+        t.push(`${formatGeoText(s.destinationPort)} Port`),
+      hasGeoText(s.destinationCountry) &&
+        t.push(formatGeoText(s.destinationCountry)));
+    const r = e.join(", "),
+      i = t.join(", ");
+    return r || i ? `${r || "Origin TBD"} -> ${i || "Destination TBD"}` : "";
   };
 class zt {
   constructor() {
@@ -10941,7 +10962,52 @@ class zt {
       c = Math.max(1, t),
       u = Math.max(1, Math.min(100, r)),
       h = (c - 1) * u,
-      p = h + u - 1;
+      p = h + u - 1,
+      b = String(o || "").trim();
+    if (b) {
+      let y = _.from("payment_transactions")
+        .select("*")
+        .order("date", { ascending: !1 });
+      if (n) i && (y = y.eq("customer_id", i));
+      else {
+        if (!i) return { transactions: [], totalCount: 0 };
+        y = y.eq("customer_id", i);
+      }
+      a && a !== "all" && (y = y.eq("type", a));
+      const { data: k, error: I } = await y;
+      if (I)
+        throw (
+          console.error("Error fetching paginated transactions:", I),
+          new Error("Failed to fetch paginated transactions")
+        );
+      const P = b.toLowerCase(),
+        V = Object.values(ee).filter((Q) => Q.toLowerCase().includes(P)),
+        L =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            b,
+          ),
+        w = (k || []).filter((Q) => {
+          const j = String(Q.description || "")
+              .toLowerCase()
+              .includes(P),
+            de = V.includes(String(Q.type || "")),
+            se =
+              L &&
+              [
+                Q.id,
+                Q.customer_id,
+                Q.related_order_id,
+                Q.related_consolidation_id,
+                Q.related_shipment_id,
+              ].some((Y) => String(Y || "").toLowerCase() === P);
+          return j || de || se;
+        }),
+        xe = w.slice(h, p + 1);
+      return {
+        transactions: xe.map(this.transformDatabaseTransaction),
+        totalCount: w.length,
+      };
+    }
     let y = _.from("payment_transactions")
       .select("*", { count: "exact" })
       .order("date", { ascending: !1 })
@@ -10950,24 +11016,6 @@ class zt {
     else {
       if (!i) return { transactions: [], totalCount: 0 };
       y = y.eq("customer_id", i);
-    }
-    const b = String(o || "").trim();
-    if (b) {
-      const k = b.replace(/[%_,]/g, "\\$&"),
-        I = [`description.ilike.%${k}%`];
-      for (const P of Object.values(ee))
-        P.toLowerCase().includes(b.toLowerCase()) && I.push(`type.eq.${P}`);
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        b,
-      ) &&
-        I.push(
-          `id.eq.${b}`,
-          `customer_id.eq.${b}`,
-          `related_order_id.eq.${b}`,
-          `related_consolidation_id.eq.${b}`,
-          `related_shipment_id.eq.${b}`,
-        );
-      y = y.or(I.join(","));
     }
     a && a !== "all" && (y = y.eq("type", a));
     const { data: k, error: I, count: P } = await y;
@@ -11568,6 +11616,13 @@ class Wt {
       status: e.status,
       notes: e.notes,
       creationDate: e.creation_date,
+      originCountry: e.origin_country || "",
+      originCity: e.origin_city || "",
+      destinationCountry: e.destination_country || "",
+      destinationCity: e.destination_city || "",
+      destinationPort: e.destination_port || "",
+      readyDate: e.ready_date || "",
+      chargesApplied: !!e.charges_applied,
     });
   }
   static getInstance() {
@@ -11631,6 +11686,20 @@ class Wt {
         customer_id: e.customerId,
         status: e.status,
         notes: e.notes,
+        origin_country: hasGeoText(e.originCountry)
+          ? formatGeoText(e.originCountry)
+          : null,
+        origin_city: hasGeoText(e.originCity) ? formatGeoText(e.originCity) : null,
+        destination_country: hasGeoText(e.destinationCountry)
+          ? formatGeoText(e.destinationCountry)
+          : null,
+        destination_city: hasGeoText(e.destinationCity)
+          ? formatGeoText(e.destinationCity)
+          : null,
+        destination_port: hasGeoText(e.destinationPort)
+          ? formatGeoText(e.destinationPort)
+          : null,
+        ready_date: hasGeoText(e.readyDate) ? e.readyDate : null,
         creation_date: new Date().toISOString(),
       },
       { data: r, error: i } = await _.from("orders")
@@ -11665,7 +11734,29 @@ class Wt {
       t.weightKG !== void 0 && (r.weight_kg = t.weightKG),
       t.customerId !== void 0 && (r.customer_id = t.customerId),
       t.status !== void 0 && (r.status = t.status),
-      t.notes !== void 0 && (r.notes = t.notes));
+      t.notes !== void 0 && (r.notes = t.notes),
+      t.originCountry !== void 0 &&
+        (r.origin_country = hasGeoText(t.originCountry)
+          ? formatGeoText(t.originCountry)
+          : null),
+      t.originCity !== void 0 &&
+        (r.origin_city = hasGeoText(t.originCity)
+          ? formatGeoText(t.originCity)
+          : null),
+      t.destinationCountry !== void 0 &&
+        (r.destination_country = hasGeoText(t.destinationCountry)
+          ? formatGeoText(t.destinationCountry)
+          : null),
+      t.destinationCity !== void 0 &&
+        (r.destination_city = hasGeoText(t.destinationCity)
+          ? formatGeoText(t.destinationCity)
+          : null),
+      t.destinationPort !== void 0 &&
+        (r.destination_port = hasGeoText(t.destinationPort)
+          ? formatGeoText(t.destinationPort)
+          : null),
+      t.readyDate !== void 0 &&
+        (r.ready_date = hasGeoText(t.readyDate) ? t.readyDate : null));
     const { data: i, error: n } = await _.from("orders")
       .update(r)
       .eq("id", e)
@@ -11820,7 +11911,20 @@ class Kt {
     this.transformDatabaseConsolidation = (e) => ({
       id: e.id,
       name: e.name,
-      route: e.route,
+      route:
+        e.route ||
+        buildStandardRouteLabel({
+          originCountry: e.origin_country,
+          originCity: e.origin_city,
+          destinationCountry: e.destination_country,
+          destinationCity: e.destination_city,
+          destinationPort: e.destination_port,
+        }),
+      originCountry: e.origin_country || "",
+      originCity: e.origin_city || "",
+      destinationCountry: e.destination_country || "",
+      destinationCity: e.destination_city || "",
+      destinationPort: e.destination_port || "",
       departureDate: e.departure_date,
       creationDate: e.creation_date,
       orderIds: e.order_ids || [],
@@ -11879,9 +11983,23 @@ class Kt {
       customerId: r,
       costDistributionMethod: n,
     });
-    const a = {
+    const a = buildStandardRouteLabel(e),
+      c = {
         name: e.name,
-        route: e.route,
+        route: e.route || a,
+        origin_country: hasGeoText(e.originCountry)
+          ? formatGeoText(e.originCountry)
+          : null,
+        origin_city: hasGeoText(e.originCity) ? formatGeoText(e.originCity) : null,
+        destination_country: hasGeoText(e.destinationCountry)
+          ? formatGeoText(e.destinationCountry)
+          : null,
+        destination_city: hasGeoText(e.destinationCity)
+          ? formatGeoText(e.destinationCity)
+          : null,
+        destination_port: hasGeoText(e.destinationPort)
+          ? formatGeoText(e.destinationPort)
+          : null,
         departure_date: e.departureDate,
         creation_date: new Date().toISOString(),
         container_type_id: e.containerTypeId,
@@ -11895,16 +12013,16 @@ class Kt {
         fixed_rate_per_m3: o,
         notes: e.notes,
       },
-      { data: c, error: u } = await _.from("consolidations")
-        .insert([a])
+      { data: u, error: h } = await _.from("consolidations")
+        .insert([c])
         .select()
         .single();
-    if (u)
+    if (h)
       throw (
-        console.error("Error creating consolidation:", u),
+        console.error("Error creating consolidation:", h),
         new Error("Failed to create consolidation")
       );
-    const h = this.transformDatabaseConsolidation(c);
+    const p = this.transformDatabaseConsolidation(u);
     return (
       !i &&
         r &&
@@ -11914,14 +12032,14 @@ class Kt {
           {
             importance: K.Medium,
             linkToPage: "consolidations",
-            linkToId: h.id,
+            linkToId: p.id,
           },
         )),
       await ie.createAdminNotification(
         `New ${i ? "mixed" : "single-customer"} consolidation "${e.name}" created`,
-        { importance: K.Low, linkToPage: "consolidations", linkToId: h.id },
+        { importance: K.Low, linkToPage: "consolidations", linkToId: p.id },
       ),
-      h
+      p
     );
   }
   async update(e, t) {
@@ -11929,6 +12047,26 @@ class Kt {
     if (
       (t.name !== void 0 && (r.name = t.name),
       t.route !== void 0 && (r.route = t.route),
+      t.originCountry !== void 0 &&
+        (r.origin_country = hasGeoText(t.originCountry)
+          ? formatGeoText(t.originCountry)
+          : null),
+      t.originCity !== void 0 &&
+        (r.origin_city = hasGeoText(t.originCity)
+          ? formatGeoText(t.originCity)
+          : null),
+      t.destinationCountry !== void 0 &&
+        (r.destination_country = hasGeoText(t.destinationCountry)
+          ? formatGeoText(t.destinationCountry)
+          : null),
+      t.destinationCity !== void 0 &&
+        (r.destination_city = hasGeoText(t.destinationCity)
+          ? formatGeoText(t.destinationCity)
+          : null),
+      t.destinationPort !== void 0 &&
+        (r.destination_port = hasGeoText(t.destinationPort)
+          ? formatGeoText(t.destinationPort)
+          : null),
       t.departureDate !== void 0 && (r.departure_date = t.departureDate),
       t.containerTypeId !== void 0 && (r.container_type_id = t.containerTypeId),
       t.status !== void 0 && (r.status = t.status),
@@ -11981,6 +12119,22 @@ class Kt {
         String(t),
         n,
         r.name,
+      );
+  }
+  async delete(e) {
+    const { error: t } = await _.from("consolidation_orders")
+      .delete()
+      .eq("consolidation_id", e);
+    if (t)
+      throw (
+        console.error("Error deleting consolidation order links:", t),
+        new Error("Failed to delete consolidation order links")
+      );
+    const { error: r } = await _.from("consolidations").delete().eq("id", e);
+    if (r)
+      throw (
+        console.error("Error deleting consolidation:", r),
+        new Error("Failed to delete consolidation")
       );
   }
   async updateOrders(e, t, r, i, n) {
@@ -12409,6 +12563,13 @@ class Jt {
         status: e.status,
         notes: e.notes,
         creationDate: e.creation_date,
+        originCountry: e.origin_country || "",
+        originCity: e.origin_city || "",
+        destinationCountry: e.destination_country || "",
+        destinationCity: e.destination_city || "",
+        destinationPort: e.destination_port || "",
+        readyDate: e.ready_date || "",
+        chargesApplied: !!e.charges_applied,
       })),
       (this.transformDatabaseShipment = (e) => ({
         id: e.id,
@@ -12689,6 +12850,13 @@ class Qt {
         status: e.status,
         notes: e.notes,
         creationDate: e.creation_date,
+        originCountry: e.origin_country || "",
+        originCity: e.origin_city || "",
+        destinationCountry: e.destination_country || "",
+        destinationCity: e.destination_city || "",
+        destinationPort: e.destination_port || "",
+        readyDate: e.ready_date || "",
+        chargesApplied: !!e.charges_applied,
       })));
   }
   static getInstance() {
@@ -13472,17 +13640,20 @@ const hc = Qt.getInstance(),
     });
   },
   fc = x.lazy(() =>
-    ze(() => import("./dashboardpage.js"), __vite__mapDeps([0, 1, 2, 3, 4, 5])),
+    ze(
+      () => import("./dashboardpage.js?v=20260223f"),
+      __vite__mapDeps([0, 1, 2, 3, 4, 5]),
+    ),
   ),
   pc = x.lazy(() =>
     ze(
-      () => import("./orderspage.js"),
+      () => import("./orderspage.js?v=20260223f"),
       __vite__mapDeps([6, 1, 2, 7, 3, 8, 9, 10, 11, 4, 5]),
     ),
   ),
   gc = x.lazy(() =>
     ze(
-      () => import("./consolidationspage.js"),
+      () => import("./consolidationspage.js?v=20260223f"),
       __vite__mapDeps([12, 1, 2, 7, 3, 8, 9, 10, 11, 4, 5]),
     ).then((s) => ({ default: s.ConsolidationsPage })),
   ),
@@ -13494,7 +13665,7 @@ const hc = Qt.getInstance(),
   ),
   vc = x.lazy(() =>
     ze(
-      () => import("./customerspage.js"),
+      () => import("./customerspage.js?v=20260223f"),
       __vite__mapDeps([14, 1, 2, 7, 3, 11, 4, 5]),
     ),
   ),
@@ -14136,6 +14307,7 @@ const hc = Qt.getInstance(),
       [Tn, En] = x.useState({
         departingSoon: 0,
         capacityRisk: 0,
+        highVarianceRisk: 0,
         missingTracking: 0,
         missingShipment: 0,
         negativeBalances: 0,
@@ -14547,6 +14719,22 @@ const hc = Qt.getInstance(),
               customer_id: g,
               status: d.Pending,
               notes: f.notes,
+              origin_country: hasGeoText(f.originCountry)
+                ? formatGeoText(f.originCountry)
+                : null,
+              origin_city: hasGeoText(f.originCity)
+                ? formatGeoText(f.originCity)
+                : null,
+              destination_country: hasGeoText(f.destinationCountry)
+                ? formatGeoText(f.destinationCountry)
+                : null,
+              destination_city: hasGeoText(f.destinationCity)
+                ? formatGeoText(f.destinationCity)
+                : null,
+              destination_port: hasGeoText(f.destinationPort)
+                ? formatGeoText(f.destinationPort)
+                : null,
+              ready_date: hasGeoText(f.readyDate) ? f.readyDate : null,
             },
           ])
           .select();
@@ -14565,6 +14753,13 @@ const hc = Qt.getInstance(),
           status: S.status,
           notes: S.notes,
           creationDate: S.creation_date,
+          originCountry: S.origin_country || "",
+          originCity: S.origin_city || "",
+          destinationCountry: S.destination_country || "",
+          destinationCity: S.destination_city || "",
+          destinationPort: S.destination_port || "",
+          readyDate: S.ready_date || "",
+          chargesApplied: !!S.charges_applied,
         }));
         H((S) => [...S, ...C]);
         const M = C[0];
@@ -14651,7 +14846,29 @@ const hc = Qt.getInstance(),
           g.weightKG !== void 0 && (C.weight_kg = g.weightKG),
           g.customerId !== void 0 && (C.customer_id = g.customerId),
           g.status !== void 0 && (C.status = g.status),
-          g.notes !== void 0 && (C.notes = g.notes));
+          g.notes !== void 0 && (C.notes = g.notes),
+          g.originCountry !== void 0 &&
+            (C.origin_country = hasGeoText(g.originCountry)
+              ? formatGeoText(g.originCountry)
+              : null),
+          g.originCity !== void 0 &&
+            (C.origin_city = hasGeoText(g.originCity)
+              ? formatGeoText(g.originCity)
+              : null),
+          g.destinationCountry !== void 0 &&
+            (C.destination_country = hasGeoText(g.destinationCountry)
+              ? formatGeoText(g.destinationCountry)
+              : null),
+          g.destinationCity !== void 0 &&
+            (C.destination_city = hasGeoText(g.destinationCity)
+              ? formatGeoText(g.destinationCity)
+              : null),
+          g.destinationPort !== void 0 &&
+            (C.destination_port = hasGeoText(g.destinationPort)
+              ? formatGeoText(g.destinationPort)
+              : null),
+          g.readyDate !== void 0 &&
+            (C.ready_date = hasGeoText(g.readyDate) ? g.readyDate : null));
         const { data: M, error: E } = await _.from("orders")
           .update(C)
           .eq("id", f)
@@ -14669,6 +14886,13 @@ const hc = Qt.getInstance(),
             status: S.status,
             notes: S.notes,
             creationDate: S.creation_date,
+            originCountry: S.origin_country || "",
+            originCity: S.origin_city || "",
+            destinationCountry: S.destination_country || "",
+            destinationCity: S.destination_city || "",
+            destinationPort: S.destination_port || "",
+            readyDate: S.ready_date || "",
+            chargesApplied: !!S.charges_applied,
           }));
           if (D[0]) {
             try {
@@ -15249,11 +15473,93 @@ const hc = Qt.getInstance(),
           );
         }
       },
+      deleteConsolidationRecord = async (f) => {
+        const g = ce.find((w) => w.id === f);
+        if (!g) {
+          r(
+            "Consolidation Not Found",
+            "Could not find the consolidation to delete.",
+          );
+          return;
+        }
+        if ((g.orderIds || []).length > 0) {
+          n(
+            "Cannot Delete Consolidation",
+            "This consolidation still has orders. Remove all orders first, then delete.",
+          );
+          return;
+        }
+        const v = le.find(
+          (w) =>
+            w.type === "consolidation" &&
+            (w.relatedId === f || w.consolidationId === f),
+        );
+        if (v) {
+          n(
+            "Cannot Delete Consolidation",
+            "A shipment is linked to this consolidation. Delete/cancel shipment flow first.",
+          );
+          return;
+        }
+        if (g.shippingCostDistributed) {
+          n(
+            "Cannot Delete Consolidation",
+            "Shipping cost has already been distributed for this consolidation.",
+          );
+          return;
+        }
+        const w = R.some((C) => C.relatedConsolidationId === f);
+        if (w) {
+          n(
+            "Cannot Delete Consolidation",
+            "Payment transactions are linked to this consolidation.",
+          );
+          return;
+        }
+        try {
+          (await lr.delete(f),
+            ge((C) => C.filter((M) => M.id !== f)),
+            await ie.createSystemNotification(
+              `Consolidation "${g.name}" deleted`,
+              {
+                importance: K.Medium,
+                linkToPage: "consolidations",
+              },
+            ),
+            await st());
+        } catch (C) {
+          r(
+            "Delete Error",
+            "Error deleting consolidation: " +
+              (C instanceof Error ? C.message : String(C)),
+          );
+        }
+      },
       Fn = async (f, g) => {
         const v = ce.find((S) => S.id === f),
           w = {};
         (g.name !== void 0 && (w.name = g.name),
           g.route !== void 0 && (w.route = g.route),
+          g.originCountry !== void 0 &&
+            (w.origin_country = hasGeoText(g.originCountry)
+              ? formatGeoText(g.originCountry)
+              : null),
+          g.originCity !== void 0 &&
+            (w.origin_city = hasGeoText(g.originCity)
+              ? formatGeoText(g.originCity)
+              : null),
+          g.destinationCountry !== void 0 &&
+            (w.destination_country = hasGeoText(g.destinationCountry)
+              ? formatGeoText(g.destinationCountry)
+              : null),
+          g.destinationCity !== void 0 &&
+            (w.destination_city = hasGeoText(g.destinationCity)
+              ? formatGeoText(g.destinationCity)
+              : null),
+          g.destinationPort !== void 0 &&
+            (w.destination_port = hasGeoText(g.destinationPort)
+              ? formatGeoText(g.destinationPort)
+              : null),
           g.departureDate !== void 0 && (w.departure_date = g.departureDate),
           g.containerTypeId !== void 0 &&
             (w.container_type_id = g.containerTypeId),
@@ -15324,7 +15630,20 @@ const hc = Qt.getInstance(),
             const T = {
               id: S.id,
               name: S.name,
-              route: S.route,
+              route:
+                S.route ||
+                buildStandardRouteLabel({
+                  originCountry: S.origin_country,
+                  originCity: S.origin_city,
+                  destinationCountry: S.destination_country,
+                  destinationCity: S.destination_city,
+                  destinationPort: S.destination_port,
+                }),
+              originCountry: S.origin_country || "",
+              originCity: S.origin_city || "",
+              destinationCountry: S.destination_country || "",
+              destinationCity: S.destination_city || "",
+              destinationPort: S.destination_port || "",
               departureDate: S.departure_date,
               creationDate: S.creation_date,
               orderIds: S.order_ids || [],
@@ -15591,7 +15910,20 @@ const hc = Qt.getInstance(),
             const fe = {
               id: V.id,
               name: V.name,
-              route: V.route,
+              route:
+                V.route ||
+                buildStandardRouteLabel({
+                  originCountry: V.origin_country,
+                  originCity: V.origin_city,
+                  destinationCountry: V.destination_country,
+                  destinationCity: V.destination_city,
+                  destinationPort: V.destination_port,
+                }),
+              originCountry: V.origin_country || "",
+              originCity: V.origin_city || "",
+              destinationCountry: V.destination_country || "",
+              destinationCity: V.destination_city || "",
+              destinationPort: V.destination_port || "",
               departureDate: V.departure_date,
               creationDate: V.creation_date,
               orderIds: V.order_ids || [],
@@ -15960,7 +16292,20 @@ const hc = Qt.getInstance(),
         (f) => ({
           id: f.id,
           name: f.name,
-          route: f.route,
+          route:
+            f.route ||
+            buildStandardRouteLabel({
+              originCountry: f.origin_country,
+              originCity: f.origin_city,
+              destinationCountry: f.destination_country,
+              destinationCity: f.destination_city,
+              destinationPort: f.destination_port,
+            }),
+          originCountry: f.origin_country || "",
+          originCity: f.origin_city || "",
+          destinationCountry: f.destination_country || "",
+          destinationCity: f.destination_city || "",
+          destinationPort: f.destination_port || "",
           departureDate: f.departure_date,
           creationDate: f.creation_date,
           orderIds: f.order_ids || [],
@@ -16070,6 +16415,26 @@ const hc = Qt.getInstance(),
                     "Error fetching recent shipments for dashboard:",
                     S.error,
                   ));
+              const U = (() => {
+                if (D.error) return 0;
+                const j = D.data || [];
+                let de = 0;
+                for (const se of j) {
+                  const Y = Number(se.estimated_shipping_cost || 0);
+                  if (!(Y > 0)) continue;
+                  const X = Number(se.cost_variance_percentage);
+                  let V = Number.isFinite(X)
+                    ? Math.abs(X)
+                    : Number.NaN;
+                  if (!Number.isFinite(V)) {
+                    const be = Number(se.shipping_cost || 0);
+                    if (!(be > 0)) continue;
+                    V = Math.abs(((be - Y) / Y) * 100);
+                  }
+                  V >= 25 && (de += 1);
+                }
+                return de;
+              })();
               const $ = (j) => {
                 (Sn({
                   totalSuppliers: Number(j.total_suppliers || 0),
@@ -16088,6 +16453,9 @@ const hc = Qt.getInstance(),
                   En({
                     departingSoon: Number(j.departing_soon || 0),
                     capacityRisk: Number(j.capacity_risk || 0),
+                    highVarianceRisk: D.error
+                      ? Number(j.high_variance_risk || 0)
+                      : U,
                     missingTracking: Number(j.missing_tracking || 0),
                     missingShipment: Number(j.missing_shipment || 0),
                     negativeBalances: Number(j.negative_balances || 0),
@@ -16213,6 +16581,13 @@ const hc = Qt.getInstance(),
                   status: j.status,
                   notes: j.notes,
                   creationDate: j.creation_date,
+                  originCountry: j.origin_country || "",
+                  originCity: j.origin_city || "",
+                  destinationCountry: j.destination_country || "",
+                  destinationCity: j.destination_city || "",
+                  destinationPort: j.destination_port || "",
+                  readyDate: j.ready_date || "",
+                  chargesApplied: !!j.charges_applied,
                 })),
               ),
                 D.error ? ge([]) : ge((D.data || []).map(Gr)),
@@ -16386,7 +16761,7 @@ const hc = Qt.getInstance(),
         const f = h.find((v) => v.id === s.id);
         (f == null ? void 0 : f.role) === "admin" &&
           ze(
-            () => import("./dashboardpage.js"),
+            () => import("./dashboardpage.js?v=20260223f"),
             __vite__mapDeps([0, 1, 2, 3, 4, 5]),
           );
       }, [s == null ? void 0 : s.id, h]));
@@ -16743,6 +17118,7 @@ const hc = Qt.getInstance(),
             onRecalculateDistribution: Pn,
             addConsolidation: Ln,
             updateConsolidationDetails: Fn,
+            deleteConsolidation: deleteConsolidationRecord,
             updateConsolidationStatus: Bs,
             createShipmentFromConsolidation: Mn,
             consolidationsLoading: Ne,

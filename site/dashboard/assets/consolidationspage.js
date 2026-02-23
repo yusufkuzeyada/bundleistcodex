@@ -28,6 +28,280 @@ import { R as ss } from "./relatedpanel.js";
 import "./react.js";
 import "./supabase.js";
 import "./icons.js";
+const formatLocationField = (s) =>
+    String(s == null ? "" : s)
+      .replace(/\s+/g, " ")
+      .trim(),
+  foldSpecialCharacters = (s) =>
+    String(s == null ? "" : s)
+      .replace(/[\u0131\u0130]/g, "i")
+      .replace(/\u00df/g, "ss")
+      .replace(/\u00e6/g, "ae")
+      .replace(/\u0153/g, "oe"),
+  normalizeLocationField = (s) =>
+    foldSpecialCharacters(formatLocationField(s))
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/&/g, " and ")
+      .replace(/[^\p{Letter}\p{Number}]+/gu, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
+  hasLocationField = (s) => normalizeLocationField(s) !== "",
+  COUNTRY_ALIAS_TO_ISO2 = Object.freeze({
+    tr: "TR",
+    turkey: "TR",
+    turkiye: "TR",
+    "republic of turkey": "TR",
+    "the republic of turkey": "TR",
+    ae: "AE",
+    uae: "AE",
+    "u a e": "AE",
+    "united arab emirates": "AE",
+    cd: "CD",
+    drc: "CD",
+    rdc: "CD",
+    "dr congo": "CD",
+    "d r congo": "CD",
+    "congo kinshasa": "CD",
+    "democratic republic of congo": "CD",
+    "democratic republic of the congo": "CD",
+    cg: "CG",
+    "congo brazzaville": "CG",
+    "republic of congo": "CG",
+    "republic of the congo": "CG",
+    us: "US",
+    usa: "US",
+    "u s a": "US",
+    "united states": "US",
+    "united states of america": "US",
+    gb: "GB",
+    uk: "GB",
+    "u k": "GB",
+    "great britain": "GB",
+    "united kingdom": "GB",
+    ci: "CI",
+    "ivory coast": "CI",
+    "cote d ivoire": "CI",
+    "cote divoire": "CI",
+    kr: "KR",
+    "south korea": "KR",
+    "republic of korea": "KR",
+    kp: "KP",
+    "north korea": "KP",
+    "democratic people s republic of korea": "KP",
+  }),
+  CITY_ALIAS_BY_COUNTRY = Object.freeze({
+    TR: Object.freeze({
+      constantinople: "istanbul",
+    }),
+    CD: Object.freeze({
+      kin: "kinshasa",
+      "kinshasa city": "kinshasa",
+    }),
+    TZ: Object.freeze({
+      "dar es salam": "dar es salaam",
+    }),
+    "*": Object.freeze({
+      "new york city": "new york",
+      "ho chi minh city": "ho chi minh",
+      saigon: "ho chi minh",
+      "saint petersburg": "st petersburg",
+    }),
+  }),
+  PORT_ALIAS_BY_COUNTRY = Object.freeze({
+    TZ: Object.freeze({
+      "dar es salam": "dar es salaam",
+    }),
+    "*": Object.freeze({
+      "st petersburg": "saint petersburg",
+    }),
+  }),
+  resolveScopedAlias = (s, j, F) => {
+    const y = j && s[j] ? s[j] : null,
+      q = s["*"] || null;
+    return (y && y[F]) || (q && q[F]) || F;
+  },
+  normalizeCountryKey = (s) => {
+    const j = normalizeLocationField(s);
+    if (!j) return "";
+    const F = COUNTRY_ALIAS_TO_ISO2[j];
+    return F ? F : /^[a-z]{2}$/.test(j) ? j.toUpperCase() : j;
+  },
+  normalizeCityKey = (s, j) => {
+    let F = normalizeLocationField(s);
+    if (!F) return "";
+    (F = F
+      .replace(/\bsaint\b/g, "st")
+      .replace(/\b(city|province|state)\b/g, "")
+      .replace(/\s+/g, " ")
+      .trim());
+    const y = normalizeCountryKey(j);
+    return resolveScopedAlias(CITY_ALIAS_BY_COUNTRY, y, F);
+  },
+  normalizePortKey = (s, j) => {
+    let F = normalizeLocationField(s);
+    if (!F) return "";
+    (F = F
+      .replace(/\b(port|harbor|harbour|terminal|seaport|liman|limani)\b/g, "")
+      .replace(/\s+/g, " ")
+      .trim());
+    const y = normalizeCountryKey(j);
+    return resolveScopedAlias(PORT_ALIAS_BY_COUNTRY, y, F);
+  },
+  buildConsolidationRouteLabel = (s) => {
+    const j = [];
+    (hasLocationField(s.originCity) && j.push(formatLocationField(s.originCity)),
+      hasLocationField(s.originCountry) &&
+        j.push(formatLocationField(s.originCountry)));
+    const F = [];
+    (hasLocationField(s.destinationCity) &&
+      F.push(formatLocationField(s.destinationCity)),
+      hasLocationField(s.destinationPort) &&
+        F.push(`${formatLocationField(s.destinationPort)} Port`),
+      hasLocationField(s.destinationCountry) &&
+        F.push(formatLocationField(s.destinationCountry)));
+    const y = j.join(", "),
+      q = F.join(", ");
+    return y || q ? `${y || "Origin TBD"} -> ${q || "Destination TBD"}` : "";
+  },
+  parseLegacyRouteParts = (s) => {
+    const j = String(s == null ? "" : s).trim();
+    if (!j)
+      return {
+        originCountry: "",
+        originCity: "",
+        destinationCountry: "",
+        destinationCity: "",
+        destinationPort: "",
+      };
+    let F = null;
+    (j.includes("->")
+      ? (F = "->")
+      : j.includes("→")
+        ? (F = "→")
+        : /\s+to\s+/i.test(j) && (F = "to"));
+    if (!F)
+      return {
+        originCountry: "",
+        originCity: "",
+        destinationCountry: "",
+        destinationCity: "",
+        destinationPort: "",
+      };
+    const y =
+        F === "to" ? j.split(/\s+to\s+/i, 2) : j.split(F, 2),
+      q = formatLocationField(y[0] || ""),
+      k = formatLocationField(y[1] || "");
+    return {
+      originCountry: "",
+      originCity: q,
+      destinationCountry: "",
+      destinationCity: k,
+      destinationPort: "",
+    };
+  },
+  buildShipmentOriginFromConsolidation = (s) => {
+    const j = [];
+    (hasLocationField(s.originCity) && j.push(formatLocationField(s.originCity)),
+      hasLocationField(s.originCountry) &&
+        j.push(formatLocationField(s.originCountry)));
+    if (j.length > 0) return j.join(", ");
+    const F = parseLegacyRouteParts(s.route);
+    return (
+      [
+        hasLocationField(F.originCity) ? formatLocationField(F.originCity) : "",
+        hasLocationField(F.originCountry)
+          ? formatLocationField(F.originCountry)
+          : "",
+      ]
+        .filter(Boolean)
+        .join(", ")
+    );
+  },
+  buildShipmentDestinationFromConsolidation = (s) => {
+    const j = [];
+    (hasLocationField(s.destinationCity) &&
+      j.push(formatLocationField(s.destinationCity)),
+      hasLocationField(s.destinationPort) &&
+        j.push(`${formatLocationField(s.destinationPort)} Port`),
+      hasLocationField(s.destinationCountry) &&
+        j.push(formatLocationField(s.destinationCountry)));
+    if (j.length > 0) return j.join(", ");
+    const F = parseLegacyRouteParts(s.route);
+    return (
+      [
+        hasLocationField(F.destinationCity)
+          ? formatLocationField(F.destinationCity)
+          : "",
+        hasLocationField(F.destinationPort)
+          ? `${formatLocationField(F.destinationPort)} Port`
+          : "",
+        hasLocationField(F.destinationCountry)
+          ? formatLocationField(F.destinationCountry)
+          : "",
+      ]
+        .filter(Boolean)
+        .join(", ")
+    );
+  },
+  parseDateOnly = (s) => {
+    if (!hasLocationField(s)) return null;
+    const j = new Date(`${s}T00:00:00`);
+    return Number.isNaN(j.getTime()) ? null : j;
+  },
+  evaluateOrderRouteFit = (s, j) => {
+    const F = [],
+      y = normalizeCountryKey(j.originCountry),
+      q = normalizeCountryKey(s.originCountry),
+      k = normalizeCountryKey(j.destinationCountry),
+      X = normalizeCountryKey(s.destinationCountry),
+      T = [
+        {
+          label: "Origin country",
+          consValue: y,
+          orderValue: q,
+        },
+        {
+          label: "Origin city",
+          consValue: normalizeCityKey(j.originCity, y),
+          orderValue: normalizeCityKey(s.originCity, q || y),
+        },
+        {
+          label: "Destination country",
+          consValue: k,
+          orderValue: X,
+        },
+        {
+          label: "Destination city",
+          consValue: normalizeCityKey(j.destinationCity, k),
+          orderValue: normalizeCityKey(s.destinationCity, X || k),
+        },
+        {
+          label: "Destination port",
+          consValue: normalizePortKey(j.destinationPort, k),
+          orderValue: normalizePortKey(s.destinationPort, X || k),
+        },
+      ];
+    for (const _ of T)
+      _.consValue &&
+        (_.orderValue
+          ? _.orderValue !== _.consValue &&
+            F.push(`${_.label} does not match consolidation.`)
+          : F.push(`${_.label} is missing on the order.`));
+    const B = parseDateOnly(j.departureDate),
+      D = parseDateOnly(s.readyDate);
+    return (
+      B &&
+        (D
+          ? D.getTime() > B.getTime() &&
+            F.push(
+              `Ready date ${s.readyDate} is after departure ${j.departureDate}.`,
+            )
+          : F.push("Ready date is missing on the order.")),
+      { isMatch: F.length === 0, reasons: F }
+    );
+  };
 const as = ({
     id: s,
     value: j,
@@ -107,7 +381,11 @@ const as = ({
     currentCustomerId: k,
   }) => {
     const [X, T] = r.useState(""),
-      [_, B] = r.useState(""),
+      [originCountry, setOriginCountry] = r.useState(""),
+      [originCity, setOriginCity] = r.useState(""),
+      [destinationCountry, setDestinationCountry] = r.useState(""),
+      [destinationCity, setDestinationCity] = r.useState(""),
+      [destinationPort, setDestinationPort] = r.useState(""),
       [D, I] = r.useState(""),
       [x, $] = r.useState(Ne.length > 0 ? Ne[0].id : ""),
       [M, A] = r.useState(""),
@@ -120,7 +398,11 @@ const as = ({
     r.useEffect(() => {
       s &&
         (T(""),
-        B(""),
+        setOriginCountry(""),
+        setOriginCity(""),
+        setDestinationCountry(""),
+        setDestinationCity(""),
+        setDestinationPort(""),
         I(""),
         $(Ne.length > 0 ? Ne[0].id : ""),
         A(""),
@@ -141,10 +423,22 @@ const as = ({
       oe = (h) => {
         h.preventDefault();
         const Y = d ? null : q ? N : k;
-        if (!X.trim() || !_.trim() || !D.trim() || !x) {
+        if (!X.trim() || !D.trim() || !x) {
           C(
             "Missing Fields",
-            "Please fill in Name, Route, Departure Date, and Container Type.",
+            "Please fill in Name, Departure Date, and Container Type.",
+          );
+          return;
+        }
+        if (
+          !hasLocationField(originCountry) ||
+          !hasLocationField(originCity) ||
+          !hasLocationField(destinationCountry) ||
+          !hasLocationField(destinationCity)
+        ) {
+          C(
+            "Missing Route Fields",
+            "Origin country/city and destination country/city are required.",
           );
           return;
         }
@@ -193,8 +487,16 @@ const as = ({
           );
           return;
         }
+        const ke = {
+          originCountry: formatLocationField(originCountry),
+          originCity: formatLocationField(originCity),
+          destinationCountry: formatLocationField(destinationCountry),
+          destinationCity: formatLocationField(destinationCity),
+          destinationPort: formatLocationField(destinationPort),
+        };
+        const xe = buildConsolidationRouteLabel(ke);
         (F(
-          { name: X, route: _, departureDate: D, containerTypeId: x },
+          { name: X, route: xe, departureDate: D, containerTypeId: x, ...ke },
           b ? 0 : H,
           Y,
           d,
@@ -448,18 +750,92 @@ const as = ({
                       }),
                     }),
                     e.jsx(Ce, {
-                      label: "Route",
+                      label: "Route Preview",
                       required: !0,
-                      help: "Origin to destination route",
+                      help: "Auto-generated from standardized fields",
                       children: e.jsx("input", {
                         type: "text",
-                        value: _,
-                        onChange: (h) => B(h.target.value),
+                        value: buildConsolidationRouteLabel({
+                          originCountry,
+                          originCity,
+                          destinationCountry,
+                          destinationCity,
+                          destinationPort,
+                        }),
+                        readOnly: !0,
                         className:
                           "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
                         placeholder:
                           "e.g., Istanbul Warehouse → Matadi Port, DRC",
                         required: !0,
+                      }),
+                    }),
+                    e.jsx(Ce, {
+                      label: "Origin Country",
+                      required: !0,
+                      help: "Standardized origin country",
+                      children: e.jsx("input", {
+                        type: "text",
+                        value: originCountry,
+                        onChange: (h) => setOriginCountry(h.target.value),
+                        className:
+                          "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
+                        placeholder: "e.g., Turkey",
+                        required: !0,
+                      }),
+                    }),
+                    e.jsx(Ce, {
+                      label: "Origin City",
+                      required: !0,
+                      help: "Standardized origin city",
+                      children: e.jsx("input", {
+                        type: "text",
+                        value: originCity,
+                        onChange: (h) => setOriginCity(h.target.value),
+                        className:
+                          "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
+                        placeholder: "e.g., Istanbul",
+                        required: !0,
+                      }),
+                    }),
+                    e.jsx(Ce, {
+                      label: "Destination Country",
+                      required: !0,
+                      help: "Standardized destination country",
+                      children: e.jsx("input", {
+                        type: "text",
+                        value: destinationCountry,
+                        onChange: (h) => setDestinationCountry(h.target.value),
+                        className:
+                          "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
+                        placeholder: "e.g., DR Congo",
+                        required: !0,
+                      }),
+                    }),
+                    e.jsx(Ce, {
+                      label: "Destination City",
+                      required: !0,
+                      help: "Standardized destination city",
+                      children: e.jsx("input", {
+                        type: "text",
+                        value: destinationCity,
+                        onChange: (h) => setDestinationCity(h.target.value),
+                        className:
+                          "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
+                        placeholder: "e.g., Matadi",
+                        required: !0,
+                      }),
+                    }),
+                    e.jsx(Ce, {
+                      label: "Destination Port",
+                      help: "Optional port for stricter route matching",
+                      children: e.jsx("input", {
+                        type: "text",
+                        value: destinationPort,
+                        onChange: (h) => setDestinationPort(h.target.value),
+                        className:
+                          "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
+                        placeholder: "e.g., Matadi",
                       }),
                     }),
                     e.jsx(Ce, {
@@ -587,7 +963,17 @@ const as = ({
   }) => {
     var h, Y, ae, le, be, de;
     const [k, X] = r.useState(s.name),
-      [T, _] = r.useState(s.route),
+      [originCountry, setOriginCountry] = r.useState(s.originCountry || ""),
+      [originCity, setOriginCity] = r.useState(s.originCity || ""),
+      [destinationCountry, setDestinationCountry] = r.useState(
+        s.destinationCountry || "",
+      ),
+      [destinationCity, setDestinationCity] = r.useState(
+        s.destinationCity || "",
+      ),
+      [destinationPort, setDestinationPort] = r.useState(
+        s.destinationPort || "",
+      ),
       [B, D] = r.useState(s.departureDate),
       [I, x] = r.useState(s.containerTypeId),
       [$, M] = r.useState(
@@ -609,7 +995,28 @@ const as = ({
       (r.useEffect(() => {
         var z, i, u;
         if (!j) return;
-        (X(s.name), _(s.route));
+        const routeFallback = parseLegacyRouteParts(s.route),
+          originCountryValue = formatLocationField(
+            s.originCountry || routeFallback.originCountry,
+          ),
+          originCityValue = formatLocationField(
+            s.originCity || routeFallback.originCity,
+          ),
+          destinationCountryValue = formatLocationField(
+            s.destinationCountry || routeFallback.destinationCountry,
+          ),
+          destinationCityValue = formatLocationField(
+            s.destinationCity || routeFallback.destinationCity,
+          ),
+          destinationPortValue = formatLocationField(
+            s.destinationPort || routeFallback.destinationPort,
+          );
+        (X(s.name),
+          setOriginCountry(originCountryValue),
+          setOriginCity(originCityValue),
+          setDestinationCountry(destinationCountryValue),
+          setDestinationCity(destinationCityValue),
+          setDestinationPort(destinationPortValue));
         let m = s.departureDate;
         if (s.departureDate)
           if (s.departureDate.includes("T")) m = s.departureDate.split("T")[0];
@@ -645,8 +1052,16 @@ const as = ({
           E("Missing Name", "Consolidation name is required.");
           return;
         }
-        if (!T.trim()) {
-          E("Missing Route", "Route is required.");
+        if (
+          !hasLocationField(originCountry) ||
+          !hasLocationField(originCity) ||
+          !hasLocationField(destinationCountry) ||
+          !hasLocationField(destinationCity)
+        ) {
+          E(
+            "Missing Route Fields",
+            "Origin country/city and destination country/city are required.",
+          );
           return;
         }
         if (!B.trim()) {
@@ -713,21 +1128,30 @@ const as = ({
           return;
         }
         const ke = {
+            originCountry: formatLocationField(originCountry),
+            originCity: formatLocationField(originCity),
+            destinationCountry: formatLocationField(destinationCountry),
+            destinationCity: formatLocationField(destinationCity),
+            destinationPort: formatLocationField(destinationPort),
+          },
+          xe = buildConsolidationRouteLabel(ke);
+        const _e = {
           name: k,
-          route: T,
+          route: xe,
+          ...ke,
           departureDate: B,
           containerTypeId: I,
           shippingCost: u > 0 ? u : void 0,
           customerId: s.isMixed ? null : v,
           notes: ee.trim() ? ee : void 0,
         };
-        (ie !== null && (ke.estimatedShippingCost = ie > 0 ? ie : 0),
+        (ie !== null && (_e.estimatedShippingCost = ie > 0 ? ie : 0),
           s.isMixed &&
-            ((ke.costDistributionMethod = O),
+            ((_e.costDistributionMethod = O),
             O === "fixed_rate_m3"
-              ? (ke.fixedRatePerM3 = Re)
-              : (ke.fixedRatePerM3 = void 0)),
-          y(s.id, ke),
+              ? (_e.fixedRatePerM3 = Re)
+              : (_e.fixedRatePerM3 = void 0)),
+          y(s.id, _e),
           s.status !== f.InTransit &&
             s.status !== f.Delivered &&
             s.status !== f.Completed &&
@@ -841,7 +1265,7 @@ const as = ({
                       className:
                         "block text-sm font-semibold text-gray-700 mb-2",
                       children: [
-                        "Route ",
+                        "Route Preview ",
                         e.jsx("span", {
                           className: "text-red-500",
                           children: "*",
@@ -851,10 +1275,140 @@ const as = ({
                     e.jsx("input", {
                       type: "text",
                       id: "editConsRoute",
-                      value: T,
-                      onChange: (m) => _(m.target.value),
-                      className: "ui-field",
-                      placeholder: "e.g., China to USA",
+                      value: buildConsolidationRouteLabel({
+                        originCountry,
+                        originCity,
+                        destinationCountry,
+                        destinationCity,
+                        destinationPort,
+                      }),
+                      readOnly: !0,
+                      className: "ui-field bg-slate-50 border-slate-200",
+                      placeholder: "Auto-generated route",
+                    }),
+                  ],
+                }),
+                e.jsxs("div", {
+                  className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+                  children: [
+                    e.jsxs("div", {
+                      children: [
+                        e.jsxs("label", {
+                          htmlFor: "editConsOriginCountry",
+                          className:
+                            "block text-sm font-semibold text-gray-700 mb-2",
+                          children: [
+                            "Origin Country ",
+                            e.jsx("span", {
+                              className: "text-red-500",
+                              children: "*",
+                            }),
+                          ],
+                        }),
+                        e.jsx("input", {
+                          type: "text",
+                          id: "editConsOriginCountry",
+                          value: originCountry,
+                          onChange: (m) => setOriginCountry(m.target.value),
+                          className: "ui-field",
+                          placeholder: "e.g., Turkey",
+                        }),
+                      ],
+                    }),
+                    e.jsxs("div", {
+                      children: [
+                        e.jsxs("label", {
+                          htmlFor: "editConsOriginCity",
+                          className:
+                            "block text-sm font-semibold text-gray-700 mb-2",
+                          children: [
+                            "Origin City ",
+                            e.jsx("span", {
+                              className: "text-red-500",
+                              children: "*",
+                            }),
+                          ],
+                        }),
+                        e.jsx("input", {
+                          type: "text",
+                          id: "editConsOriginCity",
+                          value: originCity,
+                          onChange: (m) => setOriginCity(m.target.value),
+                          className: "ui-field",
+                          placeholder: "e.g., Istanbul",
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+                e.jsxs("div", {
+                  className: "grid grid-cols-1 md:grid-cols-3 gap-4",
+                  children: [
+                    e.jsxs("div", {
+                      children: [
+                        e.jsxs("label", {
+                          htmlFor: "editConsDestinationCountry",
+                          className:
+                            "block text-sm font-semibold text-gray-700 mb-2",
+                          children: [
+                            "Destination Country ",
+                            e.jsx("span", {
+                              className: "text-red-500",
+                              children: "*",
+                            }),
+                          ],
+                        }),
+                        e.jsx("input", {
+                          type: "text",
+                          id: "editConsDestinationCountry",
+                          value: destinationCountry,
+                          onChange: (m) => setDestinationCountry(m.target.value),
+                          className: "ui-field",
+                          placeholder: "e.g., DR Congo",
+                        }),
+                      ],
+                    }),
+                    e.jsxs("div", {
+                      children: [
+                        e.jsxs("label", {
+                          htmlFor: "editConsDestinationCity",
+                          className:
+                            "block text-sm font-semibold text-gray-700 mb-2",
+                          children: [
+                            "Destination City ",
+                            e.jsx("span", {
+                              className: "text-red-500",
+                              children: "*",
+                            }),
+                          ],
+                        }),
+                        e.jsx("input", {
+                          type: "text",
+                          id: "editConsDestinationCity",
+                          value: destinationCity,
+                          onChange: (m) => setDestinationCity(m.target.value),
+                          className: "ui-field",
+                          placeholder: "e.g., Matadi",
+                        }),
+                      ],
+                    }),
+                    e.jsxs("div", {
+                      children: [
+                        e.jsx("label", {
+                          htmlFor: "editConsDestinationPort",
+                          className:
+                            "block text-sm font-semibold text-gray-700 mb-2",
+                          children: "Destination Port",
+                        }),
+                        e.jsx("input", {
+                          type: "text",
+                          id: "editConsDestinationPort",
+                          value: destinationPort,
+                          onChange: (m) => setDestinationPort(m.target.value),
+                          className: "ui-field",
+                          placeholder: "e.g., Matadi",
+                        }),
+                      ],
                     }),
                   ],
                 }),
@@ -1281,18 +1835,20 @@ const as = ({
     const [q, k] = r.useState("0"),
       [X, T] = r.useState(""),
       [_, B] = r.useState(""),
-      [D, I] = r.useState("China"),
-      [x, $] = r.useState("USA"),
+      [D, I] = r.useState(""),
+      [x, $] = r.useState(""),
       [M, A] = r.useState(""),
       { showError: b } = Ue();
     if (
       (r.useEffect(() => {
         if (j) {
-          (k("0"), T(""), B(""), I("China"), $("USA"));
-          const d = new Date();
-          (d.setDate(d.getDate() + 30), A(d.toISOString().split("T")[0]));
+          const d = buildShipmentOriginFromConsolidation(s),
+            O = buildShipmentDestinationFromConsolidation(s);
+          (k("0"), T(""), B(""), I(d), $(O));
+          const N = new Date();
+          (N.setDate(N.getDate() + 30), A(N.toISOString().split("T")[0]));
         }
-      }, [j]),
+      }, [j, s]),
       !j)
     )
       return null;
@@ -1461,6 +2017,11 @@ const as = ({
                     placeholder: "e.g., USA, New York, Los Angeles",
                     required: !0,
                   }),
+                  e.jsx("p", {
+                    className: "mt-1 text-xs text-gray-500",
+                    children:
+                      "Auto-filled from consolidation route. Change only if shipment route is intentionally different.",
+                  }),
                 ],
               }),
               e.jsxs("div", {
@@ -1509,6 +2070,7 @@ const as = ({
     onAddOrder: k,
     onRemoveOrder: X,
     getCustomerName: T,
+    getOrderChargeState: _e,
   }) => {
     const [_, B] = r.useState("in"),
       [D, I] = r.useState(null),
@@ -1602,13 +2164,388 @@ const as = ({
           return;
         }
         (X(D), m());
-      },
+      };
+    const pendingCandidateStatuses = r.useMemo(
+        () =>
+          new Set(
+            [Ut.Pending, Ut.Draft, Ut.Submitted, "Pending", "Draft", "Submitted"]
+              .map((i) => (i == null ? "" : String(i).trim()))
+              .filter(Boolean),
+          ),
+        [],
+      ),
+      candidateScanMap = r.useMemo(() => {
+        const i = new Map();
+        for (const u of F) {
+          const G = [],
+            ie = String(u.status || "").trim(),
+            Re = Number(u.volumeM3 || 0),
+            ke = Number(u.weightKG || 0),
+            Pe = N + Re,
+            Me = W + ke,
+            at = _e == null ? void 0 : _e(u.id),
+            chargeState = at || {
+              hasActiveOrderCost: !0,
+              hasActiveServiceFee: !0,
+              hadServiceFeeActivity: !1,
+            },
+            routeFit = evaluateOrderRouteFit(u, s);
+          (pendingCandidateStatuses.has(ie) &&
+            G.push("Order is not confirmed yet (Pending/Draft/Submitted)."),
+            !s.isMixed &&
+              s.customerId &&
+              u.customerId !== s.customerId &&
+              G.push("Different customer than this regular consolidation."),
+            !chargeState.hasActiveOrderCost &&
+              G.push(
+                "Order cost charge is missing or fully reversed. Re-confirm order before adding.",
+              ),
+            chargeState.hadServiceFeeActivity &&
+              !chargeState.hasActiveServiceFee &&
+              G.push(
+                "Service fee was reversed and no active service fee remains.",
+              ),
+            !routeFit.isMatch && G.push(...routeFit.reasons),
+            v &&
+              Pe > v.maxVolumeM3 &&
+              G.push(
+                `Volume limit exceeded by ${(Pe - v.maxVolumeM3).toFixed(2)} m3.`,
+              ),
+            v &&
+              Me > v.maxWeightKG &&
+              G.push(
+                `Weight limit exceeded by ${(Me - v.maxWeightKG).toFixed(2)} KG.`,
+              ),
+            Re <= 0 &&
+              ke <= 0 &&
+              G.push("No positive volume/weight units for shipping allocation."),
+            !v && G.push("Container type is missing."));
+          const reasonsForUi = y
+              ? G
+              : [...G, "Consolidation is currently locked for order edits."],
+            canAddNow = y && G.length === 0;
+          i.set(u.id, { canAddNow, reasons: reasonsForUi, baseReasons: G });
+        }
+        return i;
+      }, [
+        F,
+        N,
+        W,
+        _e,
+        pendingCandidateStatuses,
+        s.isMixed,
+        s.customerId,
+        s.originCountry,
+        s.originCity,
+        s.destinationCountry,
+        s.destinationCity,
+        s.destinationPort,
+        s.departureDate,
+        v,
+        y,
+      ]),
+      candidateScanValues = r.useMemo(
+        () => Array.from(candidateScanMap.values()),
+        [candidateScanMap],
+      ),
+      candidateReadyCount = candidateScanValues.filter((i) => i.canAddNow).length,
+      candidateBlockedCount = Math.max(0, F.length - candidateReadyCount),
+      candidateTopReasons = r.useMemo(() => {
+        const i = new Map();
+        for (const u of candidateScanValues)
+          for (const G of u.baseReasons || [])
+            i.set(G, (i.get(G) || 0) + 1);
+        return [...i.entries()].sort((u, G) => G[1] - u[1]).slice(0, 3);
+      }, [candidateScanValues]),
+      inConsolidationUnconfirmed = r.useMemo(
+        () =>
+          j.filter((i) => pendingCandidateStatuses.has(String(i.status || "").trim())),
+        [j, pendingCandidateStatuses],
+      ),
+      inConsolidationUnchargeable = r.useMemo(
+        () =>
+          j.filter(
+            (i) => Number(i.volumeM3 || 0) <= 0 && Number(i.weightKG || 0) <= 0,
+          ),
+        [j],
+      ),
+      inConsolidationCustomerIds = r.useMemo(
+        () => [...new Set(j.map((i) => i.customerId).filter(Boolean))],
+        [j],
+      ),
+      inConsolidationRouteIssues = r.useMemo(() => {
+        const i = [];
+        for (const u of j) {
+          const G = evaluateOrderRouteFit(u, s);
+          G.isMatch ||
+            i.push(...G.reasons.map((ie) => `${he(u.id, "order")}: ${ie}`));
+        }
+        return i;
+      }, [
+        j,
+        s.originCountry,
+        s.originCity,
+        s.destinationCountry,
+        s.destinationCity,
+        s.destinationPort,
+        s.departureDate,
+      ]),
+      inConsolidationChargeIssues = r.useMemo(() => {
+        const i = [];
+        for (const u of j) {
+          const G =
+            (_e == null ? void 0 : _e(u.id)) || {
+              hasActiveOrderCost: !0,
+              hasActiveServiceFee: !0,
+              hadServiceFeeActivity: !1,
+            };
+          (!G.hasActiveOrderCost &&
+            i.push(
+              `${he(u.id, "order")}: Order cost charge is missing or fully reversed.`,
+            ),
+            G.hadServiceFeeActivity &&
+              !G.hasActiveServiceFee &&
+              i.push(
+                `${he(u.id, "order")}: Service fee was reversed and no active service fee remains.`,
+              ));
+        }
+        return i;
+      }, [j, _e]),
+      departureChecklist = r.useMemo(() => {
+        if (!s.departureDate)
+          return { level: "warn", text: "Departure date is not set." };
+        const i = new Date(`${s.departureDate}T00:00:00`);
+        if (Number.isNaN(i.getTime()))
+          return { level: "warn", text: "Departure date is invalid." };
+        const u = new Date();
+        u.setHours(0, 0, 0, 0);
+        const G = Math.round((i.getTime() - u.getTime()) / 864e5);
+        return G < 0
+          ? {
+              level: "fail",
+              text: `Departure date is ${Math.abs(G)} day(s) in the past.`,
+            }
+          : G <= 2
+            ? {
+                level: "warn",
+                text: `Departure is in ${G} day(s); final checks recommended.`,
+              }
+            : { level: "pass", text: `Departure in ${G} day(s).` };
+      }, [s.departureDate]),
+      checklistRows = r.useMemo(() => {
+        const i = [];
+        i.push(
+          inConsolidationUnconfirmed.length === 0
+            ? {
+                key: "confirmed",
+                label: "Current orders confirmed",
+                level: "pass",
+                detail:
+                  "All orders in this consolidation are confirmed for billing.",
+              }
+            : {
+                key: "confirmed",
+                label: "Current orders confirmed",
+                level: "fail",
+                detail: `${inConsolidationUnconfirmed.length} order(s) are Pending/Draft/Submitted. Confirm them so order and service-fee charges are applied before shipment.`,
+              },
+        );
+        i.push(
+          inConsolidationChargeIssues.length === 0
+            ? {
+                key: "charge-coverage",
+                label: "Order charges",
+                level: "pass",
+                detail:
+                  "All included orders have active order-cost charges. Service fee reversals are not detected.",
+              }
+            : {
+                key: "charge-coverage",
+                label: "Order charges",
+                level: "fail",
+                detail: `${inConsolidationChargeIssues.length} charge issue(s): ${inConsolidationChargeIssues
+                  .slice(0, 2)
+                  .join(" | ")}${inConsolidationChargeIssues.length > 2 ? " ..." : ""}`,
+              },
+        );
+        if (s.isMixed) {
+          const u = String(s.costDistributionMethod || "").trim(),
+            G = u === "fixed_rate_m3" && Number(s.fixedRatePerM3 || 0) <= 0;
+          i.push(
+            !u
+              ? {
+                  key: "customer-policy",
+                  label: "Mixed customer policy",
+                  level: "fail",
+                  detail: "Pick a mixed-consolidation cost distribution method.",
+                }
+              : G
+                ? {
+                    key: "customer-policy",
+                    label: "Mixed customer policy",
+                    level: "fail",
+                    detail: "Fixed rate per m3 must be greater than 0.",
+                  }
+                : {
+                    key: "customer-policy",
+                    label: "Mixed customer policy",
+                    level: "pass",
+                    detail: `${inConsolidationCustomerIds.length} customer(s) currently included with "${u}" distribution.`,
+                  },
+          );
+        } else {
+          const u =
+            inConsolidationCustomerIds.length <= 1 &&
+            (!s.customerId ||
+              inConsolidationCustomerIds.length === 0 ||
+              inConsolidationCustomerIds[0] === s.customerId);
+          i.push(
+            u
+              ? {
+                  key: "customer-policy",
+                  label: "Customer matching",
+                  level: "pass",
+                  detail:
+                    inConsolidationCustomerIds.length === 0
+                      ? "No orders yet, customer policy is clean."
+                      : "All orders belong to the same customer.",
+                }
+              : {
+                  key: "customer-policy",
+                  label: "Customer matching",
+                  level: "fail",
+                  detail: `Regular consolidation has ${inConsolidationCustomerIds.length} customers. Keep one customer only.`,
+                },
+          );
+        }
+        i.push(
+          inConsolidationRouteIssues.length === 0
+            ? {
+                key: "route-standardization",
+                label: "Route standardization",
+                level: "pass",
+                detail:
+                  "All included orders match standardized origin/destination and ready-date checks.",
+              }
+            : {
+                key: "route-standardization",
+                label: "Route standardization",
+                level: "fail",
+                detail: `${inConsolidationRouteIssues.length} mismatch(es): ${inConsolidationRouteIssues
+                  .slice(0, 2)
+                  .join(" | ")}${inConsolidationRouteIssues.length > 2 ? " ..." : ""}`,
+              },
+        );
+        if (!v)
+          i.push({
+            key: "capacity",
+            label: "Container capacity",
+            level: "warn",
+            detail: "Container type is missing; capacity checks are limited.",
+          });
+        else {
+          const u = N <= v.maxVolumeM3 && W <= v.maxWeightKG;
+          i.push(
+            u
+              ? {
+                  key: "capacity",
+                  label: "Container capacity",
+                  level: "pass",
+                  detail: `${N.toFixed(2)} / ${v.maxVolumeM3.toFixed(2)} m3, ${W.toFixed(0)} / ${v.maxWeightKG.toFixed(0)} KG.`,
+                }
+              : {
+                  key: "capacity",
+                  label: "Container capacity",
+                  level: "fail",
+                  detail: `Current load exceeds ${v.name} limits.`,
+                },
+          );
+        }
+        (inConsolidationUnchargeable.length > 0
+          ? i.push({
+              key: "chargeable-units",
+              label: "Chargeable units",
+              level: "warn",
+              detail: `${inConsolidationUnchargeable.length} order(s) have zero volume and weight; verify charge distribution inputs.`,
+            })
+          : i.push({
+              key: "chargeable-units",
+              label: "Chargeable units",
+              level: "pass",
+              detail: "All included orders have positive volume or weight.",
+            }),
+          i.push({
+            key: "departure",
+            label: "Departure window",
+            level: departureChecklist.level,
+            detail: departureChecklist.text,
+          }));
+        const u =
+          F.length === 0
+            ? "warn"
+            : candidateReadyCount > 0 && candidateBlockedCount > 0
+              ? "warn"
+              : candidateReadyCount > 0
+                ? "pass"
+                : "fail";
+        return (
+          i.push({
+            key: "candidate-scan",
+            label: "Auto candidate scan",
+            level: u,
+            detail:
+              F.length === 0
+                ? "No available orders to evaluate."
+                : `${candidateReadyCount} ready now, ${candidateBlockedCount} blocked for this consolidation.`,
+          }),
+          i
+        );
+      }, [
+        F.length,
+        N,
+        W,
+        departureChecklist.level,
+        departureChecklist.text,
+        inConsolidationChargeIssues,
+        inConsolidationCustomerIds,
+        inConsolidationRouteIssues,
+        inConsolidationUnchargeable.length,
+        inConsolidationUnconfirmed.length,
+        candidateReadyCount,
+        candidateBlockedCount,
+        s.isMixed,
+        s.customerId,
+        s.costDistributionMethod,
+        s.fixedRatePerM3,
+        v,
+      ]);
+    const checklistTone = (i) =>
+        i === "pass"
+          ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+          : i === "fail"
+            ? "bg-red-50 border-red-200 text-red-800"
+            : "bg-amber-50 border-amber-200 text-amber-800",
+      checklistPillTone = (i) =>
+        i === "pass"
+          ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+          : i === "fail"
+            ? "bg-red-100 text-red-800 border-red-200"
+            : "bg-amber-100 text-amber-800 border-amber-200",
       z = ({ order: i, isInConsolidation: u, canEdit: G }) => {
         const ie = N > 0 ? (i.volumeM3 / N) * 100 : 0;
+        const Re = !u ? candidateScanMap.get(i.id) || null : null,
+          ke = !u && Re ? Re.canAddNow : !0,
+          Pe =
+            !u && Re && Re.reasons.length > 0
+              ? Re.reasons.join(" | ")
+              : void 0;
         return e.jsx("div", {
           className: `group relative border rounded-lg p-3 transition-all duration-200 hover:shadow-sm ${u ? "bg-emerald-50 border-emerald-200" : "bg-blue-50 border-blue-200"}`,
-          draggable: G,
-          onDragStart: () => R(i, u ? "in" : "available"),
+          draggable: G && (u || ke),
+          onDragStart: () => {
+            if (!G || (!u && !ke)) return;
+            R(i, u ? "in" : "available");
+          },
           onDragEnd: m,
           children: e.jsxs("div", {
             className:
@@ -1636,6 +2573,25 @@ const as = ({
                             className: "text-xs text-gray-500 truncate",
                             children: T(i.customerId),
                           }),
+                          !u &&
+                            Re &&
+                            e.jsx("div", {
+                              className: "mt-1",
+                              children: e.jsx("span", {
+                                className: `inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${Re.canAddNow ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-amber-100 text-amber-800 border-amber-200"}`,
+                                children: Re.canAddNow
+                                  ? "Ready to add"
+                                  : "Needs review",
+                              }),
+                            }),
+                          !u &&
+                            Re &&
+                            !Re.canAddNow &&
+                            Re.reasons.length > 0 &&
+                            e.jsx("p", {
+                              className: "mt-1 text-[11px] text-amber-800",
+                              children: Re.reasons[0],
+                            }),
                         ],
                       }),
                     ],
@@ -1684,9 +2640,15 @@ const as = ({
               }),
               G &&
                 e.jsx("button", {
-                  className: `w-full sm:w-auto sm:ml-2 px-2 py-1 text-xs font-medium rounded transition-colors ${u ? "text-red-600 hover:bg-red-100 border border-red-200" : "text-blue-600 hover:bg-blue-100 border border-blue-200"}`,
-                  onClick: () => (u ? X(i.id) : k(i.id)),
-                  children: u ? "Remove" : "Add",
+                  type: "button",
+                  disabled: !u && !ke,
+                  title: Pe,
+                  className: `w-full sm:w-auto sm:ml-2 px-2 py-1 text-xs font-medium rounded transition-colors ${u ? "text-red-600 hover:bg-red-100 border border-red-200" : ke ? "text-blue-600 hover:bg-blue-100 border border-blue-200" : "text-slate-400 border border-slate-200 cursor-not-allowed bg-slate-50"}`,
+                  onClick: () => {
+                    if (!u && !ke) return;
+                    (u ? X(i.id) : k(i.id));
+                  },
+                  children: u ? "Remove" : ke ? "Add" : "Blocked",
                 }),
             ],
           }),
@@ -1966,6 +2928,101 @@ const as = ({
                   ],
                 }),
               }),
+              e.jsxs("div", {
+                className:
+                  "mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3",
+                children: [
+                  e.jsxs("div", {
+                    className:
+                      "mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between",
+                    children: [
+                      e.jsx("div", {
+                        className: "text-sm font-semibold text-slate-900",
+                        children: "Consolidation Candidate Checklist",
+                      }),
+                      e.jsxs("div", {
+                        className:
+                          "text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1 self-start sm:self-auto",
+                        children: [
+                          "Ready now: ",
+                          e.jsxs("span", {
+                            className: "font-semibold text-emerald-700",
+                            children: [candidateReadyCount, "/", F.length],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                  e.jsx("div", {
+                    className: "space-y-2",
+                    children: checklistRows.map((i) =>
+                      e.jsxs(
+                        "div",
+                        {
+                          className: `rounded-lg border px-3 py-2 ${checklistTone(i.level)}`,
+                          children: [
+                            e.jsxs("div", {
+                              className:
+                                "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between",
+                              children: [
+                                e.jsx("span", {
+                                  className: "text-xs font-semibold uppercase",
+                                  children: i.label,
+                                }),
+                                e.jsx("span", {
+                                  className: `inline-flex self-start sm:self-auto rounded-full border px-2 py-0.5 text-[10px] font-semibold ${checklistPillTone(i.level)}`,
+                                  children:
+                                    i.level === "pass"
+                                      ? "Pass"
+                                      : i.level === "fail"
+                                        ? "Fail"
+                                        : "Warn",
+                                }),
+                              ],
+                            }),
+                            e.jsx("div", {
+                              className: "mt-1 text-xs",
+                              children: i.detail,
+                            }),
+                          ],
+                        },
+                        i.key,
+                      ),
+                    ),
+                  }),
+                  candidateTopReasons.length > 0 &&
+                    e.jsxs("div", {
+                      className:
+                        "mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900",
+                      children: [
+                        e.jsx("div", {
+                          className: "font-semibold",
+                          children: "Most common blockers",
+                        }),
+                        e.jsx("div", {
+                          className: "mt-1 flex flex-wrap gap-2",
+                          children: candidateTopReasons.map(([i, u]) =>
+                            e.jsxs(
+                              "span",
+                              {
+                                className:
+                                  "inline-flex items-center rounded-full border border-amber-200 bg-white px-2 py-0.5",
+                                children: [
+                                  i,
+                                  e.jsxs("span", {
+                                    className: "ml-1 font-semibold",
+                                    children: ["(", u, ")"],
+                                  }),
+                                ],
+                              },
+                              `${i}-${u}`,
+                            ),
+                          ),
+                        }),
+                      ],
+                    }),
+                ],
+              }),
               !y &&
                 e.jsx("div", {
                   className:
@@ -2241,6 +3298,7 @@ const as = ({
     onRecalculateDistribution: F,
     addConsolidation: y,
     updateConsolidationDetails: q,
+    deleteConsolidation: removeConsolidation,
     allOrders: k,
     allSuppliers: X,
     allCustomers: T,
@@ -2314,6 +3372,77 @@ const as = ({
             );
           })
           .join(", "),
+      orderChargeStateMap = r.useMemo(() => {
+        const t = new Map(),
+          a = (n) => {
+            if (!n) return null;
+            if (!t.has(n))
+              t.set(n, {
+                orderCost: 0,
+                orderCostReversal: 0,
+                serviceFee: 0,
+                serviceFeeReversal: 0,
+                hasActiveOrderCost: !1,
+                hasActiveServiceFee: !1,
+                hadServiceFeeActivity: !1,
+                orderCostOutstanding: 0,
+                serviceFeeOutstanding: 0,
+              });
+            return t.get(n);
+          };
+        for (const n of j || []) {
+          const p = a(n.relatedOrderId);
+          if (!p) continue;
+          const o = Math.abs(Number(n.amount || 0));
+          if (!Number.isFinite(o) || o <= 0) continue;
+          switch (String(n.type || "")) {
+            case "OrderCost":
+              p.orderCost += o;
+              break;
+            case "OrderCostReversal":
+              p.orderCostReversal += o;
+              break;
+            case "ServiceFee":
+              p.serviceFee += o;
+              break;
+            case "ServiceFeeReversal":
+              p.serviceFeeReversal += o;
+              break;
+            default:
+              break;
+          }
+        }
+        for (const n of t.values()) {
+          const p = Math.max(0, n.orderCost - n.orderCostReversal),
+            o = Math.max(0, n.serviceFee - n.serviceFeeReversal);
+          (n.orderCostOutstanding = p,
+            n.serviceFeeOutstanding = o,
+            n.hasActiveOrderCost = p > 0.01,
+            n.hasActiveServiceFee = o > 0.01,
+            n.hadServiceFeeActivity =
+              n.serviceFee > 0.01 || n.serviceFeeReversal > 0.01);
+        }
+        return t;
+      }, [j]),
+      getOrderChargeState = r.useCallback(
+        (t) =>
+          t
+            ? orderChargeStateMap.get(t) || {
+                hasActiveOrderCost: !1,
+                hasActiveServiceFee: !0,
+                hadServiceFeeActivity: !1,
+                orderCostOutstanding: 0,
+                serviceFeeOutstanding: 0,
+              }
+            : {
+                hasActiveOrderCost: !1,
+                hasActiveServiceFee: !0,
+                hadServiceFeeActivity: !1,
+                orderCostOutstanding: 0,
+                serviceFeeOutstanding: 0,
+              },
+        [orderChargeStateMap],
+      ),
       Le = (t) => k.filter((a) => t.orderIds.includes(a.id)),
       pt = (t) =>
         k.filter((a) => {
@@ -2349,6 +3478,29 @@ const as = ({
           );
           return;
         }
+        const V = getOrderChargeState(p.id);
+        if (!V.hasActiveOrderCost) {
+          N(
+            "Order Charges Missing",
+            "Order cost charge is missing or fully reversed. Re-confirm this order before adding it to consolidation.",
+          );
+          return;
+        }
+        if (V.hadServiceFeeActivity && !V.hasActiveServiceFee) {
+          N(
+            "Service Fee Missing",
+            "Service fee was reversed and no active service fee remains. Review payments before adding this order.",
+          );
+          return;
+        }
+        const J = evaluateOrderRouteFit(p, n);
+        if (!J.isMatch) {
+          N(
+            "Route Or Schedule Mismatch",
+            `Order cannot be added due to standardized route checks:\n\n${J.reasons.join("\n")}`,
+          );
+          return;
+        }
         if (
           n.status === f.InTransit ||
           n.status === f.Delivered ||
@@ -2368,34 +3520,34 @@ const as = ({
           );
           return;
         }
-        const V = Le(n),
-          J = V.reduce((w, xe) => w + xe.volumeM3, 0),
-          L = V.reduce((w, xe) => w + xe.weightKG, 0);
-        if (J + p.volumeM3 > o.maxVolumeM3) {
-          const w = J + p.volumeM3,
-            xe = w - o.maxVolumeM3;
+        const L = Le(n),
+          w = L.reduce((xe, Xe) => xe + Xe.volumeM3, 0),
+          xe = L.reduce((Xe, Qe) => Xe + Qe.weightKG, 0);
+        if (w + p.volumeM3 > o.maxVolumeM3) {
+          const Xe = w + p.volumeM3,
+            Qe = Xe - o.maxVolumeM3;
           N(
             "Volume Limit Exceeded",
-            `Cannot add order. Would exceed container volume limit by ${xe.toFixed(2)} m3.
+            `Cannot add order. Would exceed container volume limit by ${Qe.toFixed(2)} m3.
 
 Container: ${o.name} (${o.maxVolumeM3.toFixed(2)} m3 max)
-Current usage: ${J.toFixed(2)} m3
+Current usage: ${w.toFixed(2)} m3
 Adding: ${p.volumeM3.toFixed(2)} m3
-Total would be: ${w.toFixed(2)} m3`,
+Total would be: ${Xe.toFixed(2)} m3`,
           );
           return;
         }
-        if (L + p.weightKG > o.maxWeightKG) {
-          const w = L + p.weightKG,
-            xe = w - o.maxWeightKG;
+        if (xe + p.weightKG > o.maxWeightKG) {
+          const Xe = xe + p.weightKG,
+            Qe = Xe - o.maxWeightKG;
           N(
             "Weight Limit Exceeded",
-            `Cannot add order. Would exceed container weight limit by ${xe.toFixed(2)} KG.
+            `Cannot add order. Would exceed container weight limit by ${Qe.toFixed(2)} KG.
 
 Container: ${o.name} (${o.maxWeightKG.toFixed(2)} KG max)
-Current usage: ${L.toFixed(2)} KG
+Current usage: ${xe.toFixed(2)} KG
 Adding: ${p.weightKG.toFixed(2)} KG
-Total would be: ${w.toFixed(2)} KG`,
+Total would be: ${Xe.toFixed(2)} KG`,
           );
           return;
         }
@@ -2497,6 +3649,32 @@ Total would be: ${w.toFixed(2)} KG`,
         t.status !== f.Cancelled &&
         !t.shippingCostDistributed,
       St = (t) => t.status !== f.Cancelled,
+      getDeleteBlockReason = (t) => {
+        if (!b) return "Only admins can delete consolidations.";
+        if ((t.orderIds || []).length > 0)
+          return "This consolidation still has orders. Remove all orders first.";
+        if (lt(t.id))
+          return "A shipment is linked to this consolidation. Shipment must be handled first.";
+        if (t.shippingCostDistributed)
+          return "Shipping cost has already been distributed for this consolidation.";
+        if (j.some((a) => a.relatedConsolidationId === t.id))
+          return "Payment transactions are linked to this consolidation.";
+        return "";
+      },
+      handleDeleteConsolidation = (t) => {
+        const a = getDeleteBlockReason(t);
+        if (a) {
+          N("Cannot Delete Consolidation", a);
+          return;
+        }
+        if (
+          !window.confirm(
+            `Delete consolidation \"${t.name}\" permanently? This cannot be undone.`,
+          )
+        )
+          return;
+        typeof removeConsolidation == "function" && removeConsolidation(t.id);
+      },
       Oe = s,
       [os, ds] = r.useState([]),
       qe = r.useCallback(() => {
@@ -4843,6 +6021,26 @@ Total would be: ${w.toFixed(2)} KG`,
                                                                 children:
                                                                   "Edit",
                                                               }),
+                                                            e.jsx(S, {
+                                                              variant: "outline",
+                                                              size: "xs",
+                                                              onClick: () =>
+                                                                handleDeleteConsolidation(
+                                                                  t,
+                                                                ),
+                                                              disabled: !!getDeleteBlockReason(
+                                                                t,
+                                                              ),
+                                                              title:
+                                                                getDeleteBlockReason(
+                                                                  t,
+                                                                ) ||
+                                                                "Delete consolidation",
+                                                              className:
+                                                                "text-red-700 border-red-200 hover:bg-red-50",
+                                                              children:
+                                                                "Delete",
+                                                            }),
                                                           ],
                                                         }),
                                                     ],
@@ -5161,6 +6359,7 @@ Total would be: ${w.toFixed(2)} KG`,
                 onAddOrder: Ft,
                 onRemoveOrder: Tt,
                 getCustomerName: Ie,
+                getOrderChargeState,
               }),
             Qe &&
               Ot &&
