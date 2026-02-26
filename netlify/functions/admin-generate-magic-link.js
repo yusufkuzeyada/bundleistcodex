@@ -59,7 +59,15 @@ function resolveRequestOrigin(event) {
   const host =
     readHeader(event, "x-forwarded-host") || readHeader(event, "host");
   if (!host) {
-    return "";
+    const netlifyUrl = String(process.env.URL || "").trim();
+    if (!netlifyUrl) {
+      return "";
+    }
+    try {
+      return new URL(netlifyUrl).origin;
+    } catch {
+      return "";
+    }
   }
   const forwardedProto = readHeader(event, "x-forwarded-proto");
   const candidate = String(forwardedProto || "")
@@ -91,6 +99,19 @@ function resolveRedirectTo(event, requestedValue) {
       : new URL(requested).toString();
   } catch {
     return fallback;
+  }
+}
+
+function normalizeActionLink(actionLink, redirectTo) {
+  if (!actionLink || !redirectTo) {
+    return actionLink;
+  }
+  try {
+    const url = new URL(actionLink);
+    url.searchParams.set("redirect_to", redirectTo);
+    return url.toString();
+  } catch {
+    return actionLink;
   }
 }
 
@@ -244,7 +265,10 @@ exports.handler = async (event) => {
       });
     }
 
-    const actionLink = extractActionLink(generateBody);
+    const actionLink = normalizeActionLink(
+      extractActionLink(generateBody),
+      redirectTo,
+    );
     if (!actionLink) {
       console.error(
         "admin-generate-magic-link: missing action link in response",
