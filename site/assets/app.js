@@ -5690,6 +5690,8 @@ const La = () => {
               "Ideal for first-time importers who want to manage suppliers, payments, and shipping more smoothly.",
             commercial:
               "After your first shipment, continue with Starter or upgrade to Standard for better rates, full dashboard access, and priority scheduling.",
+            footnote:
+              "Many customers start with a pilot shipment and naturally move to Standard as their import volume grows.",
             model: "Includes",
             icon: Fs,
             iconColor: "text-emerald-700",
@@ -6159,6 +6161,13 @@ const La = () => {
                                         "mt-1 text-xs text-slate-500 leading-relaxed",
                                       children: i.commercial,
                                     }),
+                                    i.footnote
+                                      ? t.jsx("p", {
+                                          className:
+                                            "mt-1 text-[11px] text-slate-500 leading-relaxed",
+                                          children: i.footnote,
+                                        })
+                                      : null,
                                     t.jsx("div", {
                                       className:
                                         "mt-3 border-t border-slate-900/10 pt-3",
@@ -6192,73 +6201,6 @@ const La = () => {
                               d,
                             );
                           }),
-                        }),
-                        t.jsxs("div", {
-                          className: "mt-6 grid gap-4 sm:grid-cols-2",
-                          children: [
-                            t.jsxs("div", {
-                              className:
-                                "h-full rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm",
-                              children: [
-                                t.jsx("h3", {
-                                  className: "text-lg font-bold text-slate-900",
-                                  children: "How Pricing Works",
-                                }),
-                                t.jsx("p", {
-                                  className:
-                                    "mt-2 text-sm text-slate-700 leading-relaxed",
-                                  children:
-                                    "Bundleist separates service fees from pass-through costs to ensure full transparency and cost control.",
-                                }),
-                                t.jsxs("div", {
-                                  className:
-                                    "mt-3 space-y-1.5 text-sm text-slate-700",
-                                  children: [
-                                    t.jsx("div", {
-                                      children:
-                                        "Service Fee: Bundleist operational fee.",
-                                    }),
-                                    t.jsx("div", {
-                                      children:
-                                        "Freight and Duties: charged at actual carrier rates.",
-                                    }),
-                                    t.jsx("div", {
-                                      children:
-                                        "Bank Fees: passed through at cost, with no markup.",
-                                    }),
-                                  ],
-                                }),
-                                t.jsx("p", {
-                                  className:
-                                    "mt-3 text-sm font-semibold text-slate-900",
-                                  children:
-                                    "No hidden fees. No surprises. Full cost visibility.",
-                                }),
-                              ],
-                            }),
-                            t.jsxs("div", {
-                              className:
-                                "h-full rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm",
-                              children: [
-                                t.jsx("h3", {
-                                  className: "text-lg font-bold text-slate-900",
-                                  children: "Scaling With You",
-                                }),
-                                t.jsx("p", {
-                                  className:
-                                    "mt-2 text-sm text-slate-700 leading-relaxed",
-                                  children:
-                                    "Many customers start with a pilot shipment and naturally move to Standard as their import volume grows.",
-                                }),
-                                t.jsx("p", {
-                                  className:
-                                    "mt-2 text-sm text-slate-700 leading-relaxed",
-                                  children:
-                                    "Enterprise is designed for high-volume importers who require priority handling, cost optimization, and dedicated support.",
-                                }),
-                              ],
-                            }),
-                          ],
                         }),
                       ],
                     }),

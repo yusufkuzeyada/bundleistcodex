@@ -1705,7 +1705,8 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
     [d.CustomsClearance]: "Order undergoing customs clearance process",
     [d.OutForDelivery]: "Order out for delivery to customer",
     [d.Delivered]: "Order successfully delivered to customer",
-    [d.Completed]: "Order completed",
+    [d.Completed]:
+      "Order closed after delivery confirmation and post-delivery reconciliation",
     [d.Cancelled]: "Order has been cancelled",
     [d.OnHold]: "Order temporarily on hold awaiting resolution",
   },
@@ -1837,17 +1838,19 @@ const STREAMLINED_PRE_SHIPMENT_CONSOLIDATION_STATUSES = new Set([
       ? d.ReadyToShip
       : s === m.OnHold
         ? d.OnHold
-      : s === m.Delivered || s === m.Completed
-        ? d.Delivered
-          : s === m.OutForDelivery
-            ? d.OutForDelivery
-            : s === m.CustomsClearance
-              ? d.CustomsClearance
-              : s === m.InTransit
-                ? d.InTransit
-                : isPreShipmentConsolidationStatus(s)
-                  ? preShipmentStatus
-                  : preShipmentStatus,
+        : s === m.Completed
+          ? d.Completed
+          : s === m.Delivered
+            ? d.Delivered
+            : s === m.OutForDelivery
+              ? d.OutForDelivery
+              : s === m.CustomsClearance
+                ? d.CustomsClearance
+                : s === m.InTransit
+                  ? d.InTransit
+                  : isPreShipmentConsolidationStatus(s)
+                    ? preShipmentStatus
+                    : preShipmentStatus,
   SHIPMENT_TO_CONSOLIDATION_STATUS_MAP = Object.freeze({
     [m.InTransit]: m.InTransit,
     [m.CustomsClearance]: m.CustomsClearance,
@@ -1871,7 +1874,9 @@ const STREAMLINED_PRE_SHIPMENT_CONSOLIDATION_STATUSES = new Set([
   mapConsolidationToShipmentStatus = (s) =>
     CONSOLIDATION_TO_SHIPMENT_STATUS_MAP[String(s) || ""] || null,
   mapShipmentToOrderStatus = (s) =>
-    s === "Delivered" || s === "Completed"
+    s === "Completed"
+      ? d.Completed
+      : s === "Delivered"
       ? d.Delivered
       : s === "Cancelled"
         ? d.Cancelled
@@ -11809,7 +11814,7 @@ class Gt {
     return (t || []).map(this.transformDatabaseShipment);
   }
   async getDelivered() {
-    const e = [d.Delivered, m.Delivered, m.Completed],
+    const e = [d.Delivered, d.Completed, m.Delivered, m.Completed],
       { data: t, error: r } = await _.from("shipments")
         .select("*")
         .in("status", e)
@@ -15825,6 +15830,17 @@ const hc = Qt.getInstance(),
       Us = async (f, g, v = !1) => {
         const w = le.find((M) => M.id === f);
         if (!w) return;
+        if (String(g) === m.Completed && w.type === "consolidation") {
+          const D = w.relatedId || w.consolidationId,
+            S = D ? ce.find(($) => $.id === D) : null;
+          if (S && !S.shippingCostDistributed) {
+            n(
+              "Finalize Costs First",
+              "Set and distribute actual shipping cost before marking this consolidation shipment as completed.",
+            );
+            return;
+          }
+        }
         if (isDeliveredLikeStatus(g) && !String(w.trackingUrl || "").trim()) {
           n(
             "Tracking Required",
@@ -16150,14 +16166,17 @@ const hc = Qt.getInstance(),
           return;
         }
         if (
+          !v &&
           w.orderIds
             .map((E) => A.find((D) => D.id === E))
-            .filter((E) => E && [d.Delivered, d.Cancelled].includes(E.status))
+            .filter((E) =>
+              E && [d.Delivered, d.Completed, d.Cancelled].includes(E.status),
+            )
             .length > 0
         ) {
           n(
             "Consolidation Locked",
-            "This consolidation cannot be updated because one or more related orders are locked (shipped, delivered, or cancelled). For audit and business reasons, shipped/delivered/cancelled orders and their consolidations cannot be changed. If you need to make an exception, please contact an administrator.",
+            "This consolidation cannot be updated because one or more related orders are locked (shipped, delivered, completed, or cancelled). For audit and business reasons, these orders and their consolidations cannot be changed directly. If you need to make an exception, please contact an administrator.",
           );
           return;
         }
@@ -16216,7 +16235,10 @@ const hc = Qt.getInstance(),
               };
             for (const Q of S) {
               const j = B[Q.status] || 0;
-              if ((B[T] || 0) > j) {
+              if (
+                (B[T] || 0) > j ||
+                (T === d.Completed && Q.status === d.Delivered)
+              ) {
                 const Y = Q.status;
                 (await We(Q.id, { status: T }, !0),
                   await ie.createOrderStatusNotification(
@@ -16443,9 +16465,15 @@ const hc = Qt.getInstance(),
                       consolidationStatus: fe.status,
                       consolidationMappedStatus: xe,
                       consolidationLevel: ct,
-                      willAdvance: ct > lt,
+                      willAdvance:
+                        ct > lt ||
+                        (xe === d.Completed && Ve.status === d.Delivered),
                     }),
-                      (Qe = ct > lt ? xe : Ve.status));
+                      (Qe =
+                        ct > lt ||
+                        (xe === d.Completed && Ve.status === d.Delivered)
+                          ? xe
+                          : Ve.status));
                   }
                   const Tr = Ve.status;
                   (Tr !== Qe &&
@@ -16533,10 +16561,16 @@ const hc = Qt.getInstance(),
                       consolidationStatus: fe.status,
                       consolidationMappedStatus: Je,
                       consolidationLevel: Ae,
-                      willAdvance: Ae > Ue,
+                      willAdvance:
+                        Ae > Ue ||
+                        (Je === d.Completed && ve.status === d.Delivered),
                     },
                   ),
-                    (xe = Ae > Ue ? Je : ve.status));
+                    (xe =
+                      Ae > Ue ||
+                      (Je === d.Completed && ve.status === d.Delivered)
+                        ? Je
+                        : ve.status));
                 }
                 if (ve.status !== xe) {
                   const Ae = ve.status;

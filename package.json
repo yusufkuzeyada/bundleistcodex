@@ -9,6 +9,7 @@
     "setup:static": "npm run prepare:static && npm run format:static",
     "map:supabase": "node ./scripts/generate-supabase-map.mjs",
     "migrate:codes": "node ./scripts/migrate-entity-codes.mjs",
+    "sync:completed": "node ./scripts/sync-completed-statuses.mjs",
     "reset:seed:orders": "node ./scripts/reset-and-seed-orders.mjs",
     "dev:functions": "npx netlify-cli@latest dev --port 4173 --offline",
     "dev": "serve -l 4173 site",

@@ -341,6 +341,21 @@ const formatLocationField = (s) =>
     const j = getConsolidationPrimaryLabel(s),
       F = getConsolidationSecondaryLabel(s);
     return F ? `${j} - ${F}` : j;
+  },
+  sanitizeCurrencyInput = (s) => {
+    let j = String(s ?? "").replace(/[^\d.]/g, "");
+    const F = j.indexOf(".");
+    return (
+      F !== -1 &&
+        (j = `${j.slice(0, F + 1)}${j.slice(F + 1).replace(/\./g, "")}`),
+      j
+    );
+  },
+  parseCurrencyInput = (s) => {
+    const j = sanitizeCurrencyInput(s);
+    if (j === "") return 0;
+    const F = Number.parseFloat(j);
+    return Number.isFinite(F) ? F : 0;
   };
 const as = ({
     id: s,
@@ -507,7 +522,7 @@ const as = ({
           C("Invalid Date", "Departure date cannot be in the past.");
           return;
         }
-        const H = parseFloat(M) || 0;
+        const H = parseCurrencyInput(M);
         if (H < 0) {
           C("Invalid Cost", "Estimated shipping cost cannot be negative.");
           return;
@@ -519,7 +534,7 @@ const as = ({
           );
           return;
         }
-        const ce = parseFloat(pe) || 0;
+        const ce = parseCurrencyInput(pe);
         if (d && P === "fixed_rate_m3" && ce <= 0) {
           C(
             "Invalid Rate",
@@ -734,13 +749,13 @@ const as = ({
                               children: "$",
                             }),
                             e.jsx("input", {
-                              type: "number",
+                              type: "text",
                               value: pe,
-                              onChange: (h) => ee(h.target.value),
+                              onChange: (h) =>
+                                ee(sanitizeCurrencyInput(h.target.value)),
                               className: "ui-field pl-8 pr-4",
                               placeholder: "100.00",
-                              min: "0.01",
-                              step: "0.01",
+                              inputMode: "decimal",
                               required: d && P === "fixed_rate_m3",
                             }),
                             e.jsx("span", {
@@ -933,26 +948,15 @@ const as = ({
                     label: "Estimated Shipping Cost",
                     help: "Initial cost estimate for planning and cost tracking (USD)",
                     children: [
-                      e.jsxs("div", {
-                        className: "relative",
-                        children: [
-                          e.jsx("span", {
-                            className:
-                              "absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium",
-                            children: "$",
-                          }),
-                          e.jsx("input", {
-                            type: "number",
-                            value: M,
-                            onChange: (h) => A(h.target.value),
-                            disabled: b,
-                            className:
-                              "w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200",
-                            placeholder: "2500.00",
-                            min: "0",
-                            step: "0.01",
-                          }),
-                        ],
+                      e.jsx("input", {
+                        type: "text",
+                        value: M,
+                        onChange: (h) => A(sanitizeCurrencyInput(h.target.value)),
+                        disabled: b,
+                        className:
+                          "ui-field",
+                        placeholder: "2500.00",
+                        inputMode: "decimal",
                       }),
                       e.jsxs("label", {
                         className:
@@ -1138,7 +1142,7 @@ const as = ({
           E("Invalid Departure Date", "Departure date cannot be in the past.");
           return;
         }
-        const u = parseFloat($) || 0;
+        const u = parseCurrencyInput($);
         if (u < 0) {
           E(
             "Invalid Shipping Cost",
@@ -1146,12 +1150,14 @@ const as = ({
           );
           return;
         }
-        const G = (
+        const G = sanitizeCurrencyInput(
+            (
             ((Pe = Z.current) == null ? void 0 : Pe.value) ??
             A ??
             ""
           ).trim(),
-          ie = G === "" ? null : parseFloat(G) || 0;
+          ),
+          ie = G === "" ? null : parseCurrencyInput(G);
         if (ie !== null && ie < 0) {
           E(
             "Invalid Estimated Cost",
@@ -1159,8 +1165,9 @@ const as = ({
           );
           return;
         }
-        const Re =
-          parseFloat(((Me = d.current) == null ? void 0 : Me.value) || W) || 0;
+        const Re = parseCurrencyInput(
+          ((Me = d.current) == null ? void 0 : Me.value) || W,
+        );
         if (O === "fixed_rate_m3" && Re <= 0) {
           E(
             "Invalid Rate",
@@ -1574,7 +1581,8 @@ const as = ({
                           ref: Z,
                           defaultValue: A,
                           onChange: (m) => {
-                            const R = m.target.value;
+                            const R = sanitizeCurrencyInput(m.target.value);
+                            m.target.value = R;
                             b(R);
                           },
                           className: "ui-field",
