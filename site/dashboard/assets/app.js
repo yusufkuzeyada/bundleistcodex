@@ -15073,7 +15073,7 @@ const hc = Qt.getInstance(),
           C = w == null ? void 0 : w.access_token;
         if (!C)
           throw new Error("Missing session token. Please sign in again.");
-        const B = (() => {
+        const magicLinkRedirectTo = (() => {
             try {
               return new URL("/dashboard/", window.location.origin).toString();
             } catch {
@@ -15093,7 +15093,11 @@ const hc = Qt.getInstance(),
               "Content-Type": "application/json",
               Authorization: `Bearer ${C}`,
             },
-            body: JSON.stringify(B ? { userId: f, redirectTo: B } : { userId: f }),
+            body: JSON.stringify(
+              magicLinkRedirectTo
+                ? { userId: f, redirectTo: magicLinkRedirectTo }
+                : { userId: f },
+            ),
           });
           if ($.status !== 404 || S === M[M.length - 1]) {
             (E = $, (D = S));
@@ -15126,12 +15130,12 @@ const hc = Qt.getInstance(),
                           : "Failed to generate magic link.",
           );
         }
-        const B = String((T == null ? void 0 : T.actionLink) || "").trim();
-        if (!B)
+        const magicLink = String((T == null ? void 0 : T.actionLink) || "").trim();
+        if (!magicLink)
           throw new Error(
             "Magic link was generated but no link was returned by the server.",
           );
-        return B;
+        return magicLink;
       },
       Rs = async () => {
         u(!0);
