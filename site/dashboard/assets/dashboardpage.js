@@ -2092,10 +2092,6 @@ const ht = ({
                           }),
                         ],
                       }),
-                      e.jsx("div", {
-                        className: "mt-6",
-                        children: e.jsx(fe, { title: "Recent activity" }),
-                      }),
                     ],
                   }),
                 ],

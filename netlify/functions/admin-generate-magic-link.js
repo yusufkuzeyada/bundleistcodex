@@ -127,6 +127,30 @@ function extractActionLink(payload) {
   return typeof direct === "string" ? direct.trim() : "";
 }
 
+function isRedirectConstraintError(payload) {
+  if (!payload || typeof payload !== "object") {
+    return false;
+  }
+  const text = [
+    payload.msg,
+    payload.message,
+    payload.error_description,
+    payload.error,
+  ]
+    .filter((value) => typeof value === "string" && value.trim())
+    .join(" ")
+    .toLowerCase();
+  if (!text.includes("redirect")) {
+    return false;
+  }
+  return (
+    text.includes("allow") ||
+    text.includes("whitelist") ||
+    text.includes("valid") ||
+    text.includes("match")
+  );
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return jsonResponse(405, { code: "method_not_allowed" });
@@ -238,16 +262,39 @@ exports.handler = async (event) => {
       generatePayload.redirect_to = redirectTo;
     }
 
-    const generateResponse = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link`, {
-      method: "POST",
-      headers: {
-        apikey: serviceRoleKey,
-        Authorization: `Bearer ${serviceRoleKey}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(generatePayload),
-    });
-    const generateBody = await parseJson(generateResponse);
+    const requestGenerateLink = async (payload) => {
+      const response = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link`, {
+        method: "POST",
+        headers: {
+          apikey: serviceRoleKey,
+          Authorization: `Bearer ${serviceRoleKey}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const body = await parseJson(response);
+      return { response, body };
+    };
+
+    let { response: generateResponse, body: generateBody } =
+      await requestGenerateLink(generatePayload);
+
+    if (
+      !generateResponse.ok &&
+      generatePayload.redirect_to &&
+      isRedirectConstraintError(generateBody)
+    ) {
+      console.warn(
+        "admin-generate-magic-link: redirect_to rejected, retrying without redirect",
+        {
+          attemptedRedirect: generatePayload.redirect_to,
+          error: generateBody,
+        },
+      );
+      delete generatePayload.redirect_to;
+      ({ response: generateResponse, body: generateBody } =
+        await requestGenerateLink(generatePayload));
+    }
     if (!generateResponse.ok) {
       console.error(
         "admin-generate-magic-link: generate_link failed",
@@ -267,7 +314,7 @@ exports.handler = async (event) => {
 
     const actionLink = normalizeActionLink(
       extractActionLink(generateBody),
-      redirectTo,
+      generatePayload.redirect_to || "",
     );
     if (!actionLink) {
       console.error(
@@ -282,7 +329,7 @@ exports.handler = async (event) => {
       userId,
       email: targetEmail,
       actionLink,
-      redirectTo: redirectTo || null,
+      redirectTo: generatePayload.redirect_to || null,
     });
   } catch (error) {
     console.error("admin-generate-magic-link: unexpected error", error);
