@@ -85,6 +85,28 @@ Notes:
 - Resend has a free tier; this keeps initial cost at $0 if your volume stays within free limits.
 - `npm run dev` serves static files only. Netlify Functions run in Netlify or via Netlify CLI (`netlify dev`).
 
+### Notification policy and cleanup
+
+Dashboard notification center policy is now explicit:
+
+- Customer page size: `50` (load more for older items)
+- Admin page size: `100` (load more for older items)
+
+Automated retention cleanup runs daily off-peak via scheduled Netlify Function:
+
+- Function: `/.netlify/functions/notification-retention-cleanup`
+- Schedule: `15 2 * * *` (02:15 UTC daily)
+- Defaults: read notifications `21` days, unread notifications `75` days
+- Cleanup is batched and repeats within one run until backlog is drained (up to configured max batches)
+
+Optional env vars for this cleanup flow:
+
+- `NOTIFICATION_READ_RETENTION_DAYS` (clamped to `14..30`)
+- `NOTIFICATION_UNREAD_RETENTION_DAYS` (clamped to `60..90`)
+- `NOTIFICATION_CLEANUP_BATCH_SIZE` (clamped to `500..10000`)
+- `NOTIFICATION_CLEANUP_MAX_BATCHES` (clamped to `1..50`)
+- `NOTIFICATION_CLEANUP_SECRET` (required header `x-notification-cleanup-secret` for manual invocation)
+
 ## Important note
 
 This setup removes hash suffixes from chunk names and runs formatter on `js/css/html` so files become readable and directly editable.

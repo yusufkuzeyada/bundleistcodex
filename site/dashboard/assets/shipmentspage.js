@@ -385,12 +385,8 @@ const F = 20,
       },
       fe = (t) =>
         t.type === "consolidation"
-          ? t.status !== L.Delivered &&
-            t.status !== L.Completed &&
-            t.status !== L.Cancelled
-          : t.status !== E.Delivered &&
-            t.status !== E.Completed &&
-            t.status !== E.Cancelled;
+          ? ve(t.status).length > 0
+          : ge(t.status).length > 0;
     return (
       r.useEffect(() => {
         g(1);

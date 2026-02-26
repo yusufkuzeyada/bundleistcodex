@@ -28,6 +28,19 @@ import { R as ss } from "./relatedpanel.js";
 import "./react.js";
 import "./supabase.js";
 import "./icons.js";
+const FILTERABLE_CONSOLIDATION_STATUSES = [
+  f.Planning,
+  f.Loading,
+  f.QualityCheck,
+  f.ReadyToShip,
+  f.InTransit,
+  f.CustomsClearance,
+  f.OutForDelivery,
+  f.Delivered,
+  f.Completed,
+  f.Cancelled,
+  f.OnHold,
+];
 const formatLocationField = (s) =>
     String(s == null ? "" : s)
       .replace(/\s+/g, " ")
@@ -301,6 +314,33 @@ const formatLocationField = (s) =>
           : F.push("Ready date is missing on the order.")),
       { isMatch: F.length === 0, reasons: F }
     );
+  },
+  getConsolidationManualName = (s) => {
+    const j =
+      typeof (s == null ? void 0 : s.manualName) == "string"
+        ? s.manualName.trim()
+        : "";
+    if (j) return j;
+    const F =
+      typeof (s == null ? void 0 : s.name) == "string" ? s.name.trim() : "";
+    return F && F !== "Consolidation" ? F : "";
+  },
+  getConsolidationPrimaryLabel = (s) => {
+    if (!s) return "Consolidation";
+    const j =
+      typeof s.id == "string" && s.id ? he(s.id, "consolidation") : "",
+      F = getConsolidationManualName(s);
+    return j || F || "Consolidation";
+  },
+  getConsolidationSecondaryLabel = (s) => {
+    const j = getConsolidationManualName(s),
+      F = getConsolidationPrimaryLabel(s);
+    return j && j !== F ? j : "";
+  },
+  getConsolidationIdentityText = (s) => {
+    const j = getConsolidationPrimaryLabel(s),
+      F = getConsolidationSecondaryLabel(s);
+    return F ? `${j} - ${F}` : j;
   };
 const as = ({
     id: s,
@@ -423,10 +463,10 @@ const as = ({
       oe = (h) => {
         h.preventDefault();
         const Y = d ? null : q ? N : k;
-        if (!X.trim() || !D.trim() || !x) {
+        if (!D.trim() || !x) {
           C(
             "Missing Fields",
-            "Please fill in Name, Departure Date, and Container Type.",
+            "Please fill in Departure Date and Container Type.",
           );
           return;
         }
@@ -496,7 +536,13 @@ const as = ({
         };
         const xe = buildConsolidationRouteLabel(ke);
         (F(
-          { name: X, route: xe, departureDate: D, containerTypeId: x, ...ke },
+          {
+            name: X.trim(),
+            route: xe,
+            departureDate: D,
+            containerTypeId: x,
+            ...ke,
+          },
           b ? 0 : H,
           Y,
           d,
@@ -737,7 +783,7 @@ const as = ({
                   children: [
                     e.jsx(Ce, {
                       label: "Consolidation Name",
-                      required: !0,
+                      required: !1,
                       help: "A descriptive name for this consolidation",
                       children: e.jsx("input", {
                         type: "text",
@@ -746,7 +792,6 @@ const as = ({
                         className:
                           "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
                         placeholder: "e.g., May Shipment Batch 1",
-                        required: !0,
                       }),
                     }),
                     e.jsx(Ce, {
@@ -962,7 +1007,7 @@ const as = ({
     allCustomers: q,
   }) => {
     var h, Y, ae, le, be, de;
-    const [k, X] = r.useState(s.name),
+    const [k, X] = r.useState(getConsolidationManualName(s)),
       [originCountry, setOriginCountry] = r.useState(s.originCountry || ""),
       [originCity, setOriginCity] = r.useState(s.originCity || ""),
       [destinationCountry, setDestinationCountry] = r.useState(
@@ -1011,7 +1056,7 @@ const as = ({
           destinationPortValue = formatLocationField(
             s.destinationPort || routeFallback.destinationPort,
           );
-        (X(s.name),
+        (X(getConsolidationManualName(s)),
           setOriginCountry(originCountryValue),
           setOriginCity(originCityValue),
           setDestinationCountry(destinationCountryValue),
@@ -1048,10 +1093,6 @@ const as = ({
       return null;
     const oe = () => {
         var Pe, Me;
-        if (!k.trim()) {
-          E("Missing Name", "Consolidation name is required.");
-          return;
-        }
         if (
           !hasLocationField(originCountry) ||
           !hasLocationField(originCity) ||
@@ -1136,7 +1177,7 @@ const as = ({
           },
           xe = buildConsolidationRouteLabel(ke);
         const _e = {
-          name: k,
+          name: k.trim(),
           route: xe,
           ...ke,
           departureDate: B,
@@ -1152,13 +1193,20 @@ const as = ({
               ? (_e.fixedRatePerM3 = Re)
               : (_e.fixedRatePerM3 = void 0)),
           y(s.id, _e),
-          s.status !== f.InTransit &&
-            s.status !== f.Delivered &&
-            s.status !== f.Completed &&
-            (s.status, f.Cancelled),
           F());
       },
-      K = s.shippingCostDistributed;
+      K = s.shippingCostDistributed,
+      CONSOLIDATION_SHIPMENT_ACTIVITY_STATUSES = new Set([
+        f.InTransit,
+        f.CustomsClearance,
+        f.OutForDelivery,
+        f.Delivered,
+        f.Completed,
+      ]),
+      costFieldsLockedByStatus =
+        CONSOLIDATION_SHIPMENT_ACTIVITY_STATUSES.has(
+          String(s.status || "").trim(),
+        ) || s.status === f.Cancelled;
     return e.jsx("div", {
       className:
         "fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center p-4",
@@ -1240,13 +1288,7 @@ const as = ({
                       htmlFor: "editConsName",
                       className:
                         "block text-sm font-semibold text-gray-700 mb-2",
-                      children: [
-                        "Consolidation Name ",
-                        e.jsx("span", {
-                          className: "text-red-500",
-                          children: "*",
-                        }),
-                      ],
+                      children: "Consolidation Name",
                     }),
                     e.jsx("input", {
                       type: "text",
@@ -1556,13 +1598,8 @@ const as = ({
                           id: "editConsShipCost",
                           value: $,
                           onChange: M,
-                          disabled:
-                            (K && s.isMixed) ||
-                            s.status === f.InTransit ||
-                            s.status === f.Delivered ||
-                            s.status === f.Completed ||
-                            s.status === f.Cancelled,
-                          className: `w-full px-4 py-3 border rounded-xl shadow-sm text-gray-900 transition-colors ${(K && s.isMixed) || s.status === f.InTransit || s.status === f.Delivered || s.status === f.Completed || s.status === f.Cancelled ? "border-gray-200 bg-gray-100 cursor-not-allowed" : "border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"}`,
+                          disabled: (K && s.isMixed) || costFieldsLockedByStatus,
+                          className: `w-full px-4 py-3 border rounded-xl shadow-sm text-gray-900 transition-colors ${(K && s.isMixed) || costFieldsLockedByStatus ? "border-gray-200 bg-gray-100 cursor-not-allowed" : "border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"}`,
                           placeholder: "Final actual cost",
                         }),
                         K &&
@@ -1572,9 +1609,9 @@ const as = ({
                             children:
                               "Revert status to 'Loading' or 'Planning' to edit.",
                           }),
-                        (s.status === f.InTransit ||
-                          s.status === f.Delivered ||
-                          s.status === f.Completed) &&
+                        CONSOLIDATION_SHIPMENT_ACTIVITY_STATUSES.has(
+                          String(s.status || "").trim(),
+                        ) &&
                           e.jsx("p", {
                             className: "text-xs text-red-500 mt-1",
                             children:
@@ -1896,7 +1933,10 @@ const as = ({
         children: [
           e.jsxs("h2", {
             className: "text-xl font-semibold text-gray-800 mb-4",
-            children: ["Start Shipment - ", s.name],
+            children: [
+              "Start Shipment - ",
+              getConsolidationPrimaryLabel(s),
+            ],
           }),
           e.jsx("p", {
             className: "text-sm text-gray-600 mb-4",
@@ -1989,7 +2029,7 @@ const as = ({
                     onChange: (d) => I(d.target.value),
                     className:
                       "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-900",
-                    placeholder: "e.g., China, Shanghai, Guangzhou",
+                    placeholder: "e.g., Istanbul, Turkiye",
                     required: !0,
                   }),
                 ],
@@ -2014,7 +2054,7 @@ const as = ({
                     onChange: (d) => $(d.target.value),
                     className:
                       "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-900",
-                    placeholder: "e.g., USA, New York, Los Angeles",
+                    placeholder: "e.g., Matadi Port, DR Congo",
                     required: !0,
                   }),
                   e.jsx("p", {
@@ -2347,7 +2387,7 @@ const as = ({
                 key: "confirmed",
                 label: "Current orders confirmed",
                 level: "fail",
-                detail: `${inConsolidationUnconfirmed.length} order(s) are Pending/Draft/Submitted. Confirm them so order and service-fee charges are applied before shipment.`,
+                detail: `${inConsolidationUnconfirmed.length} order(s) are Pending/Draft/Submitted. Confirm them so order-cost charges are applied before consolidation assignment.`,
               },
         );
         i.push(
@@ -2694,7 +2734,7 @@ const as = ({
                       }),
                       e.jsx("p", {
                         className: "text-sm text-slate-300",
-                        children: s.name,
+                        children: getConsolidationIdentityText(s),
                       }),
                     ],
                   }),
@@ -3330,6 +3370,18 @@ const as = ({
       [G, ie] = r.useState(null),
       [Re, ke] = r.useState(null),
       Pe = 85,
+      CONSOLIDATION_ORDER_EDIT_LOCK_STATUSES = new Set([
+        f.InTransit,
+        f.CustomsClearance,
+        f.OutForDelivery,
+        f.Delivered,
+        f.Completed,
+        f.Cancelled,
+      ]),
+      isConsolidationOrderEditLockedStatus = (t) =>
+        CONSOLIDATION_ORDER_EDIT_LOCK_STATUSES.has(String(t || "").trim()),
+      isConsolidationOrderEditLocked = (t) =>
+        !!t && isConsolidationOrderEditLockedStatus(t.status),
       Me = (t) =>
         t >= 100
           ? "bg-red-500"
@@ -3467,7 +3519,7 @@ const as = ({
         if (p.status === Ut.Pending) {
           N(
             "Order Not Confirmed",
-            "This order is still Pending. Confirm it (Pending → Processing) so charges are applied before adding it to a consolidation.",
+            "This order is still Pending. Confirm it (Pending → Processing) so order-cost charges are applied before adding it to a consolidation.",
           );
           return;
         }
@@ -3501,12 +3553,7 @@ const as = ({
           );
           return;
         }
-        if (
-          n.status === f.InTransit ||
-          n.status === f.Delivered ||
-          n.status === f.Completed ||
-          n.status === f.Cancelled
-        ) {
+        if (isConsolidationOrderEditLocked(n)) {
           N(
             "Invalid Status",
             `Cannot add orders to a consolidation with status: ${n.status}.`,
@@ -3556,12 +3603,7 @@ Total would be: ${Xe.toFixed(2)} KG`,
       ft = (t, a) => {
         const n = s.find((p) => p.id === t);
         if (n) {
-          if (
-            n.status === f.InTransit ||
-            n.status === f.Delivered ||
-            n.status === f.Completed ||
-            n.status === f.Cancelled
-          ) {
+          if (isConsolidationOrderEditLocked(n)) {
             N(
               "Invalid Status",
               `Cannot remove orders from a consolidation with status: ${n.status}.`,
@@ -3624,15 +3666,23 @@ Total would be: ${Xe.toFixed(2)} KG`,
             (a.relatedId === t || a.consolidationId === t),
         ),
       wt = (t, a) => {
+        const n = s.find((p) => p.id === t);
+        if (!n) return;
         if (a === f.InTransit) {
-          const n = s.find((p) => p.id === t);
-          n && (de(n), le(!0));
+          if (!n.orderIds || n.orderIds.length === 0) {
+            N(
+              "No Orders",
+              "Cannot move this consolidation to InTransit with no orders. Add at least one order first.",
+            );
+            return;
+          }
+          (de(n), le(!0));
         } else x(t, a);
       },
       Ct = (t) => {
         (console.log(
           "[DEBUG] Status update clicked for:",
-          t.name,
+          getConsolidationIdentityText(t),
           "Status:",
           t.status,
         ),
@@ -3642,12 +3692,7 @@ Total would be: ${Xe.toFixed(2)} KG`,
       kt = async (t) => {
         H && (await wt(H.id, t), R(!1), ce(null));
       },
-      Mt = (t) =>
-        t.status !== f.InTransit &&
-        t.status !== f.Delivered &&
-        t.status !== f.Completed &&
-        t.status !== f.Cancelled &&
-        !t.shippingCostDistributed,
+      Mt = (t) => !isConsolidationOrderEditLocked(t) && !t.shippingCostDistributed,
       St = (t) => t.status !== f.Cancelled,
       getDeleteBlockReason = (t) => {
         if (!b) return "Only admins can delete consolidations.";
@@ -3669,7 +3714,7 @@ Total would be: ${Xe.toFixed(2)} KG`,
         }
         if (
           !window.confirm(
-            `Delete consolidation \"${t.name}\" permanently? This cannot be undone.`,
+            `Delete consolidation \"${getConsolidationIdentityText(t)}\" permanently? This cannot be undone.`,
           )
         )
           return;
@@ -3693,11 +3738,7 @@ Total would be: ${Xe.toFixed(2)} KG`,
       Dt = Q ? Le(Q) : [],
       It = Q ? pt(Q) : [],
       Lt = Q
-        ? Q.status !== f.InTransit &&
-          Q.status !== f.Delivered &&
-          Q.status !== f.Completed &&
-          Q.status !== f.Cancelled &&
-          !Q.shippingCostDistributed
+        ? !isConsolidationOrderEditLocked(Q) && !Q.shippingCostDistributed
         : !1,
       Ft = (t) => {
         Q && gt(Q.id, t);
@@ -3818,7 +3859,9 @@ Total would be: ${Xe.toFixed(2)} KG`,
           J = Fe ? !o.has(V) : !0,
           L =
             me === "" ||
-            t.name.toLowerCase().includes(me.toLowerCase()) ||
+            getConsolidationIdentityText(t)
+              .toLowerCase()
+              .includes(me.toLowerCase()) ||
             t.route.toLowerCase().includes(me.toLowerCase()) ||
             (t.notes && t.notes.toLowerCase().includes(me.toLowerCase())),
           w = ve === "" || t.status === ve;
@@ -4065,7 +4108,7 @@ Total would be: ${Xe.toFixed(2)} KG`,
                                     value: "",
                                     children: "All Statuses",
                                   }),
-                                  Object.values(f).map((t) =>
+                                  FILTERABLE_CONSOLIDATION_STATUSES.map((t) =>
                                     e.jsx(
                                       "option",
                                       { value: t, children: t },
@@ -4261,10 +4304,30 @@ Total would be: ${Xe.toFixed(2)} KG`,
                                                                     ),
                                                               ],
                                                             }),
-                                                            e.jsx("div", {
+                                                            e.jsxs("div", {
                                                               className:
-                                                                "font-semibold text-slate-900 truncate",
-                                                              children: t.name,
+                                                                "min-w-0",
+                                                              children: [
+                                                                e.jsx("div", {
+                                                                  className:
+                                                                    "font-semibold text-slate-900 truncate",
+                                                                  children:
+                                                                    getConsolidationPrimaryLabel(
+                                                                      t,
+                                                                    ),
+                                                                }),
+                                                                getConsolidationSecondaryLabel(
+                                                                  t,
+                                                                ) &&
+                                                                  e.jsx("div", {
+                                                                    className:
+                                                                      "text-xs text-slate-500 truncate",
+                                                                    children:
+                                                                      getConsolidationSecondaryLabel(
+                                                                        t,
+                                                                      ),
+                                                                  }),
+                                                              ],
                                                             }),
                                                             e.jsxs("div", {
                                                               className:
@@ -4616,7 +4679,10 @@ Total would be: ${Xe.toFixed(2)} KG`,
                                                           at: t.creationDate,
                                                           title:
                                                             "Consolidation created",
-                                                          subtitle: t.name,
+                                                          subtitle:
+                                                            getConsolidationIdentityText(
+                                                              t,
+                                                            ),
                                                           tone: "neutral",
                                                         }),
                                                         t.departureDate &&
@@ -4731,7 +4797,7 @@ Total would be: ${Xe.toFixed(2)} KG`,
                                                               t.id,
                                                               "consolidation",
                                                             ),
-                                                            subtitle: `${t.name} (${t.status})`,
+                                                            subtitle: `${getConsolidationIdentityText(t)} (${t.status})`,
                                                             onClick: () =>
                                                               d(
                                                                 "consolidations",
@@ -4864,11 +4930,33 @@ Total would be: ${Xe.toFixed(2)} KG`,
                                                                 children:
                                                                   "Consolidation",
                                                               }),
-                                                              e.jsx("div", {
+                                                              e.jsxs("div", {
                                                                 className:
-                                                                  "text-lg font-extrabold tracking-tight text-slate-900 truncate",
-                                                                children:
-                                                                  t.name,
+                                                                  "min-w-0",
+                                                                children: [
+                                                                  e.jsx("div", {
+                                                                    className:
+                                                                      "text-lg font-extrabold tracking-tight text-slate-900 truncate",
+                                                                    children:
+                                                                      getConsolidationPrimaryLabel(
+                                                                        t,
+                                                                      ),
+                                                                  }),
+                                                                  getConsolidationSecondaryLabel(
+                                                                    t,
+                                                                  ) &&
+                                                                    e.jsx(
+                                                                      "div",
+                                                                      {
+                                                                        className:
+                                                                          "text-xs text-slate-500 truncate",
+                                                                        children:
+                                                                          getConsolidationSecondaryLabel(
+                                                                            t,
+                                                                          ),
+                                                                      },
+                                                                    ),
+                                                                ],
                                                               }),
                                                               e.jsxs("div", {
                                                                 className:
@@ -6117,10 +6205,29 @@ Total would be: ${Xe.toFixed(2)} KG`,
                                                             }),
                                                       ],
                                                     }),
-                                                    e.jsx("div", {
-                                                      className:
-                                                        "font-semibold text-slate-900 truncate",
-                                                      children: t.name,
+                                                    e.jsxs("div", {
+                                                      className: "min-w-0",
+                                                      children: [
+                                                        e.jsx("div", {
+                                                          className:
+                                                            "font-semibold text-slate-900 truncate",
+                                                          children:
+                                                            getConsolidationPrimaryLabel(
+                                                              t,
+                                                            ),
+                                                        }),
+                                                        getConsolidationSecondaryLabel(
+                                                          t,
+                                                        ) &&
+                                                          e.jsx("div", {
+                                                            className:
+                                                              "text-xs text-slate-500 truncate",
+                                                            children:
+                                                              getConsolidationSecondaryLabel(
+                                                                t,
+                                                              ),
+                                                          }),
+                                                      ],
                                                     }),
                                                     e.jsxs("div", {
                                                       className:
@@ -6376,9 +6483,22 @@ Total would be: ${Xe.toFixed(2)} KG`,
                       className:
                         "flex justify-between items-center mb-4 pb-4 border-b border-gray-200",
                       children: [
-                        e.jsxs("h2", {
-                          className: "text-xl font-bold text-gray-900",
-                          children: ["Consolidation Details: ", Qe.name],
+                        e.jsxs("div", {
+                          className: "min-w-0",
+                          children: [
+                            e.jsxs("h2", {
+                              className: "text-xl font-bold text-gray-900",
+                              children: [
+                                "Consolidation Details: ",
+                                getConsolidationPrimaryLabel(Qe),
+                              ],
+                            }),
+                            getConsolidationSecondaryLabel(Qe) &&
+                              e.jsx("p", {
+                                className: "text-sm text-slate-500 truncate",
+                                children: getConsolidationSecondaryLabel(Qe),
+                              }),
+                          ],
                         }),
                         e.jsx("button", {
                           className:
@@ -6489,8 +6609,8 @@ Total would be: ${Xe.toFixed(2)} KG`,
                               e.jsx("span", {
                                 className:
                                   "truncate font-extrabold text-lg text-gray-900",
-                                title: t.name,
-                                children: t.name,
+                                title: getConsolidationIdentityText(t),
+                                children: getConsolidationPrimaryLabel(t),
                               }),
                               e.jsxs("span", {
                                 className: `inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${$e.pill} font-semibold text-xs ml-1`,

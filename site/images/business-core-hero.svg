@@ -1,0 +1,60 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Bundleist Business Logic Hero</title>
+  <desc id="desc">Abstract logistics control center with connected workflow steps for orders, consolidations, and shipments.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1f3a"/>
+      <stop offset="100%" stop-color="#123d63"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.06"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#021324" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+
+  <circle cx="1380" cy="120" r="220" fill="#4ecdc4" fill-opacity="0.14"/>
+  <circle cx="210" cy="760" r="260" fill="#ffb347" fill-opacity="0.12"/>
+
+  <g filter="url(#shadow)">
+    <rect x="120" y="140" rx="24" ry="24" width="1360" height="620" fill="url(#card)" stroke="#bfe3ff" stroke-opacity="0.25"/>
+  </g>
+
+  <g stroke="#8dd6ff" stroke-width="5" fill="none" stroke-linecap="round">
+    <path d="M320 500 H620"/>
+    <path d="M780 500 H1080"/>
+    <path d="M1240 500 H1340"/>
+  </g>
+
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#e9f6ff">
+    <text x="170" y="250" font-size="68" font-weight="700">Business Logic Is The Core</text>
+    <text x="170" y="300" font-size="30" fill="#b9deff">Reliable workflows create reliable customer trust.</text>
+  </g>
+
+  <g font-family="Segoe UI, Arial, sans-serif" text-anchor="middle">
+    <g>
+      <rect x="240" y="430" width="220" height="140" rx="18" fill="#1f6aa5"/>
+      <text x="350" y="490" font-size="30" font-weight="700" fill="#ffffff">Order</text>
+      <text x="350" y="530" font-size="22" fill="#d5ecff">Validated Steps</text>
+    </g>
+    <g>
+      <rect x="620" y="430" width="320" height="140" rx="18" fill="#157f78"/>
+      <text x="780" y="490" font-size="30" font-weight="700" fill="#ffffff">Consolidation</text>
+      <text x="780" y="530" font-size="22" fill="#d6fff9">Controlled Progress</text>
+    </g>
+    <g>
+      <rect x="1080" y="430" width="320" height="140" rx="18" fill="#c26a1b"/>
+      <text x="1240" y="490" font-size="30" font-weight="700" fill="#ffffff">Shipment</text>
+      <text x="1240" y="530" font-size="22" fill="#fff1dc">Trackable Delivery</text>
+    </g>
+  </g>
+
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#bcdfff" font-size="22">
+    <text x="170" y="680">Bundleist</text>
+    <text x="290" y="680" fill="#87c8f6">Operational integrity by design</text>
+  </g>
+</svg>

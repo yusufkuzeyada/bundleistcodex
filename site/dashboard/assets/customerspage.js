@@ -39,6 +39,7 @@ const $t = ({
   getSupplierName: Dt = (q) => "Unknown Supplier",
   getCustomerName: Mt = (q) => "Unknown Customer",
   onNavigate: w = () => {},
+  createCustomerMagicLink: wt = async () => "",
 }) => {
   var et, tt, st, rt;
   const [q, we] = n.useState(""),
@@ -48,7 +49,7 @@ const $t = ({
     [ie, Te] = n.useState(""),
     [Ie, De] = n.useState(""),
     [H, Me] = n.useState(""),
-    [C, Pe] = n.useState(N.Trial),
+    [C, Pe] = n.useState(N.Growth),
     [mt, G] = n.useState(!1),
     [ut, V] = n.useState(!1),
     [le, _e] = n.useState(""),
@@ -57,9 +58,10 @@ const $t = ({
     [de, Oe] = n.useState(""),
     [me, Le] = n.useState(""),
     [Be, qe] = n.useState(""),
-    [ue, $e] = n.useState(N.Trial),
+    [ue, $e] = n.useState(N.Growth),
     [Ae, Z] = n.useState(null),
     [ze, Je] = n.useState(null),
+    isAdminRecord = (t) => (t.role || St.Customer) === St.Admin,
     { showError: M, showSuccess: gt } = Ct(),
     xt = (t) => {
       if (
@@ -74,7 +76,7 @@ const $t = ({
       ) {
         M(
           "Missing Fields",
-          "Please fill in all required fields: Name, Email, Company Name, Phone, Address, Password, and select a Contract Type.",
+          "Please fill in all required fields: Name, Email, Company Name, Phone, Address, Password, and select a Plan.",
         );
         return;
       }
@@ -104,7 +106,7 @@ const $t = ({
         Te(""),
         De(""),
         Me(""),
-        Pe(N.Trial),
+        Pe(N.Growth),
         G(!1));
     },
     pt = (t) => {
@@ -119,7 +121,7 @@ const $t = ({
       ) {
         M(
           "Missing Fields",
-          "Please fill in all required fields: Name, Email, Company Name, Phone, Address, and Contract Type.",
+          "Please fill in all required fields: Name, Email, Company Name, Phone, Address, and Plan.",
         );
         return;
       }
@@ -143,8 +145,15 @@ const $t = ({
         V(!1),
         Z(null));
     },
-    D = u ? ye : ye.filter((t) => t.id === dt),
     [$, Re] = n.useState(""),
+    [roleScope, setRoleScope] = n.useState("customers"),
+    D = u
+      ? ye.filter((t) => {
+          const s =
+            (t.role || St.Customer) === St.Admin ? "admins" : "customers";
+          return roleScope === "all" ? !0 : s === roleScope;
+        })
+      : ye.filter((t) => t.id === dt),
     [F, Ke] = n.useState("all"),
     [O, Ue] = n.useState("all"),
     [S, We] = n.useState("all"),
@@ -153,13 +162,22 @@ const $t = ({
     [Q, _] = n.useState(1),
     ge = 18,
     [L, Ve] = n.useState(null),
-    [ht, X] = n.useState(!1);
+    [ht, X] = n.useState(!1),
+    [magicLinkByCustomer, setMagicLinkByCustomer] = n.useState({}),
+    [magicLinkLoadingId, setMagicLinkLoadingId] = n.useState(null);
   (n.useEffect(() => {
     try {
       const t = localStorage.getItem("bundleist_customers_state");
       if (!t) return;
       const s = JSON.parse(t);
       (s && typeof s.search == "string" && Re(s.search),
+        s &&
+          typeof s.roleScope == "string" &&
+          setRoleScope(
+            ["customers", "admins", "all"].includes(s.roleScope)
+              ? s.roleScope
+              : "customers",
+          ),
         s && typeof s.contractFilter == "string" && Ke(s.contractFilter),
         s && typeof s.balanceFilter == "string" && Ue(s.balanceFilter),
         s && typeof s.exceptionFilter == "string" && We(s.exceptionFilter),
@@ -177,6 +195,7 @@ const $t = ({
           "bundleist_customers_state",
           JSON.stringify({
             search: $,
+            roleScope,
             contractFilter: F,
             balanceFilter: O,
             exceptionFilter: S,
@@ -187,7 +206,10 @@ const $t = ({
           }),
         );
       } catch {}
-    }, [$, F, O, S, P, A, Q, L]));
+    }, [$, roleScope, F, O, S, P, A, Q, L]),
+    n.useEffect(() => {
+      roleScope === "admins" && (Ke("all"), Ue("all"), We("all"));
+    }, [roleScope]));
   const z = n.useMemo(() => {
       var o;
       if (!u) return new Map();
@@ -442,13 +464,15 @@ const $t = ({
             lastActivityAt: wt,
           };
         }).filter((c) => {
+          const p = isAdminRecord(c.customer);
           if (
-            (F !== "all" && c.customer.contractType !== F) ||
-            (O === "due" && c.balance >= 0) ||
-            (O === "credit" && c.balance < 0)
+            !p &&
+            ((F !== "all" && c.customer.contractType !== F) ||
+              (O === "due" && c.balance >= 0) ||
+              (O === "credit" && c.balance < 0))
           )
             return !1;
-          if (S !== "all") {
+          if (!p && S !== "all") {
             const g = c.exceptions;
             if (
               (S === "negative_balance" && !g.negativeBalance) ||
@@ -535,11 +559,45 @@ const $t = ({
             ));
         } catch (o) {
           const a = o instanceof Error ? o.message : String(o);
-          M("Update Failed", `Could not change contract type: ${a}`);
+          M("Update Failed", `Could not change plan: ${a}`);
         } finally {
           Je(null);
         }
       }
+    },
+    lr = async (t) => {
+      if (!u || !(t != null && t.id)) return;
+      setMagicLinkLoadingId(t.id);
+      try {
+        const s = await Promise.resolve(wt(t.id));
+        if (!s || !String(s).trim())
+          throw new Error("Magic link was not returned.");
+        const m = String(s).trim(),
+          o = await at(m);
+        (setMagicLinkByCustomer((a) => ({ ...a, [t.id]: m })),
+          o
+            ? gt(
+                "Magic Link Ready",
+                `Magic link for ${t.companyName} copied to clipboard.`,
+              )
+            : gt(
+                "Magic Link Ready",
+                "Link generated. Use Copy Magic Link to copy it manually.",
+              ));
+      } catch (s) {
+        const m = s instanceof Error ? s.message : String(s);
+        M("Magic Link Error", m || "Failed to generate magic link.");
+      } finally {
+        setMagicLinkLoadingId(null);
+      }
+    },
+    Pr = async (t) => {
+      const s = magicLinkByCustomer[t];
+      if (!s) return;
+      const m = await at(s);
+      m
+        ? gt("Copied", "Magic link copied to clipboard.")
+        : M("Copy Failed", "Could not copy magic link automatically.");
     };
   return u
     ? u
@@ -596,7 +654,16 @@ const $t = ({
                             children: [
                               e.jsxs("div", {
                                 className: "text-sm text-gray-500",
-                                children: ["Showing: ", y.total, " customers"],
+                                children: [
+                                  "Showing: ",
+                                  y.total,
+                                  " ",
+                                  roleScope === "admins"
+                                    ? "admins"
+                                    : roleScope === "all"
+                                      ? "records"
+                                      : "customers",
+                                ],
                               }),
                               e.jsx(I, {
                                 type: "button",
@@ -645,13 +712,40 @@ const $t = ({
                           }),
                           e.jsxs("div", {
                             className:
-                              "lg:col-span-7 grid grid-cols-2 sm:grid-cols-5 gap-2",
+                              "lg:col-span-7 grid grid-cols-2 sm:grid-cols-6 gap-2",
                             children: [
+                              e.jsxs("select", {
+                                value: roleScope,
+                                onChange: (t) => {
+                                  const s = t.target.value;
+                                  (setRoleScope(s),
+                                    s === "admins" &&
+                                      (Ke("all"), Ue("all"), We("all")),
+                                    _(1));
+                                },
+                                className:
+                                  "px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800",
+                                children: [
+                                  e.jsx("option", {
+                                    value: "customers",
+                                    children: "Customers",
+                                  }),
+                                  e.jsx("option", {
+                                    value: "admins",
+                                    children: "Admins",
+                                  }),
+                                  e.jsx("option", {
+                                    value: "all",
+                                    children: "All Roles",
+                                  }),
+                                ],
+                              }),
                               e.jsxs("select", {
                                 value: F,
                                 onChange: (t) => {
                                   (Ke(t.target.value), _(1));
                                 },
+                                disabled: roleScope === "admins",
                                 className:
                                   "px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800",
                                 children: [
@@ -673,6 +767,7 @@ const $t = ({
                                 onChange: (t) => {
                                   (Ue(t.target.value), _(1));
                                 },
+                                disabled: roleScope === "admins",
                                 className:
                                   "px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800",
                                 children: [
@@ -695,6 +790,7 @@ const $t = ({
                                 onChange: (t) => {
                                   (We(t.target.value), _(1));
                                 },
+                                disabled: roleScope === "admins",
                                 className:
                                   "px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800",
                                 title: "Exceptions",
@@ -780,7 +876,11 @@ const $t = ({
                                       className:
                                         "text-sm font-semibold text-gray-900",
                                       children:
-                                        "No customers match these filters.",
+                                        roleScope === "admins"
+                                          ? "No admins match these filters."
+                                          : roleScope === "all"
+                                            ? "No records match these filters."
+                                            : "No customers match these filters.",
                                     }),
                                     e.jsx("div", {
                                       className: "text-xs text-gray-500 mt-1",
@@ -796,7 +896,8 @@ const $t = ({
                                     const s = t.customer,
                                       m = te === s.id,
                                       o = t.balance,
-                                      a = t.exceptions;
+                                      a = t.exceptions,
+                                      p = isAdminRecord(s);
                                     return e.jsx(
                                       "button",
                                       {
@@ -820,7 +921,7 @@ const $t = ({
                                                     "text-xs text-gray-600 truncate",
                                                   children: [
                                                     s.contactPerson,
-                                                    " · ",
+                                                    " Â· ",
                                                     s.email,
                                                   ],
                                                 }),
@@ -834,34 +935,51 @@ const $t = ({
                                                   className:
                                                     "mt-2 flex flex-wrap gap-2 items-center",
                                                   children: [
-                                                    e.jsx(be, {
-                                                      className: `${fe[s.contractType]} px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide`,
-                                                      children:
-                                                        ((d =
-                                                          v[s.contractType]) ==
-                                                        null
-                                                          ? void 0
-                                                          : d.name) ||
-                                                        s.contractType,
-                                                    }),
-                                                    e.jsxs("span", {
-                                                      className: `text-[11px] font-bold ${o < 0 ? "text-red-700" : "text-emerald-700"}`,
-                                                      children: [
-                                                        o < 0
-                                                          ? "Due"
-                                                          : "Credit",
-                                                        " $",
-                                                        Math.abs(o).toFixed(0),
-                                                      ],
-                                                    }),
-                                                    e.jsxs("span", {
-                                                      className:
-                                                        "text-[11px] font-semibold text-gray-600",
-                                                      children: [
-                                                        "Open shipments: ",
-                                                        t.openShipments,
-                                                      ],
-                                                    }),
+                                                    p
+                                                      ? e.jsx(be, {
+                                                          className:
+                                                            "px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-slate-200 text-slate-800",
+                                                          children: "Admin",
+                                                        })
+                                                      : e.jsx(be, {
+                                                          className: `${fe[s.contractType]} px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide`,
+                                                          children:
+                                                            ((d =
+                                                              v[s.contractType]) ==
+                                                            null
+                                                              ? void 0
+                                                              : d.name) ||
+                                                            s.contractType,
+                                                        }),
+                                                    p
+                                                      ? e.jsx("span", {
+                                                          className:
+                                                            "text-[11px] font-semibold text-slate-600",
+                                                          children:
+                                                            "Platform administrator",
+                                                        })
+                                                      : e.jsxs("span", {
+                                                          className: `text-[11px] font-bold ${o < 0 ? "text-red-700" : "text-emerald-700"}`,
+                                                          children: [
+                                                            o < 0
+                                                              ? "Due"
+                                                              : "Credit",
+                                                            " $",
+                                                            Math.abs(o).toFixed(
+                                                              0,
+                                                            ),
+                                                          ],
+                                                        }),
+                                                    !p &&
+                                                      e.jsxs("span", {
+                                                        className:
+                                                          "text-[11px] font-semibold text-gray-600",
+                                                        children: [
+                                                          "Open shipments: ",
+                                                          t.openShipments,
+                                                        ],
+                                                      }),
+                                                    !p &&
                                                     u &&
                                                     (a == null
                                                       ? void 0
@@ -875,6 +993,7 @@ const $t = ({
                                                           ],
                                                         })
                                                       : null,
+                                                    !p &&
                                                     u &&
                                                     (a == null
                                                       ? void 0
@@ -888,6 +1007,7 @@ const $t = ({
                                                           ],
                                                         })
                                                       : null,
+                                                    !p &&
                                                     u &&
                                                     (a == null
                                                       ? void 0
@@ -901,6 +1021,7 @@ const $t = ({
                                                           ],
                                                         })
                                                       : null,
+                                                    !p &&
                                                     u &&
                                                     (a == null
                                                       ? void 0
@@ -998,7 +1119,11 @@ const $t = ({
                                         e.jsx("div", {
                                           className:
                                             "text-xs font-semibold text-gray-500 uppercase tracking-wider",
-                                          children: "Customer",
+                                          children:
+                                            (r.customer.role ||
+                                              St.Customer) === St.Admin
+                                              ? "Admin Account"
+                                              : "Customer",
                                         }),
                                         e.jsx("div", {
                                           className:
@@ -1030,37 +1155,50 @@ const $t = ({
                                       className:
                                         "flex flex-col items-end gap-2",
                                       children: [
-                                        e.jsx(be, {
-                                          className: `${fe[r.customer.contractType]} px-3 py-1 rounded-full text-xs font-semibold tracking-wide`,
-                                          children:
-                                            ((et =
-                                              v[r.customer.contractType]) ==
-                                            null
-                                              ? void 0
-                                              : et.name) ||
-                                            r.customer.contractType,
-                                        }),
-                                        e.jsxs("div", {
-                                          className: "flex items-center gap-2",
-                                          children: [
-                                            e.jsx("label", {
-                                              htmlFor:
-                                                "quickContractTypeDesktop",
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx(be, {
                                               className:
-                                                "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
-                                              children: "Plan",
+                                                "px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-slate-200 text-slate-800",
+                                              children: "Admin",
+                                            })
+                                          : e.jsx(be, {
+                                              className: `${fe[r.customer.contractType]} px-3 py-1 rounded-full text-xs font-semibold tracking-wide`,
+                                              children:
+                                                ((et =
+                                                  v[r.customer.contractType]) ==
+                                                null
+                                                  ? void 0
+                                                  : et.name) ||
+                                                r.customer.contractType,
                                             }),
-                                            e.jsx("select", {
-                                              id: "quickContractTypeDesktop",
-                                              value: r.customer.contractType,
-                                              onChange: (t) => {
-                                                Xe(r.customer, t.target.value);
-                                              },
-                                              disabled: ze === r.customer.id,
-                                              className:
-                                                "h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:opacity-60",
-                                              children: Object.values(N).map(
-                                                (t) =>
+                                        (r.customer.role || St.Customer) ===
+                                          St.Customer &&
+                                          e.jsxs("div", {
+                                            className: "flex items-center gap-2",
+                                            children: [
+                                              e.jsx("label", {
+                                                htmlFor:
+                                                  "quickContractTypeDesktop",
+                                                className:
+                                                  "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
+                                                children: "Plan",
+                                              }),
+                                              e.jsx("select", {
+                                                id: "quickContractTypeDesktop",
+                                                value: r.customer.contractType,
+                                                onChange: (t) => {
+                                                  Xe(
+                                                    r.customer,
+                                                    t.target.value,
+                                                  );
+                                                },
+                                                disabled: ze === r.customer.id,
+                                                className:
+                                                  "h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:opacity-60",
+                                                children: Object.values(
+                                                  N,
+                                                ).map((t) =>
                                                   e.jsx(
                                                     "option",
                                                     {
@@ -1069,10 +1207,10 @@ const $t = ({
                                                     },
                                                     t,
                                                   ),
-                                              ),
-                                            }),
-                                          ],
-                                        }),
+                                                ),
+                                              }),
+                                            ],
+                                          }),
                                         e.jsx("button", {
                                           type: "button",
                                           onClick: () => at(r.customer.id),
@@ -1081,10 +1219,54 @@ const $t = ({
                                           title: "Copy full ID",
                                           children: "Copy ID",
                                         }),
+                                        (r.customer.role || St.Customer) ===
+                                          St.Customer &&
+                                          e.jsx("button", {
+                                            type: "button",
+                                            onClick: () => lr(r.customer),
+                                            disabled:
+                                              magicLinkLoadingId ===
+                                              r.customer.id,
+                                            className:
+                                              "px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 disabled:opacity-60",
+                                            children:
+                                              magicLinkLoadingId ===
+                                              r.customer.id
+                                                ? "Generating..."
+                                                : "Create Magic Link",
+                                          }),
                                       ],
                                     }),
                                   ],
                                 }),
+                                magicLinkByCustomer[r.customer.id] &&
+                                  e.jsxs("div", {
+                                    className:
+                                      "mt-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3",
+                                    children: [
+                                      e.jsx("div", {
+                                        className:
+                                          "text-[11px] font-semibold text-emerald-800 uppercase tracking-wide",
+                                        children: "Latest Magic Link",
+                                      }),
+                                      e.jsx("div", {
+                                        className:
+                                          "mt-1 text-xs text-emerald-900 break-all",
+                                        children:
+                                          magicLinkByCustomer[r.customer.id],
+                                      }),
+                                      e.jsx("div", {
+                                        className: "mt-2",
+                                        children: e.jsx("button", {
+                                          type: "button",
+                                          onClick: () => Pr(r.customer.id),
+                                          className:
+                                            "px-3 py-1.5 rounded-lg border border-emerald-300 bg-white text-xs font-semibold text-emerald-800 hover:bg-emerald-100",
+                                          children: "Copy Magic Link",
+                                        }),
+                                      }),
+                                    ],
+                                  }),
                                 e.jsxs("div", {
                                   className: "mt-5 grid grid-cols-2 gap-3",
                                   children: [
@@ -1095,16 +1277,32 @@ const $t = ({
                                         e.jsx("div", {
                                           className:
                                             "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
-                                          children: "Balance",
+                                          children:
+                                            (r.customer.role ||
+                                              St.Customer) === St.Admin
+                                              ? "Role"
+                                              : "Balance",
                                         }),
-                                        e.jsxs("div", {
-                                          className: `text-lg font-black ${r.balance < 0 ? "text-red-700" : "text-emerald-700"}`,
-                                          children: [
-                                            r.balance < 0 ? "-" : "+",
-                                            "$",
-                                            Math.abs(r.balance).toFixed(2),
-                                          ],
-                                        }),
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx("div", {
+                                              className:
+                                                "text-sm sm:text-lg font-black leading-tight text-slate-800",
+                                              children: "Administrator",
+                                            })
+                                          : e.jsxs("div", {
+                                              className: `text-sm sm:text-lg font-black leading-tight break-all [overflow-wrap:anywhere] ${r.balance < 0 ? "text-red-700" : "text-emerald-700"}`,
+                                              children: [
+                                                r.balance < 0 ? "-" : "+",
+                                                "$",
+                                                Math.abs(
+                                                  r.balance,
+                                                ).toLocaleString(void 0, {
+                                                  minimumFractionDigits: 2,
+                                                  maximumFractionDigits: 2,
+                                                }),
+                                              ],
+                                            }),
                                       ],
                                     }),
                                     e.jsxs("div", {
@@ -1114,22 +1312,40 @@ const $t = ({
                                         e.jsx("div", {
                                           className:
                                             "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
-                                          children: "Shipments",
+                                          children:
+                                            (r.customer.role ||
+                                              St.Customer) === St.Admin
+                                              ? "Scope"
+                                              : "Shipments",
                                         }),
-                                        e.jsx("div", {
-                                          className:
-                                            "text-lg font-black text-gray-900",
-                                          children: r.shipmentsTotal,
-                                        }),
-                                        e.jsxs("div", {
-                                          className: "text-xs text-gray-600",
-                                          children: [
-                                            "Open: ",
-                                            r.openShipments,
-                                            " · Delivered: ",
-                                            r.deliveredShipments,
-                                          ],
-                                        }),
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx("div", {
+                                              className:
+                                                "text-lg font-black text-gray-900",
+                                              children: "Platform Access",
+                                            })
+                                          : e.jsx("div", {
+                                              className:
+                                                "text-lg font-black text-gray-900",
+                                              children: r.shipmentsTotal,
+                                            }),
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx("div", {
+                                              className: "text-xs text-gray-600",
+                                              children:
+                                                "Customer shipment metrics are hidden for admins.",
+                                            })
+                                          : e.jsxs("div", {
+                                              className: "text-xs text-gray-600",
+                                              children: [
+                                                "Open: ",
+                                                r.openShipments,
+                                                " Â· Delivered: ",
+                                                r.deliveredShipments,
+                                              ],
+                                            }),
                                       ],
                                     }),
                                   ],
@@ -1144,29 +1360,49 @@ const $t = ({
                                         e.jsx("div", {
                                           className:
                                             "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
-                                          children: "Orders",
+                                          children:
+                                            (r.customer.role ||
+                                              St.Customer) === St.Admin
+                                              ? "Customer Data"
+                                              : "Orders",
                                         }),
-                                        e.jsx("div", {
-                                          className:
-                                            "text-lg font-black text-gray-900",
-                                          children: r.ordersTotal,
-                                        }),
-                                        ((tt = r.exceptions) == null
-                                          ? void 0
-                                          : tt.chargesNotApplied) > 0
-                                          ? e.jsxs("div", {
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx("div", {
                                               className:
-                                                "text-xs text-amber-800 font-semibold",
-                                              children: [
-                                                "Charges not applied: ",
-                                                r.exceptions.chargesNotApplied,
-                                              ],
+                                                "text-sm font-semibold text-gray-700",
+                                              children:
+                                                "Not applicable for admin accounts",
                                             })
                                           : e.jsx("div", {
                                               className:
-                                                "text-xs text-gray-600",
-                                              children: "OK",
+                                                "text-lg font-black text-gray-900",
+                                              children: r.ordersTotal,
                                             }),
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx("div", {
+                                              className: "text-xs text-gray-600",
+                                              children:
+                                                "Billing and operational metrics are customer-only.",
+                                            })
+                                          : ((tt = r.exceptions) == null
+                                                ? void 0
+                                                : tt.chargesNotApplied) > 0
+                                            ? e.jsxs("div", {
+                                                className:
+                                                  "text-xs text-amber-800 font-semibold",
+                                                children: [
+                                                  "Charges not applied: ",
+                                                  r.exceptions
+                                                    .chargesNotApplied,
+                                                ],
+                                              })
+                                            : e.jsx("div", {
+                                                className:
+                                                  "text-xs text-gray-600",
+                                                children: "OK",
+                                              }),
                                       ],
                                     }),
                                     e.jsxs("div", {
@@ -1176,34 +1412,55 @@ const $t = ({
                                         e.jsx("div", {
                                           className:
                                             "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
-                                          children: "Consolidations",
+                                          children:
+                                            (r.customer.role ||
+                                              St.Customer) === St.Admin
+                                              ? "Status"
+                                              : "Consolidations",
                                         }),
-                                        e.jsx("div", {
-                                          className:
-                                            "text-lg font-black text-gray-900",
-                                          children: r.consolidationsTotal,
-                                        }),
-                                        ((st = r.exceptions) == null
-                                          ? void 0
-                                          : st.missingTracking) > 0
-                                          ? e.jsxs("div", {
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx("div", {
                                               className:
-                                                "text-xs text-orange-800 font-semibold",
-                                              children: [
-                                                "Missing tracking: ",
-                                                r.exceptions.missingTracking,
-                                              ],
+                                                "text-lg font-black text-gray-900",
+                                              children: "Active",
                                             })
                                           : e.jsx("div", {
                                               className:
-                                                "text-xs text-gray-600",
-                                              children: "OK",
+                                                "text-lg font-black text-gray-900",
+                                              children:
+                                                r.consolidationsTotal,
                                             }),
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? e.jsx("div", {
+                                              className: "text-xs text-gray-600",
+                                              children:
+                                                "Admin records are separated from customer billing views.",
+                                            })
+                                          : ((st = r.exceptions) == null
+                                                ? void 0
+                                                : st.missingTracking) > 0
+                                            ? e.jsxs("div", {
+                                                className:
+                                                  "text-xs text-orange-800 font-semibold",
+                                                children: [
+                                                  "Missing tracking: ",
+                                                  r.exceptions.missingTracking,
+                                                ],
+                                              })
+                                            : e.jsx("div", {
+                                                className:
+                                                  "text-xs text-gray-600",
+                                                children: "OK",
+                                              }),
                                       ],
                                     }),
                                   ],
                                 }),
                                 u &&
+                                  (r.customer.role || St.Customer) ===
+                                    St.Customer &&
                                   e.jsxs("div", {
                                     className: "mt-4 flex flex-wrap gap-2",
                                     children: [
@@ -1291,6 +1548,8 @@ const $t = ({
                                     ],
                                   }),
                                 u &&
+                                  (r.customer.role || St.Customer) ===
+                                    St.Customer &&
                                   e.jsx("div", {
                                     className: "mt-4",
                                     children: (() => {
@@ -1334,7 +1593,7 @@ const $t = ({
                                         a = s.map((l) => ({
                                           id: l.id,
                                           label: re(l.id, "order"),
-                                          subtitle: `${l.status} · $${Math.round(Number(l.value || 0)).toLocaleString()}`,
+                                          subtitle: `${l.status} Â· $${Math.round(Number(l.value || 0)).toLocaleString()}`,
                                           onClick: () => {
                                             try {
                                               localStorage.setItem(
@@ -1351,7 +1610,7 @@ const $t = ({
                                         d = m.map((l) => ({
                                           id: l.id,
                                           label: re(l.id, "consolidation"),
-                                          subtitle: `${l.status} · ${l.route}`,
+                                          subtitle: `${l.status} Â· ${l.route}`,
                                           onClick: () => {
                                             try {
                                               localStorage.setItem(
@@ -1368,7 +1627,7 @@ const $t = ({
                                         b = o.map((l) => ({
                                           id: l.id,
                                           label: re(l.id, "shipment"),
-                                          subtitle: `${l.type} · ${String(l.status)}`,
+                                          subtitle: `${l.type} Â· ${String(l.status)}`,
                                           onClick: () => {
                                             try {
                                               localStorage.setItem(
@@ -1512,7 +1771,11 @@ const $t = ({
                                 e.jsx("div", {
                                   className:
                                     "text-xs font-semibold text-gray-500 uppercase tracking-wider",
-                                  children: "Customer",
+                                  children:
+                                    (r.customer.role || St.Customer) ===
+                                    St.Admin
+                                      ? "Admin Account"
+                                      : "Customer",
                                 }),
                                 e.jsx("div", {
                                   className:
@@ -1540,30 +1803,39 @@ const $t = ({
                             e.jsxs("div", {
                               className: "flex flex-wrap gap-2 items-center",
                               children: [
-                                e.jsx(be, {
-                                  className: `${fe[r.customer.contractType]} px-3 py-1 rounded-full text-xs font-semibold tracking-wide`,
-                                  children:
-                                    ((rt = v[r.customer.contractType]) == null
-                                      ? void 0
-                                      : rt.name) || r.customer.contractType,
-                                }),
-                                e.jsx("select", {
-                                  value: r.customer.contractType,
-                                  onChange: (t) => {
-                                    Xe(r.customer, t.target.value);
-                                  },
-                                  disabled: ze === r.customer.id,
-                                  className:
-                                    "h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:opacity-60",
-                                  "aria-label": "Change contract type",
-                                  children: Object.values(N).map((t) =>
-                                    e.jsx(
-                                      "option",
-                                      { value: t, children: v[t].name },
-                                      t,
+                                (r.customer.role || St.Customer) === St.Admin
+                                  ? e.jsx(be, {
+                                      className:
+                                        "px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-slate-200 text-slate-800",
+                                      children: "Admin",
+                                    })
+                                  : e.jsx(be, {
+                                      className: `${fe[r.customer.contractType]} px-3 py-1 rounded-full text-xs font-semibold tracking-wide`,
+                                      children:
+                                        ((rt = v[r.customer.contractType]) ==
+                                        null
+                                          ? void 0
+                                          : rt.name) || r.customer.contractType,
+                                    }),
+                                (r.customer.role || St.Customer) ===
+                                  St.Customer &&
+                                  e.jsx("select", {
+                                    value: r.customer.contractType,
+                                    onChange: (t) => {
+                                      Xe(r.customer, t.target.value);
+                                    },
+                                    disabled: ze === r.customer.id,
+                                    className:
+                                      "h-8 rounded-lg border border-gray-200 bg-white px-2 text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:opacity-60",
+                                    "aria-label": "Change plan",
+                                    children: Object.values(N).map((t) =>
+                                      e.jsx(
+                                        "option",
+                                        { value: t, children: v[t].name },
+                                        t,
+                                      ),
                                     ),
-                                  ),
-                                }),
+                                  }),
                                 e.jsx("button", {
                                   type: "button",
                                   onClick: () => at(r.customer.id),
@@ -1571,8 +1843,49 @@ const $t = ({
                                     "px-3 py-1 rounded-full border border-gray-200 bg-white text-xs font-semibold text-gray-700",
                                   children: "Copy ID",
                                 }),
+                                (r.customer.role || St.Customer) ===
+                                  St.Customer &&
+                                  e.jsx("button", {
+                                    type: "button",
+                                    onClick: () => lr(r.customer),
+                                    disabled:
+                                      magicLinkLoadingId === r.customer.id,
+                                    className:
+                                      "px-3 py-1 rounded-full border border-emerald-200 bg-emerald-50 text-xs font-semibold text-emerald-800 disabled:opacity-60",
+                                    children:
+                                      magicLinkLoadingId === r.customer.id
+                                        ? "Generating..."
+                                        : "Magic Link",
+                                  }),
                               ],
                             }),
+                            magicLinkByCustomer[r.customer.id] &&
+                              e.jsxs("div", {
+                                className:
+                                  "rounded-xl border border-emerald-200 bg-emerald-50/70 p-3",
+                                children: [
+                                  e.jsx("div", {
+                                    className:
+                                      "text-[11px] font-semibold text-emerald-800 uppercase tracking-wide",
+                                    children: "Latest Magic Link",
+                                  }),
+                                  e.jsx("div", {
+                                    className:
+                                      "mt-1 text-xs text-emerald-900 break-all",
+                                    children: magicLinkByCustomer[r.customer.id],
+                                  }),
+                                  e.jsx("div", {
+                                    className: "mt-2",
+                                    children: e.jsx("button", {
+                                      type: "button",
+                                      onClick: () => Pr(r.customer.id),
+                                      className:
+                                        "px-3 py-1.5 rounded-lg border border-emerald-300 bg-white text-xs font-semibold text-emerald-800",
+                                      children: "Copy Magic Link",
+                                    }),
+                                  }),
+                                ],
+                              }),
                             e.jsx("div", {
                               className: "text-sm text-gray-600",
                               children: r.customer.email,
@@ -1598,16 +1911,33 @@ const $t = ({
                                     e.jsx("div", {
                                       className:
                                         "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
-                                      children: "Balance",
+                                      children:
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? "Role"
+                                          : "Balance",
                                     }),
-                                    e.jsxs("div", {
-                                      className: `text-base font-black ${r.balance < 0 ? "text-red-700" : "text-emerald-700"}`,
-                                      children: [
-                                        r.balance < 0 ? "-" : "+",
-                                        "$",
-                                        Math.abs(r.balance).toFixed(2),
-                                      ],
-                                    }),
+                                    (r.customer.role || St.Customer) ===
+                                    St.Admin
+                                      ? e.jsx("div", {
+                                          className:
+                                            "text-sm font-black leading-tight text-slate-800",
+                                          children: "Administrator",
+                                        })
+                                      : e.jsxs("div", {
+                                          className: `text-sm font-black leading-tight break-all [overflow-wrap:anywhere] ${r.balance < 0 ? "text-red-700" : "text-emerald-700"}`,
+                                          children: [
+                                            r.balance < 0 ? "-" : "+",
+                                            "$",
+                                            Math.abs(r.balance).toLocaleString(
+                                              void 0,
+                                              {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,
+                                              },
+                                            ),
+                                          ],
+                                        }),
                                   ],
                                 }),
                                 e.jsxs("div", {
@@ -1617,13 +1947,24 @@ const $t = ({
                                     e.jsx("div", {
                                       className:
                                         "text-[11px] font-semibold text-gray-500 uppercase tracking-wide",
-                                      children: "Open Shipments",
+                                      children:
+                                        (r.customer.role || St.Customer) ===
+                                        St.Admin
+                                          ? "Scope"
+                                          : "Open Shipments",
                                     }),
-                                    e.jsx("div", {
-                                      className:
-                                        "text-base font-black text-gray-900",
-                                      children: r.openShipments,
-                                    }),
+                                    (r.customer.role || St.Customer) ===
+                                    St.Admin
+                                      ? e.jsx("div", {
+                                          className:
+                                            "text-base font-black text-gray-900",
+                                          children: "Platform Access",
+                                        })
+                                      : e.jsx("div", {
+                                          className:
+                                            "text-base font-black text-gray-900",
+                                          children: r.openShipments,
+                                        }),
                                   ],
                                 }),
                               ],
@@ -1656,27 +1997,29 @@ const $t = ({
                                   className: "w-full",
                                   children: "Edit Customer",
                                 }),
-                                e.jsx(I, {
-                                  type: "button",
-                                  variant: "outline",
-                                  size: "xs",
-                                  onClick: () => {
-                                    try {
-                                      localStorage.setItem(
-                                        "bundleist_nav_intent",
-                                        JSON.stringify({
-                                          page: "payments",
-                                          adminCustomerFilter: r.customer.id,
-                                          forceCustomerLens: !0,
-                                          resetFilters: !0,
-                                        }),
-                                      );
-                                    } catch {}
-                                    (X(!1), w("payments"));
-                                  },
-                                  className: "w-full",
-                                  children: "Payments",
-                                }),
+                                (r.customer.role || St.Customer) ===
+                                  St.Customer &&
+                                  e.jsx(I, {
+                                    type: "button",
+                                    variant: "outline",
+                                    size: "xs",
+                                    onClick: () => {
+                                      try {
+                                        localStorage.setItem(
+                                          "bundleist_nav_intent",
+                                          JSON.stringify({
+                                            page: "payments",
+                                            adminCustomerFilter: r.customer.id,
+                                            forceCustomerLens: !0,
+                                            resetFilters: !0,
+                                          }),
+                                        );
+                                      } catch {}
+                                      (X(!1), w("payments"));
+                                    },
+                                    className: "w-full",
+                                    children: "Payments",
+                                  }),
                               ],
                             }),
                           ],
@@ -1788,14 +2131,14 @@ const $t = ({
                         ],
                       }),
                       e.jsx(ae, {
-                        title: "Contract and Notes",
+                        title: "Plan and Notes",
                         description: "Plan selection and internal context.",
                         className: "bg-gradient-to-r from-gray-50 to-slate-50",
                         children: e.jsxs("div", {
                           className: "grid grid-cols-1 md:grid-cols-2 gap-6",
                           children: [
                             e.jsx(f, {
-                              label: "Contract Type",
+                              label: "Plan",
                               required: !0,
                               children: e.jsx("select", {
                                 value: ue,
@@ -1978,7 +2321,7 @@ const $t = ({
                                 }),
                               }),
                               e.jsx(f, {
-                                label: "Contract Type",
+                                label: "Plan",
                                 required: !0,
                                 help: "Select the pricing and service plan for this customer",
                                 children: e.jsx("select", {
@@ -2013,15 +2356,16 @@ const $t = ({
                                         e.jsxs("p", {
                                           children: [
                                             e.jsx("strong", {
-                                              children: "One-time fee:",
+                                              children: "Service fee:",
                                             }),
                                             " $",
                                             v[C].oneTimeFee,
+                                            " per pilot consolidation",
                                             e.jsx("br", {}),
                                             e.jsx("span", {
                                               className: "text-blue-600",
                                               children:
-                                                "Perfect for testing our services with a single shipment.",
+                                                "Ideal for first-time importers running a pilot consolidation.",
                                             }),
                                           ],
                                         }),
@@ -2029,16 +2373,19 @@ const $t = ({
                                         e.jsxs("p", {
                                           children: [
                                             e.jsx("strong", {
-                                              children: "Commission fee:",
+                                              children: "Service fee:",
                                             }),
                                             " ",
+                                            "$",
+                                            v[C].minimumFee,
+                                            " minimum or ",
                                             (v[C].percentageFee || 0) * 100,
-                                            "% per order",
+                                            "% of order value (whichever is higher)",
                                             e.jsx("br", {}),
                                             e.jsx("span", {
                                               className: "text-blue-600",
                                               children:
-                                                "Ideal for growing businesses with regular shipments.",
+                                                "Designed for growing businesses importing regularly.",
                                             }),
                                           ],
                                         }),
@@ -2046,16 +2393,19 @@ const $t = ({
                                         e.jsxs("p", {
                                           children: [
                                             e.jsx("strong", {
-                                              children: "Commission fee:",
+                                              children: "Service fee:",
                                             }),
                                             " ",
+                                            "$",
+                                            v[C].minimumFee,
+                                            " minimum or ",
                                             (v[C].percentageFee || 0) * 100,
-                                            "% per order",
+                                            "% of order value (whichever is higher)",
                                             e.jsx("br", {}),
                                             e.jsx("span", {
                                               className: "text-blue-600",
                                               children:
-                                                "Best rates for high-volume corporate clients.",
+                                                "Built for high-volume importers needing priority handling and optimization.",
                                             }),
                                           ],
                                         }),

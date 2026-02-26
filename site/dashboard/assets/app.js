@@ -1504,11 +1504,7 @@ var St = ((s) => ((s.Admin = "admin"), (s.Customer = "customer"), s))(St || {}),
     (s.ReadyToShip = "ReadyToShip"),
     (s.InConsolidation = "InConsolidation"),
     (s.InTransit = "InTransit"),
-    (s.AtOriginPort = "AtOriginPort"),
-    (s.InTransitSea = "InTransitSea"),
-    (s.AtDestinationPort = "AtDestinationPort"),
     (s.CustomsClearance = "CustomsClearance"),
-    (s.AwaitingDelivery = "AwaitingDelivery"),
     (s.OutForDelivery = "OutForDelivery"),
     (s.Delivered = "Delivered"),
     (s.Completed = "Completed"),
@@ -1598,11 +1594,7 @@ var m = ((s) => (
     (s.QualityCheck = "QualityCheck"),
     (s.ReadyToShip = "ReadyToShip"),
     (s.InTransit = "InTransit"),
-    (s.AtOriginPort = "AtOriginPort"),
-    (s.InTransitSea = "InTransitSea"),
-    (s.AtDestinationPort = "AtDestinationPort"),
     (s.CustomsClearance = "CustomsClearance"),
-    (s.AwaitingDelivery = "AwaitingDelivery"),
     (s.OutForDelivery = "OutForDelivery"),
     (s.Delivered = "Delivered"),
     (s.Completed = "Completed"),
@@ -1655,9 +1647,9 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
       }),
     }),
   Yi = {
-    [qe.Trial]: { name: "Trial", oneTimeFee: 499 },
-    [qe.Growth]: { name: "Growth", percentageFee: 0.02 },
-    [qe.Corporate]: { name: "Corporate", percentageFee: 0.015 },
+    [qe.Trial]: { name: "Starter", oneTimeFee: 349, minimumFee: 349 },
+    [qe.Growth]: { name: "Standard", minimumFee: 350, percentageFee: 0.015 },
+    [qe.Corporate]: { name: "Enterprise", minimumFee: 750, percentageFee: 0.01 },
   },
   Nc = {
     [d.Pending]: "bg-yellow-100 text-yellow-800",
@@ -1666,11 +1658,7 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
     [d.ReadyToShip]: "bg-purple-100 text-purple-800",
     [d.InConsolidation]: "bg-violet-100 text-violet-800",
     [d.InTransit]: "bg-teal-100 text-teal-800",
-    [d.AtOriginPort]: "bg-cyan-100 text-cyan-800",
-    [d.InTransitSea]: "bg-sky-100 text-sky-800",
-    [d.AtDestinationPort]: "bg-lime-100 text-lime-800",
     [d.CustomsClearance]: "bg-orange-100 text-orange-800",
-    [d.AwaitingDelivery]: "bg-amber-100 text-amber-800",
     [d.OutForDelivery]: "bg-emerald-100 text-emerald-800",
     [d.Delivered]: "bg-green-100 text-green-800",
     [d.Completed]: "bg-green-100 text-green-800",
@@ -1679,43 +1667,42 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
   },
   ea = {
     [d.Pending]: [d.Processing, d.OnHold, d.Cancelled],
-    [d.Processing]: [d.QualityCheck, d.Pending, d.OnHold, d.Cancelled],
+    [d.Processing]: [
+      d.QualityCheck,
+      d.ReadyToShip,
+      d.OnHold,
+      d.Cancelled,
+    ],
     [d.QualityCheck]: [d.ReadyToShip, d.Processing, d.OnHold, d.Cancelled],
-    [d.ReadyToShip]: [d.InTransit, d.QualityCheck, d.OnHold, d.Cancelled],
-    [d.InConsolidation]: [],
-    [d.InTransit]: [d.AtOriginPort, d.AwaitingDelivery, d.OnHold],
-    [d.AtOriginPort]: [d.InTransitSea, d.AwaitingDelivery, d.OnHold],
-    [d.InTransitSea]: [d.AtDestinationPort, d.OnHold],
-    [d.AtDestinationPort]: [d.CustomsClearance, d.AwaitingDelivery, d.OnHold],
-    [d.CustomsClearance]: [d.AwaitingDelivery, d.OnHold],
-    [d.AwaitingDelivery]: [d.OutForDelivery, d.OnHold],
-    [d.OutForDelivery]: [d.Delivered, d.AwaitingDelivery, d.OnHold],
-    [d.Delivered]: [],
+    [d.ReadyToShip]: [d.InTransit, d.OnHold, d.Cancelled],
+    [d.InConsolidation]: [d.ReadyToShip, d.OnHold, d.Cancelled],
+    [d.InTransit]: [d.CustomsClearance, d.OutForDelivery, d.Delivered, d.OnHold],
+    [d.CustomsClearance]: [d.OutForDelivery, d.Delivered, d.OnHold],
+    [d.OutForDelivery]: [d.Delivered, d.OnHold],
+    [d.Delivered]: [d.Completed],
     [d.Completed]: [],
-    [d.Cancelled]: [d.ReadyToShip],
+    [d.Cancelled]: [],
     [d.OnHold]: [
       d.Processing,
       d.QualityCheck,
       d.ReadyToShip,
       d.InTransit,
-      d.AwaitingDelivery,
+      d.CustomsClearance,
+      d.OutForDelivery,
+      d.Cancelled,
     ],
   },
   Ac = {
     [d.Pending]:
       "Order received and awaiting confirmation - No charges applied yet",
     [d.Processing]:
-      "Order confirmed and charges applied - Being prepared for shipment",
+      "Order confirmed and order cost applied - Service fee is posted when shipment is created",
     [d.QualityCheck]: "Order undergoes quality verification before shipping",
     [d.ReadyToShip]: "Order packed and ready for shipping arrangement",
     [d.InConsolidation]:
       "Order is in a consolidation - Status follows consolidation progress",
     [d.InTransit]: "Order shipped and in transit to destination",
-    [d.AtOriginPort]: "Order at origin port/terminal awaiting departure",
-    [d.InTransitSea]: "Order on sea/air freight in progress",
-    [d.AtDestinationPort]: "Order arrived at destination port/terminal",
     [d.CustomsClearance]: "Order undergoing customs clearance process",
-    [d.AwaitingDelivery]: "Order cleared and ready for final delivery",
     [d.OutForDelivery]: "Order out for delivery to customer",
     [d.Delivered]: "Order successfully delivered to customer",
     [d.Completed]: "Order completed",
@@ -1723,26 +1710,24 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
     [d.OnHold]: "Order temporarily on hold awaiting resolution",
   },
   Dc = {
-    Preparation: [d.Pending, d.Processing, d.QualityCheck, d.ReadyToShip],
-    Shipping: [
+    Preparation: [
+      d.Pending,
+      d.Processing,
+      d.QualityCheck,
+      d.ReadyToShip,
       d.InConsolidation,
-      d.InTransit,
-      d.AtOriginPort,
-      d.InTransitSea,
-      d.AtDestinationPort,
-      d.CustomsClearance,
     ],
-    Delivery: [d.AwaitingDelivery, d.OutForDelivery],
+    Shipping: [
+      d.InTransit,
+      d.CustomsClearance,
+      d.OutForDelivery,
+    ],
     Final: [d.Delivered, d.Completed, d.Cancelled, d.OnHold],
   },
   Rc = (s) =>
     [
       d.InTransit,
-      d.AtOriginPort,
-      d.InTransitSea,
-      d.AtDestinationPort,
       d.CustomsClearance,
-      d.AwaitingDelivery,
       d.OutForDelivery,
       d.Delivered,
       d.Completed,
@@ -1758,11 +1743,7 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
     [m.QualityCheck]: "bg-indigo-100 text-indigo-800",
     [m.ReadyToShip]: "bg-blue-100 text-blue-800",
     [m.InTransit]: "bg-teal-100 text-teal-800",
-    [m.AtOriginPort]: "bg-cyan-100 text-cyan-800",
-    [m.InTransitSea]: "bg-blue-200 text-blue-900",
-    [m.AtDestinationPort]: "bg-purple-100 text-purple-800",
     [m.CustomsClearance]: "bg-violet-100 text-violet-800",
-    [m.AwaitingDelivery]: "bg-pink-100 text-pink-800",
     [m.OutForDelivery]: "bg-rose-100 text-rose-800",
     [m.Delivered]: "bg-lime-100 text-lime-800",
     [m.Completed]: "bg-emerald-100 text-emerald-800",
@@ -1784,56 +1765,31 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
   m.QualityCheck,
   m.ReadyToShip,
   m.InTransit,
-  m.AtOriginPort,
-  m.InTransitSea,
-  m.AtDestinationPort,
   m.CustomsClearance,
-  m.AwaitingDelivery,
   m.OutForDelivery,
   m.Delivered,
   m.Completed,
   m.Cancelled,
   m.OnHold);
 const ra = {
-  [m.Planning]: [m.OrderCollection, m.OnHold, m.Cancelled],
-  [m.OrderCollection]: [
-    m.DocumentPreparation,
-    m.Planning,
-    m.OnHold,
-    m.Cancelled,
-  ],
-  [m.DocumentPreparation]: [
-    m.Loading,
-    m.OrderCollection,
-    m.OnHold,
-    m.Cancelled,
-  ],
-  [m.Loading]: [m.QualityCheck, m.DocumentPreparation, m.OnHold, m.Cancelled],
+  [m.Planning]: [m.Loading, m.OnHold, m.Cancelled],
+  [m.OrderCollection]: [m.Loading, m.Planning, m.OnHold, m.Cancelled],
+  [m.DocumentPreparation]: [m.Loading, m.Planning, m.OnHold, m.Cancelled],
+  [m.Loading]: [m.ReadyToShip, m.Planning, m.OnHold, m.Cancelled],
   [m.QualityCheck]: [m.ReadyToShip, m.Loading, m.OnHold, m.Cancelled],
-  [m.ReadyToShip]: [m.InTransit, m.QualityCheck, m.OnHold, m.Cancelled],
-  [m.InTransit]: [m.AtOriginPort, m.InTransitSea, m.OnHold],
-  [m.AtOriginPort]: [m.InTransitSea, m.OnHold],
-  [m.InTransitSea]: [m.AtDestinationPort, m.OnHold],
-  [m.AtDestinationPort]: [m.CustomsClearance, m.AwaitingDelivery, m.OnHold],
-  [m.CustomsClearance]: [m.AwaitingDelivery, m.AtDestinationPort, m.OnHold],
-  [m.AwaitingDelivery]: [m.OutForDelivery, m.OnHold],
-  [m.OutForDelivery]: [m.Delivered, m.AwaitingDelivery, m.OnHold],
+  [m.ReadyToShip]: [m.InTransit, m.OnHold, m.Cancelled],
+  [m.InTransit]: [m.CustomsClearance, m.OutForDelivery, m.Delivered, m.OnHold],
+  [m.CustomsClearance]: [m.OutForDelivery, m.Delivered, m.OnHold],
+  [m.OutForDelivery]: [m.Delivered, m.OnHold],
   [m.Delivered]: [m.Completed],
   [m.Completed]: [],
   [m.Cancelled]: [],
   [m.OnHold]: [
     m.Planning,
-    m.OrderCollection,
-    m.DocumentPreparation,
     m.Loading,
-    m.QualityCheck,
     m.ReadyToShip,
     m.InTransit,
-    m.AtOriginPort,
-    m.InTransitSea,
-    m.AtDestinationPort,
     m.CustomsClearance,
-    m.AwaitingDelivery,
     m.OutForDelivery,
     m.Cancelled,
   ],
@@ -1845,17 +1801,113 @@ const ra = {
   m.QualityCheck + "",
   m.ReadyToShip + "",
   m.InTransit + "",
-  m.AtOriginPort + "",
-  m.InTransitSea + "",
-  m.AtDestinationPort + "",
   m.CustomsClearance + "",
-  m.AwaitingDelivery + "",
   m.OutForDelivery + "",
   m.Delivered + "",
   m.Completed + "",
   m.Cancelled + "",
   m.OnHold + "");
-const Lc = (s) => ra[s] || [],
+const STREAMLINED_PRE_SHIPMENT_CONSOLIDATION_STATUSES = new Set([
+    m.Planning,
+    m.OrderCollection,
+    m.DocumentPreparation,
+    m.Loading,
+    m.QualityCheck,
+    m.ReadyToShip,
+  ]),
+  isPreShipmentConsolidationStatus = (s) =>
+    STREAMLINED_PRE_SHIPMENT_CONSOLIDATION_STATUSES.has(s),
+  CONSOLIDATION_STATUSES_REQUIRING_ORDERS = new Set([
+    m.Loading,
+    m.QualityCheck,
+    m.ReadyToShip,
+    m.InTransit,
+    m.CustomsClearance,
+    m.OutForDelivery,
+    m.Delivered,
+    m.Completed,
+  ]),
+  consolidationStatusRequiresOrders = (s) =>
+    CONSOLIDATION_STATUSES_REQUIRING_ORDERS.has(s),
+  mapConsolidationStatusToOrderStatus = (
+    s,
+    { preShipmentStatus = d.InConsolidation } = {},
+  ) =>
+    s === m.Cancelled
+      ? d.ReadyToShip
+      : s === m.OnHold
+        ? d.OnHold
+      : s === m.Delivered || s === m.Completed
+        ? d.Delivered
+          : s === m.OutForDelivery
+            ? d.OutForDelivery
+            : s === m.CustomsClearance
+              ? d.CustomsClearance
+              : s === m.InTransit
+                ? d.InTransit
+                : isPreShipmentConsolidationStatus(s)
+                  ? preShipmentStatus
+                  : preShipmentStatus,
+  SHIPMENT_TO_CONSOLIDATION_STATUS_MAP = Object.freeze({
+    [m.InTransit]: m.InTransit,
+    [m.CustomsClearance]: m.CustomsClearance,
+    [m.OutForDelivery]: m.OutForDelivery,
+    [m.Delivered]: m.Delivered,
+    [m.Completed]: m.Completed,
+    [m.Cancelled]: m.Cancelled,
+    [m.OnHold]: m.OnHold,
+  }),
+  mapShipmentToConsolidationStatus = (s) =>
+    SHIPMENT_TO_CONSOLIDATION_STATUS_MAP[String(s) || ""] || null,
+  CONSOLIDATION_TO_SHIPMENT_STATUS_MAP = Object.freeze({
+    [m.InTransit]: m.InTransit,
+    [m.CustomsClearance]: m.CustomsClearance,
+    [m.OutForDelivery]: m.OutForDelivery,
+    [m.Delivered]: m.Delivered,
+    [m.Completed]: m.Completed,
+    [m.Cancelled]: m.Cancelled,
+    [m.OnHold]: m.OnHold,
+  }),
+  mapConsolidationToShipmentStatus = (s) =>
+    CONSOLIDATION_TO_SHIPMENT_STATUS_MAP[String(s) || ""] || null,
+  mapShipmentToOrderStatus = (s) =>
+    s === "Delivered" || s === "Completed"
+      ? d.Delivered
+      : s === "Cancelled"
+        ? d.Cancelled
+        : s === "OnHold"
+          ? d.OnHold
+          : s === "OutForDelivery"
+            ? d.OutForDelivery
+            : s === "CustomsClearance"
+              ? d.CustomsClearance
+              : s === "InTransit"
+                ? d.InTransit
+                : null,
+  isDeliveredLikeStatus = (s) =>
+    s === d.Delivered ||
+    s === d.Completed ||
+    s === m.Delivered ||
+    s === m.Completed ||
+    s === "Delivered" ||
+    s === "Completed",
+  Lc = (s) => ra[s] || [],
+  isAllowedStatusTransition = (s, e, t) => {
+    const r = String(s || "").trim(),
+      i = String(e || "").trim();
+    if (!r || !i) return !1;
+    if (r === i) return !0;
+    const n = t(r) || [];
+    return Array.isArray(n) && n.includes(i);
+  },
+  isAllowedOrderStatusTransition = (s, e) =>
+    isAllowedStatusTransition(s, e, $c),
+  isAllowedConsolidationStatusTransition = (s, e) =>
+    isAllowedStatusTransition(s, e, Lc),
+  getAllowedShipmentTransitions = (s, e) =>
+    s === "consolidation" ? Lc(e) : $c(e),
+  isAllowedShipmentStatusTransition = (s, e, t) =>
+    isAllowedStatusTransition(e, t, (r) => getAllowedShipmentTransitions(s, r)),
   es = 3,
   Xi = [
     { id: "dashboard", label: "Dashboard", icon: Wo },
@@ -1898,6 +1950,11 @@ function ni({
   customers: t,
   notifications: r,
   markNotificationAsRead: i,
+  markAllNotificationsAsRead: n0,
+  hasMoreNotifications: o0 = !1,
+  loadingMoreNotifications: a0 = !1,
+  onLoadMoreNotifications: c0 = null,
+  notificationPageSize: u0 = 50,
   onSignOut: n,
   currentUserId: o,
   isAdmin: a,
@@ -1923,12 +1980,10 @@ function ni({
     ue = x.useMemo(() => {
       const N = [...Xi];
       return (
-        R &&
-          R.role === "admin" &&
-          N.push({ id: "customers", label: "Customers", icon: Xo }),
+        a && N.push({ id: "customers", label: "Customers", icon: Xo }),
         N
       );
-    }, [R]);
+    }, [a]);
   (x.useEffect(() => {
     const N = (le) => {
       const W = le.target,
@@ -2109,6 +2164,11 @@ function ni({
     Ze = (N) => {
       (i(N.id), N.linkToPage && e(N.linkToPage, N.linkToId), b(!1));
     },
+    markAllNotifications = x.useCallback(async () => {
+      if (typeof n0 != "function") return;
+      const N = await n0();
+      N !== !1 && O("all");
+    }, [n0]),
     we = () => {
       if (!P) return null;
       const N = A.trim().toLowerCase(),
@@ -2124,7 +2184,8 @@ function ni({
                 (W.linkToPage || "").toLowerCase().includes(N) ||
                 (W.linkToId || "").toLowerCase().includes(N)
               : !0,
-        );
+        ),
+        W = typeof c0 == "function";
       return l.jsxs("div", {
         className: "fixed inset-0 z-[70]",
         children: [
@@ -2173,40 +2234,59 @@ function ni({
                     className: "px-4 pb-4 space-y-3",
                     children: [
                       l.jsxs("div", {
-                        className: "flex items-center gap-2",
+                        className: "flex items-center justify-between gap-2",
                         children: [
-                          l.jsx("button", {
-                            type: "button",
-                            onClick: () => O("all"),
-                            className: [
-                              "px-3 py-1.5 rounded-full text-xs font-semibold border",
-                              G === "all"
-                                ? "bg-slate-900 text-white border-slate-900"
-                                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
-                            ].join(" "),
-                            children: "All",
+                          l.jsxs("div", {
+                            className: "flex items-center gap-2",
+                            children: [
+                              l.jsx("button", {
+                                type: "button",
+                                onClick: () => O("all"),
+                                className: [
+                                  "px-3 py-1.5 rounded-full text-xs font-semibold border",
+                                  G === "all"
+                                    ? "bg-slate-900 text-white border-slate-900"
+                                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
+                                ].join(" "),
+                                children: "All",
+                              }),
+                              l.jsx("button", {
+                                type: "button",
+                                onClick: () => O("unread"),
+                                className: [
+                                  "px-3 py-1.5 rounded-full text-xs font-semibold border",
+                                  G === "unread"
+                                    ? "bg-slate-900 text-white border-slate-900"
+                                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
+                                ].join(" "),
+                                children: "Unread",
+                              }),
+                              l.jsx("button", {
+                                type: "button",
+                                onClick: () => O("high"),
+                                className: [
+                                  "px-3 py-1.5 rounded-full text-xs font-semibold border",
+                                  G === "high"
+                                    ? "bg-slate-900 text-white border-slate-900"
+                                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
+                                ].join(" "),
+                                children: "High",
+                              }),
+                            ],
                           }),
                           l.jsx("button", {
                             type: "button",
-                            onClick: () => O("unread"),
+                            onClick: () => {
+                              markAllNotifications();
+                            },
+                            disabled: ye === 0,
                             className: [
-                              "px-3 py-1.5 rounded-full text-xs font-semibold border",
-                              G === "unread"
-                                ? "bg-slate-900 text-white border-slate-900"
+                              "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
+                              ye === 0
+                                ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
                                 : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
                             ].join(" "),
-                            children: "Unread",
-                          }),
-                          l.jsx("button", {
-                            type: "button",
-                            onClick: () => O("high"),
-                            className: [
-                              "px-3 py-1.5 rounded-full text-xs font-semibold border",
-                              G === "high"
-                                ? "bg-slate-900 text-white border-slate-900"
-                                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50",
-                            ].join(" "),
-                            children: "High",
+                            children: "Mark all read",
                           }),
                         ],
                       }),
@@ -2236,7 +2316,7 @@ function ni({
                       })
                     : l.jsx("div", {
                         className: "space-y-2",
-                        children: le.slice(0, 100).map((W) => {
+                        children: le.map((W) => {
                           const Z = new Date(W.timestamp),
                             _e = Go(String(W.importance)),
                             Le = !W.isRead;
@@ -2316,13 +2396,36 @@ function ni({
                         }),
                       }),
                   l.jsxs("div", {
-                    className: "mt-4 text-[11px] text-slate-500",
+                    className: "mt-4 space-y-3",
                     children: [
-                      "Showing ",
-                      Math.min(le.length, 100),
-                      " of ",
-                      le.length,
-                      ".",
+                      l.jsxs("div", {
+                        className: "text-[11px] text-slate-500",
+                        children: [
+                          "Showing ",
+                          le.length,
+                          " loaded item",
+                          le.length === 1 ? "" : "s",
+                          ".",
+                        ],
+                      }),
+                      W &&
+                        (o0 || a0) &&
+                        l.jsx("button", {
+                          type: "button",
+                          onClick: () => {
+                            c0();
+                          },
+                          disabled: a0,
+                          className: [
+                            "w-full rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors",
+                            a0
+                              ? "border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed"
+                              : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50",
+                          ].join(" "),
+                          children: a0
+                            ? "Loading older activity..."
+                            : `Load older activity (${u0})`,
+                        }),
                     ],
                   }),
                 ],
@@ -2895,9 +2998,12 @@ function ni({
                                                   ta[R.contractType],
                                                   "px-2 py-1 rounded-xl text-xs font-semibold tracking-wide",
                                                 ].join(" "),
-                                                children: String(
-                                                  R.contractType,
-                                                ),
+                                                children:
+                                                  ((Et =
+                                                    Yi[R.contractType]) == null
+                                                    ? void 0
+                                                    : Et.name) ||
+                                                  String(R.contractType),
                                               }),
                                             ],
                                           }),
@@ -9526,6 +9632,82 @@ const sc = (s, e, t) => new rc(s, e, t),
   oc = ic,
   ac = nc,
   _ = sc(oc, ac);
+const NOTIFICATION_OWNER_PRIMARY_COLUMN = "user_id",
+  NOTIFICATION_OWNER_FALLBACK_COLUMN = "customer_id";
+let notificationOwnerColumnName = NOTIFICATION_OWNER_PRIMARY_COLUMN;
+const getNotificationOwnerColumnName = () => notificationOwnerColumnName,
+  getNotificationOwnerErrorMessage = (s) =>
+    typeof s == "string"
+      ? s.toLowerCase()
+      : `${(s == null ? void 0 : s.message) || ""}`.toLowerCase(),
+  getNotificationOwnerErrorCode = (s) =>
+    typeof s == "object" && s !== null && (s == null ? void 0 : s.code)
+      ? String(s.code).toLowerCase()
+      : "",
+  hasMissingNotificationOwnerColumnMessage = (s, e) => {
+    const t = String(e || "").toLowerCase();
+    return (
+      s.includes(`column notifications.${t} does not exist`) ||
+      s.includes(`column ${t} does not exist`) ||
+      s.includes(`could not find the '${t}' column`) ||
+      s.includes(`could not find the "${t}" column`) ||
+      (s.includes("schema cache") && s.includes(t))
+    );
+  },
+  shouldFallbackNotificationOwnerColumn = (
+    s,
+    e = getNotificationOwnerColumnName(),
+  ) => {
+    if (e !== NOTIFICATION_OWNER_PRIMARY_COLUMN) return !1;
+    const t = getNotificationOwnerErrorMessage(s),
+      r = getNotificationOwnerErrorCode(s);
+    return (
+      !t.includes(`or${NOTIFICATION_OWNER_PRIMARY_COLUMN}`) &&
+      (r === "42703" || r === "pgrst204" || t.includes("does not exist")) &&
+      hasMissingNotificationOwnerColumnMessage(
+        t,
+        NOTIFICATION_OWNER_PRIMARY_COLUMN,
+      )
+    );
+  },
+  shouldRestorePrimaryNotificationOwnerColumn = (
+    s,
+    e = getNotificationOwnerColumnName(),
+  ) => {
+    if (e !== NOTIFICATION_OWNER_FALLBACK_COLUMN) return !1;
+    const t = getNotificationOwnerErrorMessage(s),
+      r = getNotificationOwnerErrorCode(s);
+    return (
+      (r === "42703" || r === "pgrst204" || t.includes("does not exist")) &&
+      hasMissingNotificationOwnerColumnMessage(
+        t,
+        NOTIFICATION_OWNER_FALLBACK_COLUMN,
+      )
+    );
+  },
+  activateNotificationOwnerFallback = (s) =>
+    shouldFallbackNotificationOwnerColumn(s)
+      ? ((notificationOwnerColumnName = NOTIFICATION_OWNER_FALLBACK_COLUMN),
+        console.warn(
+          "notifications.user_id missing; using notifications.customer_id fallback",
+        ),
+        !0)
+      : !1,
+  restorePrimaryNotificationOwnerColumn = (s) =>
+    shouldRestorePrimaryNotificationOwnerColumn(s)
+      ? ((notificationOwnerColumnName = NOTIFICATION_OWNER_PRIMARY_COLUMN),
+        console.warn(
+          "notifications.customer_id missing; reverting to notifications.user_id",
+        ),
+        !0)
+      : !1,
+  buildNotificationOwnerOrFilter = (
+    s,
+    e = !1,
+    t = getNotificationOwnerColumnName(),
+  ) => (e ? `${t}.is.null,${t}.eq."${s}"` : `${t}.eq."${s}",${t}.is.null`),
+  readNotificationOwnerId = (s, e = getNotificationOwnerColumnName()) =>
+    s ? s[e] ?? s.user_id ?? s.customer_id ?? s.userId ?? null : null;
 class qt {
   constructor() {
     this.pendingNotifications = new Set();
@@ -9554,15 +9736,12 @@ class qt {
         if (await this.findDuplicate(t, a, c, u, r))
           return (console.log("Duplicate notification prevented:", p), null);
         const k = {
-          ...{
-            user_id: t,
-            message: r,
-            importance: i.toLowerCase(),
-            is_read: !1,
-            timestamp: new Date().toISOString(),
-            link_to_page: n,
-            link_to_id: o,
-          },
+          message: r,
+          importance: i.toLowerCase(),
+          is_read: !1,
+          timestamp: new Date().toISOString(),
+          link_to_page: n,
+          link_to_id: o,
         };
         try {
           (a && (k.event_type = a),
@@ -9581,13 +9760,22 @@ class qt {
             "Extended notification fields not available, using base fields only",
           );
         }
-        const { data: I, error: P } = await _.from("notifications")
-          .insert(k)
-          .select()
-          .single();
-        return P
-          ? (console.error("Error creating notification:", P), null)
-          : this.mapToNotificationItem(I);
+        const I = async (P) =>
+          await _.from("notifications")
+            .insert({
+              ...k,
+              [P]: t,
+            })
+            .select()
+            .single();
+        let P = getNotificationOwnerColumnName(),
+          { data: y, error: b } = await I(P);
+        b &&
+          activateNotificationOwnerFallback(b) &&
+          ((P = getNotificationOwnerColumnName()), ({ data: y, error: b } = await I(P)));
+        return b
+          ? (console.error("Error creating notification:", b), null)
+          : this.mapToNotificationItem(y);
       } finally {
         setTimeout(() => {
           this.pendingNotifications.delete(p);
@@ -9705,7 +9893,7 @@ class qt {
   getStatusImportance(e) {
     const t = ["Cancelled", "OnHold"],
       r = ["Delivered", "Completed", "OutForDelivery"],
-      i = ["InTransit", "AtDestinationPort", "CustomsClearance"];
+      i = ["InTransit", "CustomsClearance"];
     return t.includes(e)
       ? K.Critical
       : r.includes(e)
@@ -9781,44 +9969,68 @@ class qt {
   }
   async markAllAsRead(e = null, t = !1) {
     try {
-      if (t) {
-        const { error: r } = await _.from("notifications")
-          .update({ is_read: !0 })
-          .or(`user_id.is.null,user_id.eq."${e}"`)
-          .eq("is_read", !1);
-        return !r;
-      } else {
-        if (!e || e.trim() === "")
-          return (
-            console.error("Invalid userId provided for markAllAsRead"),
-            !1
-          );
-        const { error: r } = await _.from("notifications")
-          .update({ is_read: !0 })
-          .or(`user_id.eq."${e}",user_id.is.null`)
-          .eq("is_read", !1);
-        return !r;
-      }
+      if (!t && (!e || e.trim() === ""))
+        return (console.error("Invalid userId provided for markAllAsRead"), !1);
+      const r = async (i) => {
+        const { data: n, error: o } = await _.from("notifications")
+          .select("id")
+          .eq("is_read", !1)
+          .or(buildNotificationOwnerOrFilter(e, t, i))
+          .limit(5000);
+        if (o || !(n != null && n.length)) return { data: n, error: o };
+        const a = n.map((c) => c.id).filter(Boolean);
+        return a.length === 0
+          ? { data: [], error: null }
+          : await _.from("notifications")
+              .update({ is_read: !0 })
+              .in("id", a)
+              .eq("is_read", !1)
+              .select("id");
+      };
+      let i = getNotificationOwnerColumnName(),
+        { error: n } = await r(i);
+      return (
+        n &&
+          activateNotificationOwnerFallback(n) &&
+          ((i = getNotificationOwnerColumnName()), ({ error: n } = await r(i))),
+        n &&
+          restorePrimaryNotificationOwnerColumn(n) &&
+          ((i = getNotificationOwnerColumnName()), ({ error: n } = await r(i))),
+        !n
+      );
     } catch (r) {
       return (console.error("Error marking all notifications as read:", r), !1);
     }
   }
   async getNotificationsForUser(e, t = !1, r = 50) {
     try {
-      let i = _.from("notifications")
-        .select("*")
-        .order("timestamp", { ascending: !1 })
-        .limit(r);
-      t || (i = i.or(`user_id.eq."${e}",user_id.is.null`));
-      const { data: n, error: o } = await i;
-      return o
-        ? (console.error("Error fetching notifications:", o), [])
-        : (n || []).map(this.mapToNotificationItem);
+      const i = async (n) => {
+        let o = _.from("notifications")
+          .select("*")
+          .order("timestamp", { ascending: !1 })
+          .limit(r);
+        return t || (o = o.or(buildNotificationOwnerOrFilter(e, !1, n))), await o;
+      };
+      let n = getNotificationOwnerColumnName(),
+        { data: o, error: a } = await i(n);
+      return (
+        a &&
+          !t &&
+          activateNotificationOwnerFallback(a) &&
+          ((n = getNotificationOwnerColumnName()), ({ data: o, error: a } = await i(n))),
+        a &&
+          !t &&
+          restorePrimaryNotificationOwnerColumn(a) &&
+          ((n = getNotificationOwnerColumnName()), ({ data: o, error: a } = await i(n))),
+        a
+          ? (console.error("Error fetching notifications:", a), [])
+          : (o || []).map(this.mapToNotificationItem)
+      );
     } catch (i) {
       return (console.error("Unexpected error fetching notifications:", i), []);
     }
   }
-  async getNotificationsForAdmin(e = 50) {
+  async getNotificationsForAdmin(e = 100) {
     try {
       const { data: t, error: r } = await _.from("notifications")
         .select("*")
@@ -9836,25 +10048,37 @@ class qt {
   }
   async getUnreadCount(e, t = !1) {
     try {
-      let r = _.from("notifications")
-        .select("*", { count: "exact", head: !0 })
-        .eq("is_read", !1);
-      t
-        ? ((r = r.is("user_id", null)),
-          console.log(
-            "Getting unread count for admin - filter: user_id IS NULL",
-          ))
-        : ((r = r.or(`user_id.eq."${e}",user_id.is.null`)),
-          console.log(
-            `Getting unread count for customer ${e} - filter: user_id.eq."${e}",user_id.is.null`,
-          ));
-      const { count: i, error: n } = await r;
-      return n
-        ? (console.error("Error getting unread count:", n), 0)
-        : (console.log(
-            `Unread count result for ${t ? "admin" : "customer " + e}: ${i}`,
-          ),
-          i || 0);
+      const r = async (n) => {
+        let o = _.from("notifications")
+          .select("*", { count: "exact", head: !0 })
+          .eq("is_read", !1);
+        return (
+          t
+            ? ((o = o.is(n, null)),
+              console.log(`Getting unread count for admin - filter: ${n} IS NULL`))
+            : ((o = o.or(buildNotificationOwnerOrFilter(e, !1, n))),
+              console.log(
+                `Getting unread count for customer ${e} - filter: ${buildNotificationOwnerOrFilter(e, !1, n)}`,
+              )),
+          await o
+        );
+      };
+      let i = getNotificationOwnerColumnName(),
+        { count: n, error: o } = await r(i);
+      return (
+        o &&
+          activateNotificationOwnerFallback(o) &&
+          ((i = getNotificationOwnerColumnName()), ({ count: n, error: o } = await r(i))),
+        o &&
+          restorePrimaryNotificationOwnerColumn(o) &&
+          ((i = getNotificationOwnerColumnName()), ({ count: n, error: o } = await r(i))),
+        o
+          ? (console.error("Error getting unread count:", o), 0)
+          : (console.log(
+              `Unread count result for ${t ? "admin" : "customer " + e}: ${n}`,
+            ),
+            n || 0)
+      );
     } catch (r) {
       return (console.error("Unexpected error getting unread count:", r), 0);
     }
@@ -9873,20 +10097,31 @@ class qt {
       if (!t || !r || !i) return !1;
       const o = new Date();
       o.setHours(o.getHours() - 24);
-      let a = _.from("notifications")
-        .select("id")
-        .gte("timestamp", o.toISOString());
-      (e ? (a = a.eq("user_id", e)) : (a = a.is("user_id", null)),
-        (a = a.contains("metadata", {
-          event_type: t,
-          related_entity_type: r,
-          related_entity_id: i,
-        })),
-        n && (a = a.eq("message", n)));
-      const { data: c, error: u } = await a.limit(1);
-      return u
-        ? (console.error("Error checking for duplicate notifications:", u), !1)
-        : (c || []).length > 0;
+      const a = async (c) => {
+        let u = _.from("notifications")
+          .select("id")
+          .gte("timestamp", o.toISOString());
+        return (
+          e ? (u = u.eq(c, e)) : (u = u.is(c, null)),
+          (u = u.contains("metadata", {
+            event_type: t,
+            related_entity_type: r,
+            related_entity_id: i,
+          })),
+          n && (u = u.eq("message", n)),
+          await u.limit(1)
+        );
+      };
+      let c = getNotificationOwnerColumnName(),
+        { data: u, error: h } = await a(c);
+      return (
+        h &&
+          activateNotificationOwnerFallback(h) &&
+          ((c = getNotificationOwnerColumnName()), ({ data: u, error: h } = await a(c))),
+        h
+          ? (console.error("Error checking for duplicate notifications:", h), !1)
+          : (u || []).length > 0
+      );
     } catch (o) {
       return (
         console.error("Unexpected error checking for duplicates:", o),
@@ -9899,7 +10134,7 @@ class qt {
       id: e.id,
       message: e.message,
       timestamp: new Date(e.timestamp),
-      userId: e.user_id,
+      userId: readNotificationOwnerId(e),
       isRead: e.is_read,
       linkToPage: e.link_to_page,
       linkToId: e.link_to_id,
@@ -10041,8 +10276,8 @@ const ie = qt.getInstance(),
                   phone: "",
                   address: "",
                   notes: "",
-                  contract_type_id: "trial",
-                  has_used_trial_fee: !1,
+                  contract_type_id: "growth",
+                  has_used_trial_fee: !0,
                 },
               ]);
             if (te)
@@ -10146,8 +10381,8 @@ const ie = qt.getInstance(),
               phone: L || "",
               address: G || "",
               notes: "",
-              contract_type_id: "trial",
-              has_used_trial_fee: !1,
+              contract_type_id: "growth",
+              has_used_trial_fee: !0,
               role: "customer",
             },
           ]);
@@ -10189,9 +10424,9 @@ class Vt {
       costVarianceNotificationThreshold: 10,
       costVarianceHighAlertThreshold: 25,
       serviceFees: {
-        trial: { flatFee: 499 },
-        growth: { percentageRate: 0.02 },
-        corporate: { percentageRate: 0.015 },
+        trial: { flatFee: 349 },
+        growth: { minimumFee: 350, percentageRate: 0.015 },
+        corporate: { minimumFee: 750, percentageRate: 0.01 },
       },
       defaultCostDistributionMethod: "volume_proportional",
       defaultFixedRatePerM3: 100,
@@ -10225,10 +10460,14 @@ class Vt {
     switch (e) {
       case "trial":
         return r.trial.flatFee;
-      case "growth":
-        return t ? t * r.growth.percentageRate : 0;
-      case "corporate":
-        return t ? t * r.corporate.percentageRate : 0;
+      case "growth": {
+        const i = Number(t || 0);
+        return Math.max(r.growth.minimumFee, i * r.growth.percentageRate);
+      }
+      case "corporate": {
+        const i = Number(t || 0);
+        return Math.max(r.corporate.minimumFee, i * r.corporate.percentageRate);
+      }
       default:
         return 0;
     }
@@ -10255,17 +10494,25 @@ class Vt {
         (this.config.costVarianceHighAlertThreshold = parseFloat(
           Oe.COST_VARIANCE_HIGH_ALERT_THRESHOLD,
         )),
-      Oe.TRIAL_SERVICE_FEE &&
+      (Oe.STARTER_SERVICE_FEE || Oe.TRIAL_SERVICE_FEE) &&
         (this.config.serviceFees.trial.flatFee = parseFloat(
-          Oe.TRIAL_SERVICE_FEE,
+          Oe.STARTER_SERVICE_FEE || Oe.TRIAL_SERVICE_FEE,
         )),
-      Oe.GROWTH_SERVICE_FEE_RATE &&
+      Oe.STANDARD_SERVICE_FEE_MINIMUM &&
+        (this.config.serviceFees.growth.minimumFee = parseFloat(
+          Oe.STANDARD_SERVICE_FEE_MINIMUM,
+        )),
+      (Oe.STANDARD_SERVICE_FEE_RATE || Oe.GROWTH_SERVICE_FEE_RATE) &&
         (this.config.serviceFees.growth.percentageRate = parseFloat(
-          Oe.GROWTH_SERVICE_FEE_RATE,
+          Oe.STANDARD_SERVICE_FEE_RATE || Oe.GROWTH_SERVICE_FEE_RATE,
         )),
-      Oe.CORPORATE_SERVICE_FEE_RATE &&
+      Oe.ENTERPRISE_SERVICE_FEE_MINIMUM &&
+        (this.config.serviceFees.corporate.minimumFee = parseFloat(
+          Oe.ENTERPRISE_SERVICE_FEE_MINIMUM,
+        )),
+      (Oe.ENTERPRISE_SERVICE_FEE_RATE || Oe.CORPORATE_SERVICE_FEE_RATE) &&
         (this.config.serviceFees.corporate.percentageRate = parseFloat(
-          Oe.CORPORATE_SERVICE_FEE_RATE,
+          Oe.ENTERPRISE_SERVICE_FEE_RATE || Oe.CORPORATE_SERVICE_FEE_RATE,
         )),
       Oe.DEFAULT_COST_DISTRIBUTION_METHOD)
     ) {
@@ -10292,9 +10539,11 @@ COST_VARIANCE_NOTIFICATION_THRESHOLD=${this.config.costVarianceNotificationThres
 COST_VARIANCE_HIGH_ALERT_THRESHOLD=${this.config.costVarianceHighAlertThreshold}
 
 # Service Fee Settings
-TRIAL_SERVICE_FEE=${this.config.serviceFees.trial.flatFee}
-GROWTH_SERVICE_FEE_RATE=${this.config.serviceFees.growth.percentageRate}
-CORPORATE_SERVICE_FEE_RATE=${this.config.serviceFees.corporate.percentageRate}
+STARTER_SERVICE_FEE=${this.config.serviceFees.trial.flatFee}
+STANDARD_SERVICE_FEE_MINIMUM=${this.config.serviceFees.growth.minimumFee}
+STANDARD_SERVICE_FEE_RATE=${this.config.serviceFees.growth.percentageRate}
+ENTERPRISE_SERVICE_FEE_MINIMUM=${this.config.serviceFees.corporate.minimumFee}
+ENTERPRISE_SERVICE_FEE_RATE=${this.config.serviceFees.corporate.percentageRate}
 
 # Cost Distribution Settings
 DEFAULT_COST_DISTRIBUTION_METHOD=${this.config.defaultCostDistributionMethod}
@@ -10650,11 +10899,30 @@ const $e = Ht.getInstance(),
     supplier: "S",
     shipment: "SH",
   },
+  __entityCodeRegistry = {
+    order: new Map(),
+    consolidation: new Map(),
+  },
+  __normalizeEntityCode = (s) =>
+    typeof s == "string" && s.trim() !== "" ? s.trim().toUpperCase() : null,
+  __registerEntityCode = (s, e, t) => {
+    if (!s || !e || !t) return;
+    const r = __entityCodeRegistry[s];
+    r && r.set(String(e), t);
+  },
+  __resolveEntityCode = (s, e) => {
+    if (!s || !e) return null;
+    const t = __entityCodeRegistry[s];
+    return t ? t.get(String(e)) || null : null;
+  },
   Se = (s, e, t = 6) => {
     if (!s || typeof s != "string") return `#${as[e]}-N/A`;
     try {
-      const i = s.replace(/-/g, "").toUpperCase().slice(-t);
-      return `#${as[e]}-${i}`;
+      const i = __resolveEntityCode(e, s);
+      if (i) return `#${i}`;
+      if (/^[A-Z]{3,4}-\d{6}-\d{4,}$/i.test(s)) return `#${s.toUpperCase()}`;
+      const n = s.replace(/-/g, "").toUpperCase().slice(-t);
+      return `#${as[e]}-${n}`;
     } catch (r) {
       return (console.warn("Error formatting UUID:", r), `#${as[e]}-ERROR`);
     }
@@ -11408,22 +11676,25 @@ class Gt {
     return this.transformDatabaseShipment(i);
   }
   async updateStatus(e, t, r) {
-    const i = r.status;
+    const i = r.status,
+      n = String(t),
+      o = String(i || ""),
+      a = String((r == null ? void 0 : r.type) || "individual");
+    if (!isAllowedShipmentStatusTransition(a, o, n))
+      throw new Error(
+        `Invalid shipment status transition for ${a}: ${o} -> ${n}`,
+      );
     console.log("Updating shipment status:", {
       shipmentId: e,
       oldStatus: i,
       newStatus: t,
     });
-    const n = String(t),
-      o =
-        n === String(d.Delivered) ||
-        n === String(m.Delivered) ||
-        n === String(d.Completed) ||
-        n === String(m.Completed);
-    (await this.update(e, {
-      status: t,
-      ...(o ? { actualDelivery: new Date().toISOString() } : {}),
-    }),
+    const c = isDeliveredLikeStatus(t) || isDeliveredLikeStatus(n),
+      u = await this.update(e, {
+        status: t,
+        ...(c ? { actualDelivery: new Date().toISOString() } : {}),
+      });
+    (u &&
       await this.createShipmentNotifications(
         e,
         r.customerId,
@@ -11431,7 +11702,8 @@ class Gt {
         r.description,
         String(t),
       ),
-      console.log(`[DEBUG] Shipment ${e} status updated: ${i} → ${t}`));
+      console.log(`[DEBUG] Shipment ${e} status updated: ${i} -> ${t}`));
+    return u;
   }
   async updateTracking(e, t, r) {
     await this.update(e, { carrier: t, trackingUrl: r });
@@ -11519,18 +11791,10 @@ class Gt {
   async getInTransit() {
     const e = [
         m.InTransit,
-        m.AtOriginPort,
-        m.InTransitSea,
-        m.AtDestinationPort,
         m.CustomsClearance,
-        m.AwaitingDelivery,
         m.OutForDelivery,
         "InTransit",
-        "AtOriginPort",
-        "InTransitSea",
-        "AtDestinationPort",
         "CustomsClearance",
-        "AwaitingDelivery",
         "OutForDelivery",
       ],
       { data: t, error: r } = await _.from("shipments")
@@ -11605,25 +11869,32 @@ class Gt {
 const yt = Gt.getInstance();
 class Wt {
   constructor() {
-    this.transformDatabaseOrder = (e) => ({
-      id: e.id,
-      description: e.description,
-      value: e.value,
-      supplierId: e.supplier_id,
-      volumeM3: e.volume_m3,
-      weightKG: e.weight_kg,
-      customerId: e.customer_id,
-      status: e.status,
-      notes: e.notes,
-      creationDate: e.creation_date,
-      originCountry: e.origin_country || "",
-      originCity: e.origin_city || "",
-      destinationCountry: e.destination_country || "",
-      destinationCity: e.destination_city || "",
-      destinationPort: e.destination_port || "",
-      readyDate: e.ready_date || "",
-      chargesApplied: !!e.charges_applied,
-    });
+    this.transformDatabaseOrder = (e) => {
+      const t = __normalizeEntityCode(e.order_code);
+      return (
+        t && __registerEntityCode("order", e.id, t),
+        {
+          id: e.id,
+          code: t,
+          description: e.description,
+          value: e.value,
+          supplierId: e.supplier_id,
+          volumeM3: e.volume_m3,
+          weightKG: e.weight_kg,
+          customerId: e.customer_id,
+          status: e.status,
+          notes: e.notes,
+          creationDate: e.creation_date,
+          originCountry: e.origin_country || "",
+          originCity: e.origin_city || "",
+          destinationCountry: e.destination_country || "",
+          destinationCity: e.destination_city || "",
+          destinationPort: e.destination_port || "",
+          readyDate: e.ready_date || "",
+          chargesApplied: !!e.charges_applied,
+        }
+      );
+    };
   }
   static getInstance() {
     return (Wt.instance || (Wt.instance = new Wt()), Wt.instance);
@@ -11770,6 +12041,10 @@ class Wt {
     return this.transformDatabaseOrder(i);
   }
   async updateStatus(e, t, r, i, n) {
+    const o = String(r || "").trim(),
+      a = String(t || "").trim();
+    if (!isAllowedOrderStatusTransition(o, a))
+      throw new Error(`Invalid order status transition: ${o} -> ${a}`);
     (await this.update(e, { status: t }),
       await ie.createOrderStatusNotification(e, String(r), String(t), n, i),
       await ie.createSystemNotification(
@@ -11794,24 +12069,69 @@ class Wt {
       consolidationId: null,
       orderId: e,
     });
-    (await this.update(e, { status: d.InTransit }),
-      t > 0 &&
+    await this.update(e, { status: d.InTransit });
+    t > 0 &&
+      (await He.createTransaction({
+        customerId: n.customerId,
+        type: "ShippingCost",
+        description: `Individual shipping cost for order: ${Se(n.id, "order")}`,
+        amount: -Math.abs(t),
+        relatedOrderId: e,
+        relatedShipmentId: u.id,
+        idempotencyKey: `shipping-charge:shipment:${u.id}:individual_order:${n.customerId}:${Math.abs(t).toFixed(2)}`,
+      }));
+    try {
+      const { data: h, error: p } = await _.from("customers")
+        .select("contract_type_id, has_used_trial_fee")
+        .eq("id", n.customerId)
+        .single();
+      if (p) throw p;
+      const y = String((h == null ? void 0 : h.contract_type_id) || qe.Growth),
+        b = ((Yi[y] == null ? void 0 : Yi[y].name) || String(y)).trim() || "Standard",
+        { data: k, error: I } = await _.from("payment_transactions")
+          .select("type,amount")
+          .eq("related_order_id", e)
+          .in("type", [ee.ServiceFee, ee.ServiceFeeReversal]);
+      if (I) throw I;
+      const P = (k || []).reduce(
+          (A, H) =>
+            H.type === ee.ServiceFee ? A + Math.abs(Number(H.amount || 0)) : A,
+          0,
+        ),
+        L = (k || []).reduce(
+          (A, H) =>
+            H.type === ee.ServiceFeeReversal
+              ? A + Math.abs(Number(H.amount || 0))
+              : A,
+          0,
+        ),
+        G = Math.max(0, P - L);
+      let O = Number(Ut.calculateServiceFee(n.value, y) || 0);
+      (Number.isFinite(O) || (O = 0), (O = Math.max(0, O)));
+      const A = Math.max(0, O - G);
+      (A > 0.01 &&
         (await He.createTransaction({
           customerId: n.customerId,
-          type: "ShippingCost",
-          description: `Individual shipping cost for order: ${Se(n.id, "order")}`,
-          amount: -Math.abs(t),
+          type: ee.ServiceFee,
+          description: `Service fee for order ${Se(n.id, "order")} (${b} plan)`,
+          amount: -Math.abs(A),
           relatedOrderId: e,
           relatedShipmentId: u.id,
-          idempotencyKey: `shipping-charge:shipment:${u.id}:individual_order:${n.customerId}:${Math.abs(t).toFixed(2)}`,
+          idempotencyKey: `service-fee:shipment:${u.id}:order:${e}:${Math.abs(A).toFixed(2)}`,
         })),
-      await this.updateStatus(
-        e,
-        d.InTransit,
-        n.status,
-        n.description,
-        n.customerId,
-      ));
+        y === qe.Trial &&
+          !(h != null && h.has_used_trial_fee) &&
+          (await _.from("customers")
+            .update({ has_used_trial_fee: !0 })
+            .eq("id", n.customerId)));
+    } catch (h) {
+      console.warn(
+        "Non-fatal: failed to apply deferred service fee for individual shipment",
+        h,
+      );
+    }
+    await this.updateStatus(e, d.InTransit, n.status, n.description, n.customerId);
+    return u;
   }
   async delete(e) {
     const { error: t } = await _.from("orders").delete().eq("id", e);
@@ -11908,44 +12228,55 @@ class Wt {
 const Rr = Wt.getInstance();
 class Kt {
   constructor() {
-    this.transformDatabaseConsolidation = (e) => ({
-      id: e.id,
-      name: e.name,
-      route:
-        e.route ||
-        buildStandardRouteLabel({
-          originCountry: e.origin_country,
-          originCity: e.origin_city,
-          destinationCountry: e.destination_country,
-          destinationCity: e.destination_city,
-          destinationPort: e.destination_port,
-        }),
-      originCountry: e.origin_country || "",
-      originCity: e.origin_city || "",
-      destinationCountry: e.destination_country || "",
-      destinationCity: e.destination_city || "",
-      destinationPort: e.destination_port || "",
-      departureDate: e.departure_date,
-      creationDate: e.creation_date,
-      orderIds: e.order_ids || [],
-      containerTypeId: e.container_type_id,
-      containerSpaceFilledPercentage: e.container_space_filled_percentage || 0,
-      containerWeightFilledPercentage:
-        e.container_weight_filled_percentage || 0,
-      shippingCost: e.shipping_cost,
-      estimatedShippingCost: e.estimated_shipping_cost ?? void 0,
-      costVariance: e.cost_variance ?? void 0,
-      costVariancePercentage: e.cost_variance_percentage ?? void 0,
-      status: e.status,
-      isMixed: e.is_mixed,
-      customerId: e.customer_id,
-      involvedCustomerIds: e.involved_customer_ids || [],
-      shippingCostDistributed: e.shipping_cost_distributed,
-      costDistributionMethod: e.cost_distribution_method,
-      fixedRatePerM3: e.fixed_rate_per_m3,
-      totalBilledAmount: e.total_billed_amount,
-      notes: e.notes,
-    });
+    this.transformDatabaseConsolidation = (e) => {
+      const t = __normalizeEntityCode(e.consolidation_code),
+        r = typeof e.name == "string" ? e.name.trim() : "",
+        i = r || "Consolidation";
+      return (
+        t && __registerEntityCode("consolidation", e.id, t),
+        {
+          id: e.id,
+          code: t,
+          manualName: r,
+          name: i,
+          route:
+            e.route ||
+            buildStandardRouteLabel({
+              originCountry: e.origin_country,
+              originCity: e.origin_city,
+              destinationCountry: e.destination_country,
+              destinationCity: e.destination_city,
+              destinationPort: e.destination_port,
+            }),
+          originCountry: e.origin_country || "",
+          originCity: e.origin_city || "",
+          destinationCountry: e.destination_country || "",
+          destinationCity: e.destination_city || "",
+          destinationPort: e.destination_port || "",
+          departureDate: e.departure_date,
+          creationDate: e.creation_date,
+          orderIds: e.order_ids || [],
+          containerTypeId: e.container_type_id,
+          containerSpaceFilledPercentage:
+            e.container_space_filled_percentage || 0,
+          containerWeightFilledPercentage:
+            e.container_weight_filled_percentage || 0,
+          shippingCost: e.shipping_cost,
+          estimatedShippingCost: e.estimated_shipping_cost ?? void 0,
+          costVariance: e.cost_variance ?? void 0,
+          costVariancePercentage: e.cost_variance_percentage ?? void 0,
+          status: e.status,
+          isMixed: e.is_mixed,
+          customerId: e.customer_id,
+          involvedCustomerIds: e.involved_customer_ids || [],
+          shippingCostDistributed: e.shipping_cost_distributed,
+          costDistributionMethod: e.cost_distribution_method,
+          fixedRatePerM3: e.fixed_rate_per_m3,
+          totalBilledAmount: e.total_billed_amount,
+          notes: e.notes,
+        }
+      );
+    };
   }
   static getInstance() {
     return (Kt.instance || (Kt.instance = new Kt()), Kt.instance);
@@ -11984,8 +12315,9 @@ class Kt {
       costDistributionMethod: n,
     });
     const a = buildStandardRouteLabel(e),
-      c = {
-        name: e.name,
+      c = typeof e.name == "string" ? e.name.trim() : "",
+      u = {
+        name: c,
         route: e.route || a,
         origin_country: hasGeoText(e.originCountry)
           ? formatGeoText(e.originCountry)
@@ -12013,39 +12345,40 @@ class Kt {
         fixed_rate_per_m3: o,
         notes: e.notes,
       },
-      { data: u, error: h } = await _.from("consolidations")
-        .insert([c])
+      { data: h, error: p } = await _.from("consolidations")
+        .insert([u])
         .select()
         .single();
-    if (h)
+    if (p)
       throw (
-        console.error("Error creating consolidation:", h),
+        console.error("Error creating consolidation:", p),
         new Error("Failed to create consolidation")
       );
-    const p = this.transformDatabaseConsolidation(u);
+    const y = this.transformDatabaseConsolidation(h);
     return (
       !i &&
         r &&
         (await ie.createCustomerNotification(
           r,
-          `New consolidation "${e.name}" has been created for your orders`,
+          `New consolidation "${y.name}" has been created for your orders`,
           {
             importance: K.Medium,
             linkToPage: "consolidations",
-            linkToId: p.id,
+            linkToId: y.id,
           },
         )),
       await ie.createAdminNotification(
-        `New ${i ? "mixed" : "single-customer"} consolidation "${e.name}" created`,
-        { importance: K.Low, linkToPage: "consolidations", linkToId: p.id },
+        `New ${i ? "mixed" : "single-customer"} consolidation "${y.name}" created`,
+        { importance: K.Low, linkToPage: "consolidations", linkToId: y.id },
       ),
-      p
+      y
     );
   }
   async update(e, t) {
     const r = {};
     if (
-      (t.name !== void 0 && (r.name = t.name),
+      (t.name !== void 0 &&
+        (r.name = typeof t.name == "string" ? t.name.trim() : ""),
       t.route !== void 0 && (r.route = t.route),
       t.originCountry !== void 0 &&
         (r.origin_country = hasGeoText(t.originCountry)
@@ -12110,14 +12443,17 @@ class Kt {
     return this.transformDatabaseConsolidation(i);
   }
   async updateStatus(e, t, r) {
-    const i = r.status;
+    const i = String(r.status || "").trim(),
+      n = String(t || "").trim();
+    if (!isAllowedConsolidationStatusTransition(i, n))
+      throw new Error(`Invalid consolidation status transition: ${i} -> ${n}`);
     await this.update(e, { status: t });
-    for (const n of r.involvedCustomerIds)
+    for (const o of r.involvedCustomerIds)
       await ie.createConsolidationStatusNotification(
         e,
         String(i),
         String(t),
-        n,
+        o,
         r.name,
       );
   }
@@ -12507,6 +12843,87 @@ class Kt {
       }
       throw R;
     }
+    try {
+      const R = (c.orderIds || []).filter(Boolean),
+        ue = u.filter((C) => R.includes(C.id) && C.customerId),
+        q = new Map();
+      for (const C of ue)
+        q.set(
+          C.customerId,
+          (q.get(C.customerId) || 0) + Math.max(0, Number(C.value || 0)),
+        );
+      const oe = Array.from(q.keys()).filter(Boolean);
+      if (oe.length > 0) {
+        const { data: ye, error: Pe } = await _.from("customers")
+          .select("id,contract_type_id,has_used_trial_fee")
+          .in("id", oe);
+        if (Pe) throw Pe;
+        const Be = new Map(
+            (ye || []).map((C) => [C.id, C]),
+          ),
+          { data: Ce, error: ke } = await _.from("payment_transactions")
+            .select("customer_id,type,amount")
+            .eq("related_consolidation_id", e)
+            .in("type", [ee.ServiceFee, ee.ServiceFeeReversal]);
+        if (ke) throw ke;
+        const xe = new Map();
+        for (const C of Ce || []) {
+          const M = C.customer_id;
+          if (!M) continue;
+          const E = Math.abs(Number(C.amount || 0));
+          C.type === ee.ServiceFee
+            ? xe.set(M, (xe.get(M) || 0) + E)
+            : C.type === ee.ServiceFeeReversal &&
+              xe.set(M, (xe.get(M) || 0) - E);
+        }
+        if (R.length > 0) {
+          const { data: C, error: M } = await _.from("payment_transactions")
+            .select("customer_id,type,amount")
+            .in("related_order_id", R)
+            .in("type", [ee.ServiceFee, ee.ServiceFeeReversal]);
+          if (M) throw M;
+          for (const E of C || []) {
+            const D = E.customer_id;
+            if (!D) continue;
+            const S = Math.abs(Number(E.amount || 0));
+            E.type === ee.ServiceFee
+              ? xe.set(D, (xe.get(D) || 0) + S)
+              : E.type === ee.ServiceFeeReversal &&
+                xe.set(D, (xe.get(D) || 0) - S);
+          }
+        }
+        for (const C of oe) {
+          const M = Be.get(C),
+            E = String((M == null ? void 0 : M.contract_type_id) || qe.Growth),
+            D = ((Yi[E] == null ? void 0 : Yi[E].name) || String(E)).trim() || "Standard",
+            S = Math.max(0, Number(q.get(C) || 0));
+          let $ = Number(Ut.calculateServiceFee(S, E) || 0);
+          (Number.isFinite($) || ($ = 0), ($ = Math.max(0, $)));
+          const T = Math.max(0, Number(xe.get(C) || 0)),
+            B = Math.max(0, $ - T);
+          (B > 0.01 &&
+            (await He.createTransaction({
+              customerId: C,
+              type: ee.ServiceFee,
+              description: `Service fee for consolidation ${Se(c.id, "consolidation")} (${D} plan)`,
+              amount: -Math.abs(B),
+              relatedConsolidationId: e,
+              relatedShipmentId: ce.id,
+              idempotencyKey: `service-fee:shipment:${ce.id}:consolidation:${e}:customer:${C}:${Math.abs(B).toFixed(2)}`,
+            })),
+            E === qe.Trial &&
+              !(M != null && M.has_used_trial_fee) &&
+              (await _.from("customers")
+                .update({ has_used_trial_fee: !0 })
+                .eq("id", C)));
+        }
+      }
+    } catch (R) {
+      console.warn(
+        "Non-fatal: failed to apply deferred service fee for consolidation shipment",
+        R,
+      );
+    }
     if (b !== null && gr.shouldNotifyForCostVariance(b)) {
       const R = (y || 0) > 0 ? "over" : "under",
         ue = gr.isHighPriorityCostVariance(b) ? K.High : K.Medium;
@@ -12515,6 +12932,7 @@ class Kt {
         { importance: ue, linkToPage: "consolidations", linkToId: e },
       );
     }
+    return ce;
   }
   async notifyOrdersAdded(e, t, r, i, n) {
     const o = i.filter((a) => t.includes(a.id));
@@ -12552,25 +12970,32 @@ class Jt {
       role: e.role,
       hasUsedTrialFee: e.has_used_trial_fee,
     })),
-      (this.transformDatabaseOrder = (e) => ({
-        id: e.id,
-        description: e.description,
-        value: e.value,
-        supplierId: e.supplier_id,
-        volumeM3: e.volume_m3,
-        weightKG: e.weight_kg,
-        customerId: e.customer_id,
-        status: e.status,
-        notes: e.notes,
-        creationDate: e.creation_date,
-        originCountry: e.origin_country || "",
-        originCity: e.origin_city || "",
-        destinationCountry: e.destination_country || "",
-        destinationCity: e.destination_city || "",
-        destinationPort: e.destination_port || "",
-        readyDate: e.ready_date || "",
-        chargesApplied: !!e.charges_applied,
-      })),
+      (this.transformDatabaseOrder = (e) => {
+        const t = __normalizeEntityCode(e.order_code);
+        return (
+          t && __registerEntityCode("order", e.id, t),
+          {
+            id: e.id,
+            code: t,
+            description: e.description,
+            value: e.value,
+            supplierId: e.supplier_id,
+            volumeM3: e.volume_m3,
+            weightKG: e.weight_kg,
+            customerId: e.customer_id,
+            status: e.status,
+            notes: e.notes,
+            creationDate: e.creation_date,
+            originCountry: e.origin_country || "",
+            originCity: e.origin_city || "",
+            destinationCountry: e.destination_country || "",
+            destinationCity: e.destination_city || "",
+            destinationPort: e.destination_port || "",
+            readyDate: e.ready_date || "",
+            chargesApplied: !!e.charges_applied,
+          }
+        );
+      }),
       (this.transformDatabaseShipment = (e) => ({
         id: e.id,
         type: e.type,
@@ -12635,11 +13060,12 @@ class Jt {
         console.error("Error creating customer:", i),
         new Error("Failed to create customer")
       );
-    const n = this.transformDatabaseCustomer(r);
+    const n = this.transformDatabaseCustomer(r),
+      o = (Yi[n.contractType] && Yi[n.contractType].name) || n.contractType;
     return (
       await ie.createCustomerNotification(
         n.id,
-        `Welcome to our logistics platform! Your ${n.contractType} account has been set up.`,
+        `Welcome to our logistics platform! Your ${o} plan has been set up.`,
         { importance: K.High, linkToPage: "customers" },
       ),
       await ie.createAdminNotification(
@@ -12676,7 +13102,7 @@ class Jt {
       t.contractType &&
         (await ie.createCustomerNotification(
           e,
-          `Your contract type has been updated to ${t.contractType}`,
+          `Your plan has been updated to ${(Yi[t.contractType] && Yi[t.contractType].name) || t.contractType}`,
           { importance: K.High, linkToPage: "customers" },
         )),
       o
@@ -12839,25 +13265,32 @@ class Qt {
       contactPerson: e.contact_person,
       rating: e.rating,
     })),
-      (this.transformDatabaseOrder = (e) => ({
-        id: e.id,
-        description: e.description,
-        value: e.value,
-        supplierId: e.supplier_id,
-        volumeM3: e.volume_m3,
-        weightKG: e.weight_kg,
-        customerId: e.customer_id,
-        status: e.status,
-        notes: e.notes,
-        creationDate: e.creation_date,
-        originCountry: e.origin_country || "",
-        originCity: e.origin_city || "",
-        destinationCountry: e.destination_country || "",
-        destinationCity: e.destination_city || "",
-        destinationPort: e.destination_port || "",
-        readyDate: e.ready_date || "",
-        chargesApplied: !!e.charges_applied,
-      })));
+      (this.transformDatabaseOrder = (e) => {
+        const t = __normalizeEntityCode(e.order_code);
+        return (
+          t && __registerEntityCode("order", e.id, t),
+          {
+            id: e.id,
+            code: t,
+            description: e.description,
+            value: e.value,
+            supplierId: e.supplier_id,
+            volumeM3: e.volume_m3,
+            weightKG: e.weight_kg,
+            customerId: e.customer_id,
+            status: e.status,
+            notes: e.notes,
+            creationDate: e.creation_date,
+            originCountry: e.origin_country || "",
+            originCity: e.origin_city || "",
+            destinationCountry: e.destination_country || "",
+            destinationCity: e.destination_city || "",
+            destinationPort: e.destination_port || "",
+            readyDate: e.ready_date || "",
+            chargesApplied: !!e.charges_applied,
+          }
+        );
+      }));
   }
   static getInstance() {
     return (Qt.instance || (Qt.instance = new Qt()), Qt.instance);
@@ -13824,19 +14257,40 @@ const hc = Qt.getInstance(),
       }),
     });
   },
+  buildOrderShipmentOriginLabel = (s) => {
+    const e = [];
+    return (
+      hasGeoText(s.originCity) && e.push(formatGeoText(s.originCity)),
+      hasGeoText(s.originCountry) && e.push(formatGeoText(s.originCountry)),
+      e.join(", ")
+    );
+  },
+  buildOrderShipmentDestinationLabel = (s) => {
+    const e = [];
+    return (
+      hasGeoText(s.destinationCity) && e.push(formatGeoText(s.destinationCity)),
+      hasGeoText(s.destinationPort) &&
+        e.push(`${formatGeoText(s.destinationPort)} Port`),
+      hasGeoText(s.destinationCountry) &&
+        e.push(formatGeoText(s.destinationCountry)),
+      e.join(", ")
+    );
+  },
   Di = ({ order: s, onClose: e, onSave: t }) => {
     const [r, i] = x.useState(""),
       [n, o] = x.useState(""),
       [a, c] = x.useState(""),
-      [u, h] = x.useState("China"),
-      [p, y] = x.useState("USA"),
+      [u, h] = x.useState(() => buildOrderShipmentOriginLabel(s)),
+      [p, y] = x.useState(() => buildOrderShipmentDestinationLabel(s)),
       [b, k] = x.useState(""),
       [I, P] = x.useState(!1),
       { showError: L } = ws();
     x.useEffect(() => {
+      (h(buildOrderShipmentOriginLabel(s)),
+        y(buildOrderShipmentDestinationLabel(s)));
       const O = new Date();
       (O.setDate(O.getDate() + 30), k(O.toISOString().split("T")[0]));
-    }, []);
+    }, [s.id]);
     const G = async () => {
       if (I) return;
       const O = parseFloat(r);
@@ -13949,7 +14403,7 @@ const hc = Qt.getInstance(),
                         onChange: (O) => h(O.target.value),
                         className:
                           "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors",
-                        placeholder: "e.g., Shanghai, China",
+                        placeholder: "e.g., Istanbul, Turkiye",
                       }),
                     ],
                   }),
@@ -13968,7 +14422,7 @@ const hc = Qt.getInstance(),
                         onChange: (O) => y(O.target.value),
                         className:
                           "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors",
-                        placeholder: "e.g., Los Angeles, USA",
+                        placeholder: "e.g., Matadi Port, DR Congo",
                       }),
                     ],
                   }),
@@ -14284,11 +14738,27 @@ const hc = Qt.getInstance(),
       [Ze, we] = x.useState([]),
       [je, et] = x.useState(!1),
       [Et, N] = x.useState(null),
+      [notificationOffset, setNotificationOffset] = x.useState(0),
+      [notificationsHasMore, setNotificationsHasMore] = x.useState(!1),
+      [notificationsLoadingMore, setNotificationsLoadingMore] = x.useState(!1),
       [le, W] = x.useState([]),
       [Z, _e] = x.useState([]),
       [Le, Cc] = x.useState(!1),
       [kc, Tc] = x.useState(null),
-      Ts = 50,
+      NOTIFICATION_POLICY = Object.freeze({
+        customer: {
+          pageSize: 50,
+          readRetentionDays: 21,
+          unreadRetentionDays: 75,
+        },
+        admin: {
+          pageSize: 100,
+          readRetentionDays: 21,
+          unreadRetentionDays: 75,
+        },
+      }),
+      ADMIN_NOTIFICATION_PAGE_SIZE = NOTIFICATION_POLICY.admin.pageSize,
+      CUSTOMER_NOTIFICATION_PAGE_SIZE = NOTIFICATION_POLICY.customer.pageSize,
       [Es, Is] = x.useState({}),
       [xn, Os] = x.useState(!1),
       [Ps, js] = x.useState(!1),
@@ -14317,6 +14787,14 @@ const hc = Qt.getInstance(),
       [On, Ur] = x.useState(null),
       [wr, tr] = x.useState(null),
       [_r, xr] = x.useState(null),
+      Ys = (f) => {
+        const g = h.find((v) => v.id === f);
+        return (
+          ((g == null ? void 0 : g.role) ||
+            (s == null ? void 0 : s.role) ||
+            St.Customer) === St.Admin
+        );
+      },
       Sr = async (f, g = !1, v) => {
         try {
           const w = await He.createTransaction(f, g, v);
@@ -14587,6 +15065,67 @@ const hc = Qt.getInstance(),
           p((E) => E.map((D) => (D.id === f ? M[0] : D)));
         }
       },
+      generateCustomerMagicLink = async (f) => {
+        if (!f) throw new Error("Customer ID is required.");
+        const { data: g, error: v } = await _.auth.getSession();
+        if (v) throw new Error(v.message || "Could not read current session.");
+        const w = g == null ? void 0 : g.session,
+          C = w == null ? void 0 : w.access_token;
+        if (!C)
+          throw new Error("Missing session token. Please sign in again.");
+        const M = [
+          "/.netlify/functions/admin-generate-magic-link",
+          "/netlify/functions/admin-generate-magic-link",
+        ];
+        let E = null,
+          D = null;
+        for (const S of M) {
+          const $ = await fetch(S, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${C}`,
+            },
+            body: JSON.stringify({ userId: f }),
+          });
+          if ($.status !== 404 || S === M[M.length - 1]) {
+            (E = $, (D = S));
+            break;
+          }
+        }
+        const T = await (E == null ? void 0 : E.json()).catch(() => ({}));
+        if (!(E != null && E.ok)) {
+          if ((E == null ? void 0 : E.status) === 404)
+            throw new Error(
+              `Magic link endpoint not found (${D || "/.netlify/functions/admin-generate-magic-link"}). If local, run a Netlify functions runtime. If deployed, redeploy the site with latest functions.`,
+            );
+          const S = String((T == null ? void 0 : T.code) || "").trim();
+          const $ = String((T == null ? void 0 : T.message) || "").trim();
+          throw new Error(
+            S === "forbidden"
+              ? "Only admins can generate magic links."
+              : S === "target_not_found"
+                ? "Customer not found."
+                : S === "target_missing_email"
+                  ? "Customer does not have an email address."
+                  : S === "target_not_customer"
+                    ? "Magic links can only be generated for customer accounts."
+                    : S === "missing_auth"
+                      ? "Authentication required. Please sign in again."
+                      : S === "invalid_user_id"
+                        ? "Invalid customer id."
+                        : S === "generate_link_failed" && $
+                          ? `Failed to generate magic link: ${$}`
+                          : "Failed to generate magic link.",
+          );
+        }
+        const B = String((T == null ? void 0 : T.actionLink) || "").trim();
+        if (!B)
+          throw new Error(
+            "Magic link was generated but no link was returned by the server.",
+          );
+        return B;
+      },
       Rs = async () => {
         u(!0);
         try {
@@ -14813,11 +15352,7 @@ const hc = Qt.getInstance(),
           !v &&
           [
             d.InTransit,
-            d.AtOriginPort,
-            d.InTransitSea,
-            d.AtDestinationPort,
             d.CustomsClearance,
-            d.AwaitingDelivery,
             d.OutForDelivery,
             d.Delivered,
             d.Cancelled,
@@ -14825,11 +15360,7 @@ const hc = Qt.getInstance(),
         ) {
           const $ = [
             d.InTransit,
-            d.AtOriginPort,
-            d.InTransitSea,
-            d.AtDestinationPort,
             d.CustomsClearance,
-            d.AwaitingDelivery,
             d.OutForDelivery,
             d.Completed,
           ].includes(w.status)
@@ -14970,38 +15501,28 @@ const hc = Qt.getInstance(),
             (T) => T.relatedOrderId === f && T.type === ee.OrderCost,
           ).reduce((T, B) => T + Math.abs(B.amount), 0),
           w = R.filter(
-            (T) => T.relatedOrderId === f && T.type === ee.ServiceFee,
-          ).reduce((T, B) => T + Math.abs(B.amount), 0),
-          C = R.filter(
             (T) => T.relatedOrderId === f && T.type === ee.OrderCostReversal,
           ).reduce((T, B) => T + Math.abs(B.amount), 0),
-          M = R.filter(
-            (T) => T.relatedOrderId === f && T.type === ee.ServiceFeeReversal,
-          ).reduce((T, B) => T + Math.abs(B.amount), 0),
-          E = Math.max(0, v - C),
-          D = Math.max(0, w - M),
-          S = E > 0.01 || D > 0.01;
+          C = Math.max(0, v - w),
+          M = C > 0.01;
         if (
           (console.log(
             `[DEBUG] Checking for existing charges for order ${f}...`,
           ),
           console.log("[DEBUG] Charge state:", {
             chargedOrderCost: v,
-            chargedServiceFee: w,
-            reversedOrderCost: C,
-            reversedServiceFee: M,
-            remainingOrderCost: E,
-            remainingServiceFee: D,
-            hasActiveCharges: S,
+            reversedOrderCost: w,
+            remainingOrderCost: C,
+            hasActiveCharges: M,
           }),
-          S)
+          M)
         ) {
           (console.log(
             `[DEBUG] Found existing charges for order ${f}, skipping duplicate charge application`,
           ),
             n(
               "Charges Already Applied",
-              "This order has already been charged (net of reversals). Order cost and service fees cannot be applied multiple times.",
+              "This order already has active order-cost charges.",
             ));
           return;
         }
@@ -15019,22 +15540,6 @@ const hc = Qt.getInstance(),
           return;
         }
         try {
-          const B =
-              $.contractType === qe.Trial && $.hasUsedTrialFee
-                ? qe.Growth
-                : $.contractType,
-            Q =
-              {
-                [qe.Trial]: "Trial",
-                [qe.Growth]: "Growth",
-                [qe.Corporate]: "Corporate",
-              }[B] || "Standard",
-            j =
-              $.contractType === qe.Trial
-                ? $.hasUsedTrialFee
-                  ? { contractType: qe.Growth }
-                  : { hasUsedTrialFee: !0, contractType: qe.Growth }
-                : null;
           if (
             !(await Sr({
               customerId: g.customerId,
@@ -15046,46 +15551,6 @@ const hc = Qt.getInstance(),
             }))
           )
             throw new Error("Failed to persist order cost transaction");
-          let de = Number(Ut.calculateServiceFee(g.value, B) || 0);
-          (Number.isFinite(de) || (de = 0), (de = Math.max(0, de)));
-          if (
-            de > 0 &&
-              !(await Sr({
-                customerId: g.customerId,
-                amount: -Math.abs(de),
-                description: `Service fee for order ${Se(g.id, "order")} (${Q} contract)`,
-                type: ee.ServiceFee,
-                relatedOrderId: g.id,
-                idempotencyKey: `order-charge:${g.id}:service-fee`,
-              }))
-          )
-            if (
-              !(await Sr({
-                customerId: g.customerId,
-                amount: Math.abs(g.value),
-                description: `Order cost rollback after failed service fee for order ${Se(g.id, "order")}`,
-                type: ee.OrderCostReversal,
-                relatedOrderId: g.id,
-                idempotencyKey: `order-charge:${g.id}:order-cost-rollback-service-fee`,
-              }))
-            )
-              throw new Error(
-                "Failed to persist service fee transaction and failed to rollback order cost. Manual review required.",
-              );
-            else
-              throw new Error(
-                "Failed to persist service fee transaction. Order cost was rolled back automatically.",
-              );
-          j &&
-            (await Vr(g.customerId, j),
-            p((se) =>
-              se.map((Y) =>
-                Y.id === g.customerId ? { ...Y, ...j } : Y,
-              ),
-            ),
-            j.contractType !== void 0 && ($.contractType = j.contractType),
-            j.hasUsedTrialFee !== void 0 &&
-              ($.hasUsedTrialFee = j.hasUsedTrialFee));
           try {
             await We(f, { chargesApplied: !0 });
           } catch (se) {
@@ -15097,7 +15562,7 @@ const hc = Qt.getInstance(),
           }
           (await ie.createNotification({
             userId: g.customerId,
-            message: `Order "${g.description}" has been confirmed. Order cost: $${g.value.toFixed(2)}${de > 0 ? `, Service fee: $${de.toFixed(2)}` : ""}`,
+            message: `Order "${g.description}" has been confirmed. Order cost: $${g.value.toFixed(2)}. Service fee will be applied when shipment is created.`,
             linkToPage: "orders",
             linkToId: g.id,
             importance: K.High,
@@ -15144,11 +15609,7 @@ const hc = Qt.getInstance(),
           ),
           E = [
             d.InTransit,
-            d.AtOriginPort,
-            d.InTransitSea,
-            d.AtDestinationPort,
             d.CustomsClearance,
-            d.AwaitingDelivery,
             d.OutForDelivery,
             d.Delivered,
             d.Completed,
@@ -15157,11 +15618,7 @@ const hc = Qt.getInstance(),
         if (E.includes(v.status) || D) {
           const B = [
             d.InTransit,
-            d.AtOriginPort,
-            d.InTransitSea,
-            d.AtDestinationPort,
             d.CustomsClearance,
-            d.AwaitingDelivery,
             d.OutForDelivery,
           ].includes(v.status)
             ? "This order is locked because it is currently being shipped. Status changes for shipped orders must be managed through the Shipments page for proper tracking and audit purposes."
@@ -15184,17 +15641,10 @@ const hc = Qt.getInstance(),
               (X) => X.relatedOrderId === f && X.type === ee.OrderCost,
             ).reduce((X, V) => X + Math.abs(V.amount), 0),
             B = R.filter(
-              (X) => X.relatedOrderId === f && X.type === ee.ServiceFee,
-            ).reduce((X, V) => X + Math.abs(V.amount), 0),
-            Q = R.filter(
               (X) => X.relatedOrderId === f && X.type === ee.OrderCostReversal,
             ).reduce((X, V) => X + Math.abs(V.amount), 0),
-            j = R.filter(
-              (X) => X.relatedOrderId === f && X.type === ee.ServiceFeeReversal,
-            ).reduce((X, V) => X + Math.abs(V.amount), 0),
-            de = Math.max(0, T - Q),
-            se = Math.max(0, B - j);
-          de > 0.01 || se > 0.01 || (await Hr(f));
+            Q = Math.max(0, T - B);
+          Q > 0.01 || (await Hr(f));
         }
         const $ = v.status;
         await We(f, { status: g }, !0);
@@ -15364,25 +15814,34 @@ const hc = Qt.getInstance(),
       Us = async (f, g, v = !1) => {
         const w = le.find((M) => M.id === f);
         if (!w) return;
-        const C = w.status;
+        if (isDeliveredLikeStatus(g) && !String(w.trackingUrl || "").trim()) {
+          n(
+            "Tracking Required",
+            "Add a tracking URL before marking this shipment as delivered.",
+          );
+          return;
+        }
+        const C = w.status,
+          M =
+            isDeliveredLikeStatus(g) && !w.actualDelivery
+              ? new Date().toISOString()
+              : w.actualDelivery;
         try {
           if (
-            (W((M) => M.map((E) => (E.id === f ? { ...E, status: g } : E))),
+            (W((E) =>
+              E.map((D) =>
+                D.id === f
+                  ? {
+                      ...D,
+                      status: g,
+                      ...(M !== void 0 ? { actualDelivery: M } : {}),
+                    }
+                  : D,
+              ),
+            ),
             w.type === "consolidation" && !v)
           ) {
-            const E = {
-              [m.InTransit]: m.InTransit,
-              [m.AtOriginPort]: m.AtOriginPort,
-              [m.InTransitSea]: m.InTransitSea,
-              [m.AtDestinationPort]: m.AtDestinationPort,
-              [m.CustomsClearance]: m.CustomsClearance,
-              [m.AwaitingDelivery]: m.AwaitingDelivery,
-              [m.OutForDelivery]: m.OutForDelivery,
-              [m.Delivered]: m.Delivered,
-              [m.Completed]: m.Completed,
-              [m.Cancelled]: m.Cancelled,
-              [m.OnHold]: m.OnHold,
-            }[g];
+            const E = mapShipmentToConsolidationStatus(g);
             E &&
               (ge((D) =>
                 D.map((S) => (S.id === w.relatedId ? { ...S, status: E } : S)),
@@ -15390,19 +15849,7 @@ const hc = Qt.getInstance(),
               Bs(w.relatedId, E, !0));
           }
           if (w.type === "individual") {
-            const E = {
-              InTransit: d.InTransit,
-              AtOriginPort: d.AtOriginPort,
-              InTransitSea: d.InTransitSea,
-              AtDestinationPort: d.AtDestinationPort,
-              CustomsClearance: d.CustomsClearance,
-              AwaitingDelivery: d.AwaitingDelivery,
-              OutForDelivery: d.OutForDelivery,
-              Delivered: d.Delivered,
-              Completed: d.Delivered,
-              Cancelled: d.Cancelled,
-              OnHold: d.OnHold,
-            }[g];
+            const E = mapShipmentToOrderStatus(String(g));
             if (E) {
               (H((S) =>
                 S.map(($) => ($.id === w.relatedId ? { ...$, status: E } : $)),
@@ -15419,7 +15866,8 @@ const hc = Qt.getInstance(),
                 );
             }
           }
-          await yt.updateStatus(f, g, w);
+          const D = await yt.updateStatus(f, g, w);
+          D && W((S) => S.map(($) => ($.id === f ? D : $)));
           try {
             await $e.logAction(ot.SHIPMENT_STATUS_UPDATED, "shipment", f, {
               userId: s == null ? void 0 : s.id,
@@ -15673,26 +16121,7 @@ const hc = Qt.getInstance(),
               for (const B of T.orderIds)
                 await We(B, { status: d.ReadyToShip }, !0);
             else {
-              const Q =
-                {
-                  [m.Planning]: d.Processing,
-                  [m.OrderCollection]: d.Processing,
-                  [m.DocumentPreparation]: d.Processing,
-                  [m.Loading]: d.QualityCheck,
-                  [m.QualityCheck]: d.QualityCheck,
-                  [m.ReadyToShip]: d.ReadyToShip,
-                  [m.InTransit]: d.InTransit,
-                  [m.AtOriginPort]: d.AtOriginPort,
-                  [m.InTransitSea]: d.InTransitSea,
-                  [m.AtDestinationPort]: d.AtDestinationPort,
-                  [m.CustomsClearance]: d.CustomsClearance,
-                  [m.AwaitingDelivery]: d.AwaitingDelivery,
-                  [m.OutForDelivery]: d.OutForDelivery,
-                  [m.Delivered]: d.Delivered,
-                  [m.Completed]: d.Delivered,
-                  [m.OnHold]: d.OnHold,
-                  [m.Cancelled]: d.ReadyToShip,
-                }[T.status] || d.Processing;
+              const Q = mapConsolidationStatusToOrderStatus(T.status);
               for (const j of T.orderIds) await We(j, { status: Q }, !0);
             }
           }
@@ -15701,6 +16130,14 @@ const hc = Qt.getInstance(),
       Bs = async (f, g, v = !1) => {
         const w = ce.find((E) => E.id === f);
         if (!w) return;
+        const C = (w.orderIds || []).filter(Boolean).length;
+        if (consolidationStatusRequiresOrders(g) && C === 0) {
+          n(
+            "No Orders",
+            `Cannot move this consolidation to "${g}" because it has no orders. Add at least one order before advancing consolidation status.`,
+          );
+          return;
+        }
         if (
           w.orderIds
             .map((E) => A.find((D) => D.id === E))
@@ -15731,25 +16168,7 @@ const hc = Qt.getInstance(),
             ($) => $.type === "consolidation" && $.relatedId === f,
           );
           if (D && !v) {
-            const T = {
-              [m.InTransit]: m.InTransit,
-              [m.AtOriginPort]: m.AtOriginPort,
-              [m.InTransitSea]: m.InTransitSea,
-              [m.AtDestinationPort]: m.AtDestinationPort,
-              [m.CustomsClearance]: m.CustomsClearance,
-              [m.AwaitingDelivery]: m.AwaitingDelivery,
-              [m.OutForDelivery]: m.OutForDelivery,
-              [m.Delivered]: m.Delivered,
-              [m.Completed]: m.Completed,
-              [m.Cancelled]: m.Cancelled,
-              [m.OnHold]: m.OnHold,
-              [m.Planning]: m.Planning,
-              [m.OrderCollection]: m.OrderCollection,
-              [m.DocumentPreparation]: m.DocumentPreparation,
-              [m.Loading]: m.Loading,
-              [m.QualityCheck]: m.QualityCheck,
-              [m.ReadyToShip]: m.ReadyToShip,
-            }[g];
+            const T = mapConsolidationToShipmentStatus(g);
             T && (await Us(D.id, T, !0));
           }
           const S = A.filter(($) => w.orderIds.includes($.id));
@@ -15763,31 +16182,13 @@ const hc = Qt.getInstance(),
                   linkToId: $.id,
                   importance: K.High,
                 }));
-            (await qs(w.id, []),
+            (await qs(w.id, [], !0),
               await ie.createSystemNotification(
                 `Consolidation "${w.name}" cancelled. ${S.length} orders returned to available pool.`,
                 { linkToPage: "consolidations", linkToId: w.id },
               ));
           } else {
-            const T = {
-                [m.Planning]: d.Processing,
-                [m.OrderCollection]: d.Processing,
-                [m.DocumentPreparation]: d.Processing,
-                [m.Loading]: d.QualityCheck,
-                [m.QualityCheck]: d.QualityCheck,
-                [m.ReadyToShip]: d.ReadyToShip,
-                [m.InTransit]: d.InTransit,
-                [m.AtOriginPort]: d.AtOriginPort,
-                [m.InTransitSea]: d.InTransitSea,
-                [m.AtDestinationPort]: d.AtDestinationPort,
-                [m.CustomsClearance]: d.CustomsClearance,
-                [m.AwaitingDelivery]: d.AwaitingDelivery,
-                [m.OutForDelivery]: d.OutForDelivery,
-                [m.Delivered]: d.Delivered,
-                [m.Completed]: d.Delivered,
-                [m.OnHold]: d.OnHold,
-                [m.Cancelled]: d.ReadyToShip,
-              }[g],
+            const T = mapConsolidationStatusToOrderStatus(g),
               B = {
                 [d.Pending]: 2,
                 [d.Processing]: 3,
@@ -15795,14 +16196,10 @@ const hc = Qt.getInstance(),
                 [d.ReadyToShip]: 5,
                 [d.InConsolidation]: 5,
                 [d.InTransit]: 6,
-                [d.AtOriginPort]: 7,
-                [d.InTransitSea]: 8,
-                [d.AtDestinationPort]: 9,
-                [d.CustomsClearance]: 10,
-                [d.AwaitingDelivery]: 11,
-                [d.OutForDelivery]: 12,
-                [d.Delivered]: 13,
-                [d.Completed]: 13,
+                [d.CustomsClearance]: 7,
+                [d.OutForDelivery]: 8,
+                [d.Delivered]: 9,
+                [d.Completed]: 9,
                 [d.OnHold]: 0,
                 [d.Cancelled]: 0,
               };
@@ -15834,11 +16231,33 @@ const hc = Qt.getInstance(),
           r("Update Error", "Error updating consolidation status: " + E);
         }
       },
-      qs = async (f, g) => {
+      qs = async (f, g, V0 = !1) => {
         const v = ce.find((V) => V.id === f),
           w = $r.find((V) => V.id === (v == null ? void 0 : v.containerTypeId));
         if (!v || !w) {
           r("Not Found", "Error: Consolidation or container type not found.");
+          return;
+        }
+        const be = new Set([
+          m.InTransit,
+          m.CustomsClearance,
+          m.OutForDelivery,
+          m.Delivered,
+          m.Completed,
+          m.Cancelled,
+        ]);
+        if (!V0 && be.has(v.status)) {
+          n(
+            "Invalid Status",
+            `Cannot modify orders while consolidation status is "${v.status}".`,
+          );
+          return;
+        }
+        if (!V0 && v.shippingCostDistributed) {
+          n(
+            "Shipping Costs Distributed",
+            "Cannot modify orders: shipping costs already distributed. Revert status to Planning or Loading first if manual review approves changes.",
+          );
           return;
         }
         const C = v.orderIds || [],
@@ -15972,31 +16391,8 @@ const hc = Qt.getInstance(),
               console.warn("Audit log failed (non-fatal):", ke);
             }
             if (M.length > 0) {
-              const ke = [
-                  m.Planning,
-                  m.OrderCollection,
-                  m.DocumentPreparation,
-                ].includes(fe.status),
-                xe =
-                  {
-                    [m.Planning]: d.InConsolidation,
-                    [m.OrderCollection]: d.InConsolidation,
-                    [m.DocumentPreparation]: d.InConsolidation,
-                    [m.Loading]: d.QualityCheck,
-                    [m.QualityCheck]: d.QualityCheck,
-                    [m.ReadyToShip]: d.ReadyToShip,
-                    [m.InTransit]: d.InTransit,
-                    [m.AtOriginPort]: d.AtOriginPort,
-                    [m.InTransitSea]: d.InTransitSea,
-                    [m.AtDestinationPort]: d.AtDestinationPort,
-                    [m.CustomsClearance]: d.CustomsClearance,
-                    [m.AwaitingDelivery]: d.AwaitingDelivery,
-                    [m.OutForDelivery]: d.OutForDelivery,
-                    [m.Delivered]: d.Delivered,
-                    [m.Completed]: d.Delivered,
-                    [m.OnHold]: d.OnHold,
-                    [m.Cancelled]: d.ReadyToShip,
-                  }[fe.status] || d.InConsolidation,
+              const ke = isPreShipmentConsolidationStatus(fe.status),
+                xe = mapConsolidationStatusToOrderStatus(fe.status),
                 Ue = {
                   [d.Pending]: 2,
                   [d.Processing]: 3,
@@ -16004,14 +16400,10 @@ const hc = Qt.getInstance(),
                   [d.ReadyToShip]: 5,
                   [d.InConsolidation]: 5,
                   [d.InTransit]: 6,
-                  [d.AtOriginPort]: 7,
-                  [d.InTransitSea]: 8,
-                  [d.AtDestinationPort]: 9,
-                  [d.CustomsClearance]: 10,
-                  [d.AwaitingDelivery]: 11,
-                  [d.OutForDelivery]: 12,
-                  [d.Delivered]: 13,
-                  [d.Completed]: 13,
+                  [d.CustomsClearance]: 7,
+                  [d.OutForDelivery]: 8,
+                  [d.Delivered]: 9,
+                  [d.Completed]: 9,
                   [d.OnHold]: 0,
                   [d.Cancelled]: 0,
                 };
@@ -16087,39 +16479,8 @@ const hc = Qt.getInstance(),
                     }));
                 }
               }
-            let Je;
-            fe.status === m.Cancelled
-              ? (Je = d.ReadyToShip)
-              : ([
-                  m.Planning,
-                  m.OrderCollection,
-                  m.DocumentPreparation,
-                ].includes(fe.status),
-                (Je =
-                  {
-                    [m.Planning]: d.InConsolidation,
-                    [m.OrderCollection]: d.InConsolidation,
-                    [m.DocumentPreparation]: d.InConsolidation,
-                    [m.Loading]: d.QualityCheck,
-                    [m.QualityCheck]: d.QualityCheck,
-                    [m.ReadyToShip]: d.ReadyToShip,
-                    [m.InTransit]: d.InTransit,
-                    [m.AtOriginPort]: d.AtOriginPort,
-                    [m.InTransitSea]: d.InTransitSea,
-                    [m.AtDestinationPort]: d.AtDestinationPort,
-                    [m.CustomsClearance]: d.CustomsClearance,
-                    [m.AwaitingDelivery]: d.AwaitingDelivery,
-                    [m.OutForDelivery]: d.OutForDelivery,
-                    [m.Delivered]: d.Delivered,
-                    [m.Completed]: d.Delivered,
-                    [m.OnHold]: d.OnHold,
-                    [m.Cancelled]: d.ReadyToShip,
-                  }[fe.status] || d.InConsolidation));
-            const ir = [
-                m.Planning,
-                m.OrderCollection,
-                m.DocumentPreparation,
-              ].includes(fe.status),
+            const Je = mapConsolidationStatusToOrderStatus(fe.status),
+              ir = isPreShipmentConsolidationStatus(fe.status),
               wt = {
                 [d.Pending]: 2,
                 [d.Processing]: 3,
@@ -16127,14 +16488,10 @@ const hc = Qt.getInstance(),
                 [d.ReadyToShip]: 5,
                 [d.InConsolidation]: 5,
                 [d.InTransit]: 6,
-                [d.AtOriginPort]: 7,
-                [d.InTransitSea]: 8,
-                [d.AtDestinationPort]: 9,
-                [d.CustomsClearance]: 10,
-                [d.AwaitingDelivery]: 11,
-                [d.OutForDelivery]: 12,
-                [d.Delivered]: 13,
-                [d.Completed]: 13,
+                [d.CustomsClearance]: 7,
+                [d.OutForDelivery]: 8,
+                [d.Delivered]: 9,
+                [d.Completed]: 9,
                 [d.OnHold]: 0,
                 [d.Cancelled]: 0,
               };
@@ -16288,6 +16645,47 @@ const hc = Qt.getInstance(),
             )
           : we((w) => w.map((C) => (C.id === f ? { ...C, isRead: !0 } : C)));
       },
+      markAllNotificationsAsRead = async () => {
+        if (!(s != null && s.id)) return !1;
+        const f = async (g) => {
+          const { data: v, error: w } = await _.from("notifications")
+            .select("id")
+            .eq("is_read", !1)
+            .or(buildNotificationOwnerOrFilter(s.id, pe, g))
+            .limit(5000);
+          if (w || !(v != null && v.length)) return { data: v, error: w };
+          const C = v.map((M) => M.id).filter(Boolean);
+          return C.length === 0
+            ? { data: [], error: null }
+            : await _.from("notifications")
+                .update({ is_read: !0 })
+                .in("id", C)
+                .eq("is_read", !1)
+                .select("id");
+        };
+        let g = getNotificationOwnerColumnName(),
+          { data: v, error: w } = await f(g);
+        w &&
+          activateNotificationOwnerFallback(w) &&
+          ((g = getNotificationOwnerColumnName()), ({ data: v, error: w } = await f(g)));
+        w &&
+          restorePrimaryNotificationOwnerColumn(w) &&
+          ((g = getNotificationOwnerColumnName()), ({ data: v, error: w } = await f(g)));
+        if (w)
+          return (
+            r(
+              "Update Error",
+              "Error marking all notifications as read: " + w.message,
+            ),
+            !1
+          );
+        if (!v || v.length === 0) return !0;
+        const C = new Set(v.map((M) => M.id));
+        return (
+          we((M) => M.map((E) => (C.has(E.id) ? { ...E, isRead: !0 } : E))),
+          !0
+        );
+      },
       Gr = x.useCallback(
         (f) => ({
           id: f.id,
@@ -16343,11 +16741,7 @@ const hc = Qt.getInstance(),
               m.QualityCheck,
               m.ReadyToShip,
               m.InTransit,
-              m.AtOriginPort,
-              m.InTransitSea,
-              m.AtDestinationPort,
               m.CustomsClearance,
-              m.AwaitingDelivery,
               m.OutForDelivery,
               m.OnHold,
             ];
@@ -16690,10 +17084,8 @@ const hc = Qt.getInstance(),
         (Is({}), js(!1), H([]), ge([]), W([]), I([]), ue([]));
     }, [s == null ? void 0 : s.id]),
       x.useEffect(() => {
-        if (!(s != null && s.id) || h.length === 0 || Es[Fe]) return;
-        const f = h.find((w) => w.id === s.id),
-          g = (f == null ? void 0 : f.role) === "admin";
-        if (!f) return;
+        if (!(s != null && s.id) || Es[Fe]) return;
+        const g = Ys(s.id);
         (async () => {
           try {
             if (Fe === "dashboard")
@@ -16755,18 +17147,21 @@ const hc = Qt.getInstance(),
             console.error(`Error loading data for page "${Fe}":`, w);
           }
         })();
-      }, [s == null ? void 0 : s.id, h, Fe, Es, Vs, tt, It, Ke, Ge, at]),
+      }, [s == null ? void 0 : s.id, s == null ? void 0 : s.role, h, Fe, Es, Vs, tt, It, Ke, Ge, at]),
       x.useEffect(() => {
-        if (!(s != null && s.id) || h.length === 0) return;
-        const f = h.find((v) => v.id === s.id);
-        (f == null ? void 0 : f.role) === "admin" &&
+        if (!(s != null && s.id)) return;
+        Ys(s.id) &&
           ze(
             () => import("./dashboardpage.js?v=20260223f"),
             __vite__mapDeps([0, 1, 2, 3, 4, 5]),
           );
-      }, [s == null ? void 0 : s.id, h]));
+      }, [s == null ? void 0 : s.id, s == null ? void 0 : s.role, h]));
     const rt = h.find((f) => f.id === (s == null ? void 0 : s.id)),
-      pe = (rt == null ? void 0 : rt.role) === "admin",
+      userRole =
+        (rt == null ? void 0 : rt.role) ||
+        (s == null ? void 0 : s.role) ||
+        St.Customer,
+      pe = userRole === St.Admin,
       Hs = x.useMemo(() => {
         var g;
         if (!pe) return [];
@@ -16784,7 +17179,9 @@ const hc = Qt.getInstance(),
           f.push({
             kind: "consolidation",
             id: v.id,
-            title: `${Se(v.id, "consolidation")} ${v.name}`,
+            title: v.manualName
+              ? `${Se(v.id, "consolidation")} ${v.manualName}`
+              : Se(v.id, "consolidation"),
             subtitle: `${String(v.status)} • ${v.isMixed ? "Mixed" : "Regular"} • Orders ${((g = v.orderIds) == null ? void 0 : g.length) || 0}`,
             pageId: "consolidations",
             itemId: v.id,
@@ -16809,57 +17206,97 @@ const hc = Qt.getInstance(),
           });
         return f;
       }, [pe, A, ce, le, R]),
-      st = x.useCallback(async () => {
-        const f = h.find((v) => v.id === (s == null ? void 0 : s.id)),
-          g = (f == null ? void 0 : f.role) === "admin";
-        (et(!0), N(null));
-        try {
-          let v = _.from("notifications")
-            .select(
-              "id,user_id,message,timestamp,is_read,importance,link_to_page,link_to_id",
-            )
-            .order("timestamp", { ascending: !1 })
-            .range(0, Ts - 1);
-          if (g) v = v.or(`user_id.is.null,user_id.eq."${s.id}"`);
-          else if (s != null && s.id)
-            v = v.or(`user_id.eq."${s.id}",user_id.is.null`);
-          else {
-            (we([]), et(!1));
-            return;
+      st = x.useCallback(
+        async ({ append = !1, offsetOverride = null } = {}) => {
+          const f = h.find((D) => D.id === (s == null ? void 0 : s.id)),
+            g =
+              ((f == null ? void 0 : f.role) ||
+                (s == null ? void 0 : s.role) ||
+                St.Customer) === St.Admin;
+          append ? setNotificationsLoadingMore(!0) : (et(!0), N(null));
+          try {
+            if (!(s != null && s.id)) {
+              (we([]), setNotificationOffset(0), setNotificationsHasMore(!1));
+              return;
+            }
+            const v = g
+                ? ADMIN_NOTIFICATION_PAGE_SIZE
+                : CUSTOMER_NOTIFICATION_PAGE_SIZE,
+              w = offsetOverride !== null ? offsetOverride : 0,
+              C = w + v - 1,
+              M = async (E) => {
+                let D = _.from("notifications")
+                  .select(
+                    `id,${E},message,timestamp,is_read,importance,link_to_page,link_to_id`,
+                  )
+                  .order("timestamp", { ascending: !1 })
+                  .range(w, C);
+                return (
+                  (D = D.or(buildNotificationOwnerOrFilter(s.id, g, E))), await D
+                );
+              };
+            let E = getNotificationOwnerColumnName(),
+              { data: D, error: S } = await M(E);
+            S &&
+              activateNotificationOwnerFallback(S) &&
+              ((E = getNotificationOwnerColumnName()), ({ data: D, error: S } = await M(E)));
+            S &&
+              restorePrimaryNotificationOwnerColumn(S) &&
+              ((E = getNotificationOwnerColumnName()), ({ data: D, error: S } = await M(E)));
+            if (S)
+              (console.error("Error fetching notifications:", S),
+                N(S.message),
+                append || setNotificationsHasMore(!1));
+            else {
+              const $ = (D || []).map((T) => ({
+                  id: T.id,
+                  userId: readNotificationOwnerId(T, E),
+                  message: T.message,
+                  timestamp: T.timestamp,
+                  isRead: T.is_read ?? T.isRead ?? !1,
+                  importance: T.importance
+                    ? T.importance === "low"
+                      ? K.Low
+                      : T.importance === "medium"
+                        ? K.Medium
+                        : T.importance === "high"
+                          ? K.High
+                          : T.importance === "critical"
+                            ? K.Critical
+                            : K.Medium
+                    : K.Medium,
+                  linkToPage: T.link_to_page || T.linkToPage,
+                  linkToId: T.link_to_id || T.linkToId,
+                })),
+                T = $.length;
+              (we((B) => {
+                if (!append) return $;
+                const Q = new Set(B.map((j) => j.id)),
+                  j = $.filter((de) => !Q.has(de.id));
+                return [...B, ...j];
+              }),
+                setNotificationOffset(w + T),
+                setNotificationsHasMore(T === v));
+            }
+          } catch (v) {
+            (console.error("Exception fetching notifications:", v),
+              N("Failed to fetch notifications"),
+              append || setNotificationsHasMore(!1));
           }
-          const { data: w, error: C } = await v;
-          if (C)
-            (console.error("ğŸ”” Error fetching notifications:", C),
-              N(C.message));
-          else {
-            const M = (w || []).map((E) => ({
-              id: E.id,
-              userId: E.user_id || E.userId,
-              message: E.message,
-              timestamp: E.timestamp,
-              isRead: E.is_read ?? E.isRead ?? !1,
-              importance: E.importance
-                ? E.importance === "low"
-                  ? K.Low
-                  : E.importance === "medium"
-                    ? K.Medium
-                    : E.importance === "high"
-                      ? K.High
-                      : E.importance === "critical"
-                        ? K.Critical
-                        : K.Medium
-                : K.Medium,
-              linkToPage: E.link_to_page || E.linkToPage,
-              linkToId: E.link_to_id || E.linkToId,
-            }));
-            we(M);
-          }
-        } catch (v) {
-          (console.error("Exception fetching notifications:", v),
-            N("Failed to fetch notifications"));
-        }
-        et(!1);
-      }, [s == null ? void 0 : s.id, h, Ts]);
+          append ? setNotificationsLoadingMore(!1) : et(!1);
+        },
+        [
+          s == null ? void 0 : s.id,
+          s == null ? void 0 : s.role,
+          h,
+          ADMIN_NOTIFICATION_PAGE_SIZE,
+          CUSTOMER_NOTIFICATION_PAGE_SIZE,
+        ],
+      ),
+      loadMoreNotifications = x.useCallback(async () => {
+        if (notificationsLoadingMore || je || !notificationsHasMore) return;
+        await st({ append: !0, offsetOverride: notificationOffset });
+      }, [notificationsLoadingMore, je, notificationsHasMore, notificationOffset, st]);
     x.useEffect(() => {
       s &&
         h.length > 0 &&
@@ -16869,7 +17306,7 @@ const hc = Qt.getInstance(),
               "âŒ Database schema or setup check failed. Notifications will not be created.",
             );
         }),
-        st());
+        st({ append: !1 }));
     }, [s, h.length, st]);
     const rr = pe
         ? R
@@ -16893,9 +17330,8 @@ const hc = Qt.getInstance(),
               f.involvedCustomerIds.includes((s == null ? void 0 : s.id) || ""),
           );
     x.useEffect(() => {
-      if (!(s != null && s.id) || h.length === 0) return;
-      const f = h.find((v) => v.id === s.id);
-      !((f == null ? void 0 : f.role) === "admin") ||
+      if (!(s != null && s.id)) return;
+      !Ys(s.id) ||
         Ns ||
         (In(!0),
         (async () => {
@@ -17011,7 +17447,7 @@ const hc = Qt.getInstance(),
             console.warn("Orphan shipment repair skipped/failed:", v);
           }
         })());
-    }, [s == null ? void 0 : s.id, h, Ns, Ge, Ke]);
+    }, [s == null ? void 0 : s.id, s == null ? void 0 : s.role, h, Ns, Ge, Ke]);
     const zs = () => {
       const f = {
           allCustomers: h,
@@ -17151,6 +17587,7 @@ const hc = Qt.getInstance(),
             currentCustomerId: s == null ? void 0 : s.id,
             customers: h,
             addCustomer: jn,
+            createCustomerMagicLink: generateCustomerMagicLink,
             paymentTransactions: R,
             calculateCustomerBalance: Br,
             updateCustomer: Vr,
@@ -17247,19 +17684,24 @@ const hc = Qt.getInstance(),
                     ],
                   }),
                 })
-              : !rt && !y
+              : !rt && !y && !(s != null && s.role)
                 ? l.jsx("div", {
                     className:
                       "min-h-screen flex items-center justify-center text-red-600 font-bold",
                     children: "No user record found. Please contact support.",
                   })
-                : (rt == null ? void 0 : rt.role) === St.Admin
+                : userRole === St.Admin
                   ? l.jsxs(ni, {
                       activePageId: Fe,
                       onNavigate: bt,
                       customers: h,
                       notifications: Ze,
                       markNotificationAsRead: zr,
+                      markAllNotificationsAsRead,
+                      hasMoreNotifications: notificationsHasMore,
+                      loadingMoreNotifications: notificationsLoadingMore,
+                      onLoadMoreNotifications: loadMoreNotifications,
+                      notificationPageSize: ADMIN_NOTIFICATION_PAGE_SIZE,
                       onSignOut: Rs,
                       user: s,
                       currentUserId: s == null ? void 0 : s.id,
@@ -17284,13 +17726,18 @@ const hc = Qt.getInstance(),
                           }),
                       ],
                     })
-                  : (rt == null ? void 0 : rt.role) === St.Customer
+                  : userRole === St.Customer
                     ? l.jsxs(ni, {
                         activePageId: Fe,
                         onNavigate: bt,
                         customers: h,
                         notifications: Ze,
                         markNotificationAsRead: zr,
+                        markAllNotificationsAsRead,
+                        hasMoreNotifications: notificationsHasMore,
+                        loadingMoreNotifications: notificationsLoadingMore,
+                        onLoadMoreNotifications: loadMoreNotifications,
+                        notificationPageSize: CUSTOMER_NOTIFICATION_PAGE_SIZE,
                         onSignOut: Rs,
                         user: s,
                         currentUserId: s == null ? void 0 : s.id,

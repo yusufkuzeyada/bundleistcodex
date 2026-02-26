@@ -28,6 +28,19 @@ import { R as Ae } from "./relatedpanel.js";
 import "./react.js";
 import "./supabase.js";
 import "./icons.js";
+const FILTERABLE_ORDER_STATUSES = [
+  Z.Pending,
+  Z.Processing,
+  Z.QualityCheck,
+  Z.ReadyToShip,
+  Z.InTransit,
+  Z.CustomsClearance,
+  Z.OutForDelivery,
+  Z.Delivered,
+  Z.Completed,
+  Z.Cancelled,
+  Z.OnHold,
+];
 function Je({ title: t, titleId: o, ...m }, u) {
   return a.createElement(
     "svg",
@@ -2085,7 +2098,13 @@ const st = a.forwardRef(tt),
         (G(s), ie(!0));
       },
       Le = async (s) => {
-        p && (await u(p.id, s), ie(!1), G(null));
+        if (!p) return;
+        const l = p.id;
+        (await u(l, s),
+          A(($) => $.map((q) => (q.id === l ? { ...q, status: s } : q))),
+          de(($) => $ + 1),
+          ie(!1),
+          G(null));
       },
       Fe = () => {
         (ie(!1), G(null));
@@ -2343,7 +2362,7 @@ const st = a.forwardRef(tt),
                                 value: "",
                                 children: "All statuses",
                               }),
-                              Object.values(Z).map((s) =>
+                              FILTERABLE_ORDER_STATUSES.map((s) =>
                                 e.jsx("option", { value: s, children: s }, s),
                               ),
                             ],

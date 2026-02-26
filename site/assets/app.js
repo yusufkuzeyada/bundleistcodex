@@ -5682,34 +5682,37 @@ const La = () => {
     const a = u.useMemo(
         () => [
           {
-            tier: s("pricingTierStarter"),
-            name: s("starter"),
-            price: "$499",
-            period: s("oneTimeFee"),
-            description: s("starterDesc"),
-            commercial: s("bankTransferFees"),
-            model: s("pricingStarterModel"),
+            tier: "Starter - Pilot Consolidation",
+            name: "Starter",
+            price: "$349",
+            period: "service fee",
+            description:
+              "Ideal for first-time importers who want to manage suppliers, payments, and shipping more smoothly.",
+            commercial:
+              "After your first shipment, continue with Starter or upgrade to Standard for better rates, full dashboard access, and priority scheduling.",
+            model: "Includes",
             icon: Fs,
-            iconColor: "text-slate-700",
-            iconBg: "bg-slate-100",
-            borderColor: "border-slate-200/90",
-            tierTone: "border-slate-200 bg-slate-100 text-slate-700",
+            iconColor: "text-emerald-700",
+            iconBg: "bg-emerald-100",
+            borderColor: "border-emerald-300/90",
+            tierTone: "border-emerald-200 bg-emerald-50 text-emerald-700",
             featured: !1,
             features: [
-              s("singleConsolidatedShipmentFeature"),
-              s("supplierPaymentHandling"),
-              s("singleBillOfLadingFeature"),
-              s("documentationSupport"),
+              "Guided first consolidation from supplier pickup to dispatch",
+              "Supplier payment coordination",
+              "Single bill of lading",
+              "Basic tracking",
             ],
           },
           {
-            tier: s("pricingTierGrowth"),
-            name: s("growth"),
-            price: "2%",
-            period: s("totalOrderValue"),
-            description: s("growthDesc"),
-            commercial: s("bankTransferFees"),
-            model: s("pricingGrowthModel"),
+            tier: "Standard - Core Plan (Most Popular)",
+            name: "Standard",
+            price: "$350 minimum or 1.5%",
+            period: "of order value (whichever is higher)",
+            description: "Designed for growing businesses importing regularly.",
+            commercial:
+              "Service fee is separated from freight, duties, and bank charges for transparent cost control.",
+            model: "Includes",
             icon: Re,
             iconColor: "text-blue-600",
             iconBg: "bg-blue-100",
@@ -5717,38 +5720,40 @@ const La = () => {
             tierTone: "border-blue-200 bg-blue-50 text-blue-700",
             featured: !0,
             features: [
-              s("multipleConsolidatedShipments"),
-              s("digitalProcurementDashboard"),
-              s("realTimeTracking"),
-              s("preferredShippingRates"),
-              s("paymentHandlingProtection"),
+              "Multi-supplier consolidation",
+              "Real-time dashboard tracking",
+              "Document management",
+              "Shipment status updates",
+              "Reliable consolidation scheduling",
             ],
           },
           {
-            tier: s("pricingTierEnterprise"),
-            name: s("enterprise"),
-            price: "1.5%",
-            period: s("after5Consolidations"),
-            description: s("enterpriseDesc"),
-            commercial: s("volumeDiscounting"),
-            model: s("pricingEnterpriseModel"),
+            tier: "Enterprise - Volume and Priority",
+            name: "Enterprise",
+            price: "$750 minimum or 1%",
+            period: "service fee (whichever is higher)",
+            description:
+              "Built for high-volume importers who need speed, priority, and cost optimization.",
+            commercial:
+              "Best for teams that need faster dispatch, strategic support, and predictable priority capacity.",
+            model: "Includes",
             icon: Ue,
-            iconColor: "text-emerald-600",
-            iconBg: "bg-emerald-100",
-            borderColor: "border-emerald-200/90",
-            tierTone: "border-emerald-200 bg-emerald-50 text-emerald-700",
+            iconColor: "text-violet-700",
+            iconBg: "bg-violet-100",
+            borderColor: "border-violet-300/90",
+            tierTone: "border-violet-200 bg-violet-50 text-violet-700",
             featured: !1,
             features: [
-              s("volumeDiscountPricing"),
-              s("priorityConsolidation"),
-              s("customizedShippingSchedule"),
-              s("advancedAnalyticsReporting"),
-              s("warehouseStorageOptions"),
-              s("strategicSourcingAssistance"),
+              "Priority consolidation and faster dispatch",
+              "Dedicated operations manager",
+              "Preferential freight rates",
+              "FX optimization support",
+              "Advanced analytics and reporting",
+              "Reserved consolidation capacity during peak periods",
             ],
           },
         ],
-        [s],
+        [],
       ),
       l = u.useMemo(
         () => [
@@ -6032,17 +6037,30 @@ const La = () => {
                       className: "mx-auto max-w-7xl px-4 sm:px-6",
                       children: [
                         t.jsxs("div", {
-                          className: "text-center max-w-2xl mx-auto",
+                          className: "text-center max-w-4xl mx-auto",
                           children: [
                             t.jsx("h2", {
                               className:
                                 "text-2xl sm:text-3xl font-bold tracking-tight text-slate-950",
-                              children: s("choosePlan"),
+                              children: "Pricing",
                             }),
                             t.jsx("p", {
                               className:
                                 "mt-2 text-sm sm:text-base text-slate-700 leading-relaxed",
-                              children: s("transparentPricing"),
+                              children:
+                                "Transparent. Scalable. Built for Importers.",
+                            }),
+                            t.jsx("p", {
+                              className:
+                                "mt-2 text-sm sm:text-base text-slate-700 leading-relaxed",
+                              children:
+                                "Bundleist charges a service fee for consolidation and operational coordination. Freight, duties, and banking costs are passed through transparently with no hidden markups.",
+                            }),
+                            t.jsx("p", {
+                              className:
+                                "mt-2 text-sm sm:text-base text-slate-700 leading-relaxed",
+                              children:
+                                "Start with a pilot shipment and scale seamlessly as your import volume grows.",
                             }),
                           ],
                         }),
@@ -6052,9 +6070,7 @@ const La = () => {
                           children: a.map((i, d) => {
                             const m = i.icon,
                               c = i.featured,
-                              h = e
-                                ? i.features.slice(0, 3)
-                                : i.features.slice(0, 4);
+                              h = i.features;
                             return t.jsx(
                               "div",
                               {
@@ -6081,7 +6097,7 @@ const La = () => {
                                           ? t.jsx("div", {
                                               className:
                                                 "shrink-0 px-2.5 py-1 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wide",
-                                              children: s("recommended"),
+                                              children: "Most Popular",
                                             })
                                           : null,
                                       ],
@@ -6111,7 +6127,7 @@ const La = () => {
                                             }),
                                             t.jsx("div", {
                                               className:
-                                                "mt-0.5 text-xs sm:text-sm text-slate-700 leading-relaxed line-clamp-2",
+                                                "mt-0.5 text-xs sm:text-sm text-slate-700 leading-relaxed",
                                               children: i.description,
                                             }),
                                           ],
@@ -6140,7 +6156,7 @@ const La = () => {
                                     }),
                                     t.jsx("div", {
                                       className:
-                                        "mt-1 text-xs text-slate-500 leading-relaxed line-clamp-2",
+                                        "mt-1 text-xs text-slate-500 leading-relaxed",
                                       children: i.commercial,
                                     }),
                                     t.jsx("div", {
@@ -6160,8 +6176,7 @@ const La = () => {
                                                     "h-3.5 w-3.5 text-emerald-600 mt-0.5 flex-none",
                                                 }),
                                                 t.jsx("span", {
-                                                  className:
-                                                    "leading-relaxed line-clamp-1",
+                                                  className: "leading-relaxed",
                                                   children: g,
                                                 }),
                                               ],
@@ -6177,6 +6192,73 @@ const La = () => {
                               d,
                             );
                           }),
+                        }),
+                        t.jsxs("div", {
+                          className: "mt-6 grid gap-4 sm:grid-cols-2",
+                          children: [
+                            t.jsxs("div", {
+                              className:
+                                "h-full rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm",
+                              children: [
+                                t.jsx("h3", {
+                                  className: "text-lg font-bold text-slate-900",
+                                  children: "How Pricing Works",
+                                }),
+                                t.jsx("p", {
+                                  className:
+                                    "mt-2 text-sm text-slate-700 leading-relaxed",
+                                  children:
+                                    "Bundleist separates service fees from pass-through costs to ensure full transparency and cost control.",
+                                }),
+                                t.jsxs("div", {
+                                  className:
+                                    "mt-3 space-y-1.5 text-sm text-slate-700",
+                                  children: [
+                                    t.jsx("div", {
+                                      children:
+                                        "Service Fee: Bundleist operational fee.",
+                                    }),
+                                    t.jsx("div", {
+                                      children:
+                                        "Freight and Duties: charged at actual carrier rates.",
+                                    }),
+                                    t.jsx("div", {
+                                      children:
+                                        "Bank Fees: passed through at cost, with no markup.",
+                                    }),
+                                  ],
+                                }),
+                                t.jsx("p", {
+                                  className:
+                                    "mt-3 text-sm font-semibold text-slate-900",
+                                  children:
+                                    "No hidden fees. No surprises. Full cost visibility.",
+                                }),
+                              ],
+                            }),
+                            t.jsxs("div", {
+                              className:
+                                "h-full rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm",
+                              children: [
+                                t.jsx("h3", {
+                                  className: "text-lg font-bold text-slate-900",
+                                  children: "Scaling With You",
+                                }),
+                                t.jsx("p", {
+                                  className:
+                                    "mt-2 text-sm text-slate-700 leading-relaxed",
+                                  children:
+                                    "Many customers start with a pilot shipment and naturally move to Standard as their import volume grows.",
+                                }),
+                                t.jsx("p", {
+                                  className:
+                                    "mt-2 text-sm text-slate-700 leading-relaxed",
+                                  children:
+                                    "Enterprise is designed for high-volume importers who require priority handling, cost optimization, and dedicated support.",
+                                }),
+                              ],
+                            }),
+                          ],
                         }),
                       ],
                     }),
