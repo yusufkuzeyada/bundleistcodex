@@ -28,6 +28,23 @@ function parseBearerToken(authorizationHeader) {
   return match ? match[1].trim() : "";
 }
 
+function readHeader(event, headerName) {
+  if (!event || !event.headers || !headerName) {
+    return "";
+  }
+  const headers = event.headers;
+  if (typeof headers[headerName] === "string") {
+    return headers[headerName].trim();
+  }
+  const normalized = String(headerName).toLowerCase();
+  for (const [key, value] of Object.entries(headers)) {
+    if (String(key || "").toLowerCase() === normalized) {
+      return typeof value === "string" ? value.trim() : "";
+    }
+  }
+  return "";
+}
+
 async function parseJson(response) {
   const text = await response.text();
   if (!text) return null;
@@ -38,17 +55,43 @@ async function parseJson(response) {
   }
 }
 
+function resolveRequestOrigin(event) {
+  const host =
+    readHeader(event, "x-forwarded-host") || readHeader(event, "host");
+  if (!host) {
+    return "";
+  }
+  const forwardedProto = readHeader(event, "x-forwarded-proto");
+  const candidate = String(forwardedProto || "")
+    .split(",")[0]
+    .trim()
+    .toLowerCase();
+  let protocol = candidate;
+  if (protocol !== "http" && protocol !== "https") {
+    const hostLower = host.toLowerCase();
+    protocol =
+      hostLower.includes("localhost") || hostLower.startsWith("127.0.0.1")
+        ? "http"
+        : "https";
+  }
+  return `${protocol}://${host}`;
+}
+
 function resolveRedirectTo(event, requestedValue) {
+  const origin = resolveRequestOrigin(event);
+  const fallback = origin ? new URL("/dashboard/", origin).toString() : "";
   const requested =
     typeof requestedValue === "string" ? requestedValue.trim() : "";
-  if (requested) {
-    try {
-      return new URL(requested).toString();
-    } catch {
-      return "";
-    }
+  if (!requested) {
+    return fallback;
   }
-  return "";
+  try {
+    return origin
+      ? new URL(requested, origin).toString()
+      : new URL(requested).toString();
+  } catch {
+    return fallback;
+  }
 }
 
 function extractActionLink(payload) {
