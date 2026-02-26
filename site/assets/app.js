@@ -3932,28 +3932,32 @@ const Ge = "bundleist_language_mode",
                                 }),
                                 t.jsxs("div", {
                                   className:
-                                    "mt-3 sm:mt-4 grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-3",
+                                    "mt-3 sm:mt-4 grid gap-1 sm:gap-2",
+                                  style: {
+                                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                                  },
                                   children: [
                                     t.jsxs("div", {
                                       className:
-                                        "rounded-xl sm:rounded-2xl border border-slate-900/10 bg-white p-2.5 sm:p-3 shadow-sm",
+                                        "rounded-lg sm:rounded-xl border border-slate-900/10 bg-white p-2 sm:p-2.5 shadow-sm",
                                       children: [
                                         t.jsxs("div", {
                                           className:
-                                            "flex items-center justify-between text-[11px] sm:text-xs font-semibold text-slate-600",
+                                            "flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-slate-600",
                                           children: [
                                             t.jsx("span", {
+                                              className: "truncate",
                                               children: e("dashboardOrders"),
                                             }),
                                             t.jsx(Us, {
                                               className:
-                                                "h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400",
+                                                "h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400",
                                             }),
                                           ],
                                         }),
                                         t.jsx("div", {
                                           className:
-                                            "mt-0.5 text-base sm:text-lg font-extrabold text-slate-950",
+                                            "mt-0.5 text-sm sm:text-base font-extrabold text-slate-950",
                                           children: "12",
                                         }),
                                         t.jsx("div", {
@@ -3965,60 +3969,62 @@ const Ge = "bundleist_language_mode",
                                     }),
                                     t.jsxs("div", {
                                       className:
-                                        "rounded-xl sm:rounded-2xl border border-slate-900/10 bg-white p-2.5 sm:p-3 shadow-sm",
+                                        "rounded-lg sm:rounded-xl border border-slate-900/10 bg-white p-2 sm:p-2.5 shadow-sm",
                                       children: [
                                         t.jsxs("div", {
                                           className:
-                                            "flex items-center justify-between text-[11px] sm:text-xs font-semibold text-slate-600",
+                                            "flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-slate-600",
                                           children: [
                                             t.jsx("span", {
-                                              children: e("heroCustomers"),
+                                              className: "truncate",
+                                              children: e("dashboardShipments"),
                                             }),
-                                            t.jsx(Ie, {
+                                            t.jsx(Ye, {
                                               className:
-                                                "h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400",
+                                                "h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400",
                                             }),
                                           ],
                                         }),
                                         t.jsx("div", {
                                           className:
-                                            "mt-0.5 text-base sm:text-lg font-extrabold text-slate-950",
-                                          children: "4",
+                                            "mt-0.5 text-sm sm:text-base font-extrabold text-slate-950",
+                                          children: "3",
                                         }),
                                         t.jsx("div", {
                                           className:
                                             "mt-0.5 text-[10px] sm:text-[11px] text-slate-600",
-                                          children: e("heroCustomersMeta"),
+                                          children: e("heroShipmentInTransit"),
                                         }),
                                       ],
                                     }),
                                     t.jsxs("div", {
                                       className:
-                                        "hidden sm:block rounded-2xl border border-slate-900/10 bg-white p-3 shadow-sm",
+                                        "rounded-lg sm:rounded-xl border border-slate-900/10 bg-white p-2 sm:p-2.5 shadow-sm",
                                       children: [
                                         t.jsxs("div", {
                                           className:
-                                            "flex items-center justify-between text-xs font-semibold text-slate-600",
+                                            "flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-slate-600",
                                           children: [
                                             t.jsx("span", {
+                                              className: "truncate",
                                               children: e(
                                                 "dashboardConsolidations",
                                               ),
                                             }),
                                             t.jsx($e, {
                                               className:
-                                                "h-4 w-4 text-slate-400",
+                                                "h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400",
                                             }),
                                           ],
                                         }),
                                         t.jsx("div", {
                                           className:
-                                            "mt-1 text-lg font-extrabold text-slate-950",
+                                            "mt-0.5 text-sm sm:text-base font-extrabold text-slate-950",
                                           children: "3",
                                         }),
                                         t.jsx("div", {
                                           className:
-                                            "mt-1 text-[11px] text-slate-600",
+                                            "mt-0.5 text-[10px] sm:text-[11px] text-slate-600",
                                           children: e("heroConsolidationMeta"),
                                         }),
                                       ],
