@@ -15227,6 +15227,125 @@ const hc = Qt.getInstance(),
         }
         return T || null;
       },
+      ORDER_DRAFT_TEMP_BUCKET = "order-draft-temp",
+      ORDER_DRAFT_DOC_MAX_BYTES = 10 * 1024 * 1024,
+      ORDER_DRAFT_DOC_ALLOWED_MIME_TYPES = new Set([
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+      ]),
+      sanitizeDraftDocFilename = (f) => {
+        const g = String(f || "")
+          .replace(/[/\\?%*:|"<>]/g, "-")
+          .replace(/\s+/g, "-")
+          .replace(/[^a-zA-Z0-9._-]/g, "")
+          .replace(/-+/g, "-")
+          .replace(/^\.+/, "")
+          .trim();
+        return g || "document";
+      },
+      listOrderDraftDocuments = async (f) => {
+        const g = String(f || "").trim();
+        if (!g) throw new Error("Invalid order id.");
+        const { data: v, error: w } = await _.storage
+          .from(ORDER_DRAFT_TEMP_BUCKET)
+          .list(g, {
+            limit: 100,
+            sortBy: { column: "created_at", order: "desc" },
+          });
+        if (w)
+          throw new Error(w.message || "Failed to list draft documents.");
+        return (v || [])
+          .filter((C) => C && typeof C.name == "string" && C.name.trim() !== "")
+          .map((C) => {
+            var M, E;
+            const D = String(C.name || ""),
+              S = D.replace(/^\d{13}-[a-z0-9]+-/i, ""),
+              $ =
+                Number(
+                  (M = C.metadata) == null
+                    ? void 0
+                    : M.size,
+                ) || 0,
+              T = String(
+                ((E = C.metadata) == null ? void 0 : E.mimetype) ||
+                  "application/octet-stream",
+              ).toLowerCase();
+            return {
+              path: `${g}/${D}`,
+              storedName: D,
+              name: S || D,
+              size: $,
+              mimeType: T,
+              createdAt: C.created_at || C.updated_at || "",
+              updatedAt: C.updated_at || "",
+            };
+          });
+      },
+      uploadOrderDraftDocument = async (f, g) => {
+        const v = String(f || "").trim();
+        if (!v) throw new Error("Invalid order id.");
+        if (!(g instanceof File))
+          throw new Error("Please choose a valid file.");
+        if (!g.size || g.size <= 0)
+          throw new Error("File is empty.");
+        if (g.size > ORDER_DRAFT_DOC_MAX_BYTES)
+          throw new Error("File exceeds 10 MB limit.");
+        const w = String(g.type || "").toLowerCase().trim();
+        if (!ORDER_DRAFT_DOC_ALLOWED_MIME_TYPES.has(w))
+          throw new Error("Only PDF, JPG, PNG, and WEBP files are allowed.");
+        const C = sanitizeDraftDocFilename(g.name),
+          M = Math.random().toString(36).slice(2, 10),
+          E = `${v}/${Date.now()}-${M}-${C}`,
+          { error: D } = await _.storage.from(ORDER_DRAFT_TEMP_BUCKET).upload(E, g, {
+            upsert: !1,
+            cacheControl: "3600",
+            contentType: w || "application/octet-stream",
+          });
+        if (D) {
+          const S = String(D.message || "").toLowerCase();
+          throw new Error(
+            S.includes("row-level security")
+              ? "You do not have permission to upload files for this order."
+              : S.includes("maximum allowed size")
+                ? "File exceeds 10 MB limit."
+                : D.message || "Failed to upload document.",
+          );
+        }
+        return {
+          path: E,
+          name: C,
+          size: g.size,
+          mimeType: w || "application/octet-stream",
+        };
+      },
+      deleteOrderDraftDocument = async (f, g) => {
+        const v = String(f || "").trim(),
+          w = String(g || "").trim();
+        if (!v || !w || !w.startsWith(`${v}/`))
+          throw new Error("Invalid document path.");
+        const { error: C } = await _.storage
+          .from(ORDER_DRAFT_TEMP_BUCKET)
+          .remove([w]);
+        if (C)
+          throw new Error(C.message || "Failed to delete document.");
+        return !0;
+      },
+      getOrderDraftDocumentSignedUrl = async (f, g) => {
+        const v = String(f || "").trim(),
+          w = String(g || "").trim();
+        if (!v || !w || !w.startsWith(`${v}/`))
+          throw new Error("Invalid document path.");
+        const { data: C, error: M } = await _.storage
+          .from(ORDER_DRAFT_TEMP_BUCKET)
+          .createSignedUrl(w, 60 * 30);
+        if (M)
+          throw new Error(M.message || "Failed to create document link.");
+        const E = String((C == null ? void 0 : C.signedUrl) || "").trim();
+        if (!E) throw new Error("Could not create a temporary document link.");
+        return E;
+      },
       Rs = async () => {
         u(!0);
         try {
@@ -17858,6 +17977,10 @@ const hc = Qt.getInstance(),
             ordersError: z,
             consolidations: sr,
             shipments: kr,
+            listOrderDraftDocuments,
+            uploadOrderDraftDocument,
+            deleteOrderDraftDocument,
+            getOrderDraftDocumentSignedUrl,
             onNavigate: bt,
             onNavigateToShipment: qr,
           });

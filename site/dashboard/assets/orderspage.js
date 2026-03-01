@@ -43,6 +43,38 @@ const FILTERABLE_ORDER_STATUSES = [
   Z.Cancelled,
   Z.OnHold,
 ];
+const DRAFT_DOC_MANAGEABLE_STATUSES = [Z.Draft, Z.Submitted, Z.Pending],
+  DRAFT_DOC_ALLOWED_MIME_TYPES = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ],
+  DRAFT_DOC_ACCEPT_ATTR = DRAFT_DOC_ALLOWED_MIME_TYPES.join(","),
+  DRAFT_DOC_MAX_BYTES = 10 * 1024 * 1024,
+  formatFileSize = (t) => {
+    const o = Number(t);
+    if (!Number.isFinite(o) || o <= 0) return "0 B";
+    if (o < 1024) return `${o} B`;
+    if (o < 1024 * 1024) return `${(o / 1024).toFixed(1)} KB`;
+    return `${(o / (1024 * 1024)).toFixed(2)} MB`;
+  },
+  formatDocumentDate = (t) => {
+    const o = new Date(t || "");
+    return Number.isNaN(o.getTime()) ? "N/A" : o.toLocaleString();
+  },
+  getDocumentTypeLabel = (t) => {
+    const o = String(t || "").toLowerCase();
+    return o === "application/pdf"
+      ? "PDF"
+      : o === "image/jpeg"
+        ? "JPG"
+        : o === "image/png"
+          ? "PNG"
+          : o === "image/webp"
+            ? "WEBP"
+            : "File";
+  };
 function Je({ title: t, titleId: o, ...m }, u) {
   return a.createElement(
     "svg",
@@ -1363,6 +1395,13 @@ const st = a.forwardRef(tt),
                   }),
                 }),
               }),
+              !u &&
+                e.jsx("div", {
+                  className:
+                    "mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-900",
+                  children:
+                    "You can upload supporting draft documents after saving this order. Open the saved draft and use the Draft Documents section.",
+                }),
             ],
           }),
           e.jsxs(Re, {
@@ -1477,14 +1516,24 @@ const st = a.forwardRef(tt),
     transactions: L,
     onNavigate: h,
     onNavigateToShipment: v,
+    listOrderDraftDocuments: p,
+    uploadOrderDraftDocument: G,
+    deleteOrderDraftDocument: lt,
+    getOrderDraftDocumentSignedUrl: je,
     defaultExpanded: b = !1,
   }) => {
-    const S = (i) =>
+    const { showError: _t, showSuccess: Pt } = xe(),
+      S = (i) =>
         String(i || "")
           .replace(/_/g, " ")
           .replace(/([a-z])([A-Z])/g, "$1 $2")
           .trim(),
       [F, K] = a.useState(b),
+      [Fe, ot] = a.useState([]),
+      [Dt, bt] = a.useState(!1),
+      [Rt, mt] = a.useState(""),
+      [$t, _n] = a.useState(!1),
+      [Mt, xt] = a.useState(""),
       D = I.some((i) => i.orderIds.includes(t.id) && i.status !== X.Cancelled),
       E = f.some((i) => i.relatedId === t.id && i.type === "individual"),
       n = f.find((i) => i.relatedId === t.id && i.type === "individual"),
@@ -1504,6 +1553,7 @@ const st = a.forwardRef(tt),
       B = le(t.status) === "shipments",
       V = D && [Z.Processing, Z.QualityCheck].includes(t.status),
       P = C || B || V,
+      ut = DRAFT_DOC_MANAGEABLE_STATUSES.includes(t.status),
       j = a.useMemo(
         () => (L || []).filter((i) => i.relatedOrderId === t.id),
         [L, t.id],
@@ -1707,6 +1757,104 @@ const st = a.forwardRef(tt),
           },
         };
       }, [t.id, t.description, j, A, r, n, d, h, v]);
+    const kt = a.useCallback(async () => {
+        if (typeof p != "function") {
+          (ot([]), mt(""));
+          return;
+        }
+        (bt(!0), mt(""));
+        try {
+          const i = await Promise.resolve(p(t.id));
+          ot(Array.isArray(i) ? i : []);
+        } catch (i) {
+          const g =
+            i instanceof Error ? i.message : "Failed to load draft documents.";
+          (mt(g), _t("Document Error", g));
+        } finally {
+          bt(!1);
+        }
+      }, [p, t.id, _t]),
+      It = async (i) => {
+        var R;
+        if (!ut) {
+          i.target && (i.target.value = "");
+          return;
+        }
+        const g =
+          (R = i.target) != null && R.files && i.target.files.length > 0
+            ? i.target.files[0]
+            : null;
+        if ((i.target && (i.target.value = ""), !g)) return;
+        if (g.size > DRAFT_DOC_MAX_BYTES) {
+          _t("File Too Large", "Max file size is 10 MB.");
+          return;
+        }
+        const y = String(g.type || "").toLowerCase().trim();
+        if (!DRAFT_DOC_ALLOWED_MIME_TYPES.includes(y)) {
+          _t("Unsupported File", "Only PDF, JPG, PNG, and WEBP are allowed.");
+          return;
+        }
+        if (typeof G != "function") {
+          _t("Upload Error", "Document upload helper is unavailable.");
+          return;
+        }
+        (_n(!0), xt(""), mt(""));
+        try {
+          (await Promise.resolve(G(t.id, g)),
+            await kt(),
+            Pt("Document Uploaded", `${g.name} uploaded successfully.`));
+        } catch (R) {
+          const J =
+            R instanceof Error ? R.message : "Failed to upload document.";
+          (mt(J), _t("Upload Failed", J));
+        } finally {
+          _n(!1);
+        }
+      },
+      Nt = async (i) => {
+        if (typeof je != "function") {
+          _t("Open Failed", "Document link helper is unavailable.");
+          return;
+        }
+        (xt(i.path || ""), mt(""));
+        try {
+          const g = await Promise.resolve(je(t.id, i.path));
+          if (!g) throw new Error("Could not generate a temporary link.");
+          window.open(g, "_blank", "noopener,noreferrer");
+        } catch (g) {
+          const y =
+            g instanceof Error ? g.message : "Could not open document.";
+          (_t("Open Failed", y), mt(y));
+        } finally {
+          xt((g) => (g === i.path ? "" : g));
+        }
+      },
+      Tt = async (i) => {
+        if (!ut || typeof lt != "function") return;
+        if (!window.confirm(`Delete "${i.name || i.storedName || "document"}"?`))
+          return;
+        (xt(i.path || ""), mt(""));
+        try {
+          (await Promise.resolve(lt(t.id, i.path)),
+            await kt(),
+            Pt(
+              "Document Deleted",
+              `${i.name || i.storedName || "Document"} deleted.`,
+            ));
+        } catch (g) {
+          const y =
+            g instanceof Error ? g.message : "Failed to delete document.";
+          (_t("Delete Failed", y), mt(y));
+        } finally {
+          xt((g) => (g === i.path ? "" : g));
+        }
+      };
+    (a.useEffect(() => {
+      F && kt();
+    }, [F, t.id, kt]),
+      a.useEffect(() => {
+        ut || _n(!1);
+      }, [ut]));
     return e.jsxs("div", {
       className: "ui-surface overflow-hidden",
       children: [
@@ -2115,6 +2263,153 @@ const st = a.forwardRef(tt),
                   e.jsx("label", {
                     className:
                       "text-xs font-semibold text-gray-600 uppercase tracking-wider",
+                    children: "Draft Documents",
+                  }),
+                  e.jsxs("div", {
+                    className: "mt-2 space-y-3",
+                    children: [
+                      e.jsxs("div", {
+                        className:
+                          "rounded-lg border border-slate-200 bg-slate-50 p-3",
+                        children: [
+                          e.jsx("p", {
+                            className: "text-xs text-slate-700",
+                            children: ut
+                              ? "Upload documents while order is Draft, Submitted, or Pending. Temporary files are deleted automatically when status becomes Processing."
+                              : "Uploads are disabled after Processing starts. Existing draft documents may already be cleaned automatically.",
+                          }),
+                          ut &&
+                            e.jsxs("div", {
+                              className:
+                                "mt-3 flex flex-col gap-2 sm:flex-row sm:items-center",
+                              children: [
+                                e.jsx("input", {
+                                  id: `draft-doc-upload-${t.id}`,
+                                  type: "file",
+                                  accept: DRAFT_DOC_ACCEPT_ATTR,
+                                  onChange: It,
+                                  className: "hidden",
+                                  disabled: $t || Mt !== "",
+                                }),
+                                e.jsx("label", {
+                                  htmlFor: `draft-doc-upload-${t.id}`,
+                                  className: [
+                                    "inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-colors",
+                                    $t || Mt !== ""
+                                      ? "cursor-not-allowed bg-slate-200 text-slate-500"
+                                      : "cursor-pointer bg-emerald-700 text-white hover:bg-emerald-800",
+                                  ].join(" "),
+                                  children: $t ? "Uploading..." : "Upload Document",
+                                }),
+                                e.jsx("span", {
+                                  className: "text-xs text-slate-600",
+                                  children: "Max 10 MB. PDF, JPG, PNG, WEBP.",
+                                }),
+                              ],
+                            }),
+                        ],
+                      }),
+                      Rt &&
+                        e.jsx("div", {
+                          className: "text-xs text-red-600",
+                          children: Rt,
+                        }),
+                      Dt
+                        ? e.jsx("div", {
+                            className: "text-xs text-slate-600",
+                            children: "Loading documents...",
+                          })
+                        : Fe.length === 0
+                          ? e.jsx("div", {
+                              className:
+                                "rounded-lg border border-dashed border-slate-300 bg-white px-3 py-2 text-xs text-slate-600",
+                              children: "No draft documents uploaded yet.",
+                            })
+                          : e.jsx("div", {
+                              className: "space-y-2",
+                              children: Fe.map((i) =>
+                                e.jsxs(
+                                  "div",
+                                  {
+                                    className:
+                                      "rounded-lg border border-slate-200 bg-white px-3 py-2",
+                                    children: [
+                                      e.jsxs("div", {
+                                        className:
+                                          "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between",
+                                        children: [
+                                          e.jsxs("div", {
+                                            className: "min-w-0",
+                                            children: [
+                                              e.jsx("p", {
+                                                className:
+                                                  "text-sm font-medium text-slate-900 truncate",
+                                                title: i.name || i.storedName,
+                                                children: i.name || i.storedName,
+                                              }),
+                                              e.jsxs("p", {
+                                                className:
+                                                  "text-[11px] text-slate-600",
+                                                children: [
+                                                  getDocumentTypeLabel(i.mimeType),
+                                                  " | ",
+                                                  formatFileSize(i.size),
+                                                  " | ",
+                                                  formatDocumentDate(
+                                                    i.createdAt || i.updatedAt,
+                                                  ),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                          e.jsxs("div", {
+                                            className:
+                                              "flex items-center gap-2 sm:justify-end",
+                                            children: [
+                                              e.jsx(k, {
+                                                type: "button",
+                                                variant: "outline",
+                                                size: "xs",
+                                                className: "h-8",
+                                                onClick: () => Nt(i),
+                                                disabled: Mt === i.path || $t,
+                                                children:
+                                                  Mt === i.path
+                                                    ? "Opening..."
+                                                    : "Open",
+                                              }),
+                                              ut &&
+                                                e.jsx(k, {
+                                                  type: "button",
+                                                  variant: "destructive",
+                                                  size: "xs",
+                                                  className: "h-8",
+                                                  onClick: () => Tt(i),
+                                                  disabled: Mt === i.path || $t,
+                                                  children:
+                                                    Mt === i.path
+                                                      ? "Working..."
+                                                      : "Delete",
+                                                }),
+                                            ],
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  },
+                                  i.path,
+                                ),
+                              ),
+                            }),
+                    ],
+                  }),
+                ],
+              }),
+              e.jsxs("div", {
+                children: [
+                  e.jsx("label", {
+                    className:
+                      "text-xs font-semibold text-gray-600 uppercase tracking-wider",
                     children: "Activity",
                   }),
                   e.jsx("div", {
@@ -2322,6 +2617,10 @@ const st = a.forwardRef(tt),
     isAdmin: b,
     onNavigate: S,
     onNavigateToShipment: F,
+    listOrderDraftDocuments: q,
+    uploadOrderDraftDocument: ye,
+    deleteOrderDraftDocument: Ne,
+    getOrderDraftDocumentSignedUrl: ct,
   }) => {
     var je;
     const [K, D] = a.useState(!1),
@@ -2894,6 +3193,10 @@ const st = a.forwardRef(tt),
                                       consolidations: f,
                                       shipments: L,
                                       transactions: o,
+                                      listOrderDraftDocuments: q,
+                                      uploadOrderDraftDocument: ye,
+                                      deleteOrderDraftDocument: Ne,
+                                      getOrderDraftDocumentSignedUrl: ct,
                                       onNavigate: S,
                                       onNavigateToShipment: F,
                                     },
@@ -3136,6 +3439,10 @@ const st = a.forwardRef(tt),
                                             consolidations: f,
                                             shipments: L,
                                             transactions: o,
+                                            listOrderDraftDocuments: q,
+                                            uploadOrderDraftDocument: ye,
+                                            deleteOrderDraftDocument: Ne,
+                                            getOrderDraftDocumentSignedUrl: ct,
                                             onNavigate: S,
                                             onNavigateToShipment: F,
                                           },

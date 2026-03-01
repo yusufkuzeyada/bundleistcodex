@@ -13,6 +13,8 @@ Generated (UTC): 2026-02-23T10:53:40.833Z
 - `orders` numeric checks are status-aware: `Draft`/`Submitted` allow `value`, `volume_m3`, `weight_kg` as `>= 0`; other statuses require `> 0`.
 - Added private storage bucket `order-draft-temp` with 10 MB file limit and MIME allow-list (`pdf`, `jpeg`, `png`, `webp`).
 - Draft temp documents are intended to persist through `Draft`/`Submitted`/`Pending`, then be cleaned when order reaches `Processing`.
+- Dashboard implementation now includes a `Draft Documents` panel on order details (`site/dashboard/assets/orderspage.js`) with upload/open/delete for `Draft`/`Submitted`/`Pending` statuses.
+- Storage integration helpers live in `site/dashboard/assets/app.js`: `listOrderDraftDocuments`, `uploadOrderDraftDocument`, `deleteOrderDraftDocument`, `getOrderDraftDocumentSignedUrl`.
 
 ## Project
 - Project: `fbpemdlnlsgqkovnatro` (v4newsupa) | Region: `eu-north-1` | Status: `ACTIVE_HEALTHY`
