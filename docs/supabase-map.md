@@ -7,9 +7,12 @@ Generated (UTC): 2026-02-23T10:53:40.833Z
 ## Manual Updates (2026-03-01)
 - Applied SQL migration: `docs/sql/2026-03-01-order-draft-approval.sql`
 - Applied SQL migration: `docs/sql/2026-03-01-order-draft-metrics-constraints.sql`
+- Applied SQL migration: `docs/sql/2026-03-01-order-draft-docs-temp-bucket.sql`
 - `orders` now includes customer draft supplier fallback column: `requested_supplier_name`.
 - Customer draft workflow RLS on `orders`: `orders_customer_draft_update`, `orders_customer_draft_delete`.
 - `orders` numeric checks are status-aware: `Draft`/`Submitted` allow `value`, `volume_m3`, `weight_kg` as `>= 0`; other statuses require `> 0`.
+- Added private storage bucket `order-draft-temp` with 10 MB file limit and MIME allow-list (`pdf`, `jpeg`, `png`, `webp`).
+- Draft temp documents are intended to persist through `Draft`/`Submitted`/`Pending`, then be cleaned when order reaches `Processing`.
 
 ## Project
 - Project: `fbpemdlnlsgqkovnatro` (v4newsupa) | Region: `eu-north-1` | Status: `ACTIVE_HEALTHY`

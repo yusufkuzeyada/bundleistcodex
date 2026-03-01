@@ -45,7 +45,9 @@ Customer draft orders with admin approval require a Supabase schema/policy updat
 
 - SQL file: `docs/sql/2026-03-01-order-draft-approval.sql`
 - SQL file: `docs/sql/2026-03-01-order-draft-metrics-constraints.sql`
+- SQL file: `docs/sql/2026-03-01-order-draft-docs-temp-bucket.sql`
 - Apply it in Supabase SQL Editor before using the full draft workflow in production.
+- Optional env var for cleanup function bucket override: `ORDER_DRAFT_TEMP_BUCKET` (default: `order-draft-temp`).
 
 ## Maintainability helpers
 

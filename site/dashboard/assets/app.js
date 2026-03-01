@@ -15173,6 +15173,60 @@ const hc = Qt.getInstance(),
           );
         return magicLink;
       },
+      cleanupDraftTempDocsForProcessing = async (f) => {
+        if (!f) return null;
+        const { data: g, error: v } = await _.auth.getSession();
+        if (v) throw new Error(v.message || "Could not read current session.");
+        const w = g == null ? void 0 : g.session,
+          C = w == null ? void 0 : w.access_token;
+        if (!C)
+          throw new Error("Missing session token. Please sign in again.");
+        const M = [
+          "/.netlify/functions/order-draft-docs-cleanup",
+          "/netlify/functions/order-draft-docs-cleanup",
+        ];
+        let E = null,
+          D = null;
+        for (const S of M) {
+          const $ = await fetch(S, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${C}`,
+            },
+            body: JSON.stringify({ orderId: f }),
+          });
+          if ($.status !== 404 || S === M[M.length - 1]) {
+            (E = $, (D = S));
+            break;
+          }
+        }
+        const T = await (E == null ? void 0 : E.json()).catch(() => ({}));
+        if (!(E != null && E.ok)) {
+          if ((E == null ? void 0 : E.status) === 404)
+            throw new Error(
+              `Draft docs cleanup endpoint not found (${D || "/.netlify/functions/order-draft-docs-cleanup"}). If local, run a Netlify functions runtime. If deployed, redeploy the site with latest functions.`,
+            );
+          const S = String((T == null ? void 0 : T.code) || "").trim(),
+            $ = String((T == null ? void 0 : T.message) || "").trim();
+          throw new Error(
+            S === "forbidden"
+              ? "Only admins can clean draft temp documents."
+              : S === "missing_auth"
+                ? "Authentication required. Please sign in again."
+                : S === "invalid_order_id"
+                  ? "Invalid order id for draft document cleanup."
+                  : S === "order_not_found"
+                    ? "Order not found for draft document cleanup."
+                    : S === "order_not_processing"
+                      ? "Order must be in Processing before temp draft documents can be cleaned."
+                      : S === "cleanup_failed" && $
+                        ? `Draft docs cleanup failed: ${$}`
+                        : "Draft docs cleanup failed.",
+          );
+        }
+        return T || null;
+      },
       Rs = async () => {
         u(!0);
         try {
@@ -15868,6 +15922,18 @@ const hc = Qt.getInstance(),
         }
         const $ = v.status;
         await We(f, { status: g }, !0);
+        if (g === d.Processing)
+          try {
+            await cleanupDraftTempDocsForProcessing(f);
+          } catch (T) {
+            (console.warn("Draft temp docs cleanup failed (non-fatal):", T),
+              n(
+                "Draft Document Cleanup",
+                T instanceof Error && T.message
+                  ? T.message
+                  : "Could not clean temporary draft documents.",
+              ));
+          }
         try {
           await $e.logAction(ot.ORDER_STATUS_UPDATED, "order", f, {
             userId: s == null ? void 0 : s.id,
