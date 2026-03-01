@@ -4,6 +4,13 @@
 
 Generated (UTC): 2026-02-23T10:53:40.833Z
 
+## Manual Updates (2026-03-01)
+- Applied SQL migration: `docs/sql/2026-03-01-order-draft-approval.sql`
+- Applied SQL migration: `docs/sql/2026-03-01-order-draft-metrics-constraints.sql`
+- `orders` now includes customer draft supplier fallback column: `requested_supplier_name`.
+- Customer draft workflow RLS on `orders`: `orders_customer_draft_update`, `orders_customer_draft_delete`.
+- `orders` numeric checks are status-aware: `Draft`/`Submitted` allow `value`, `volume_m3`, `weight_kg` as `>= 0`; other statuses require `> 0`.
+
 ## Project
 - Project: `fbpemdlnlsgqkovnatro` (v4newsupa) | Region: `eu-north-1` | Status: `ACTIVE_HEALTHY`
 - Database: PostgreSQL 17 (17.4.1.054)
@@ -85,10 +92,11 @@ Generated (UTC): 2026-02-23T10:53:40.833Z
 - Frontend usage: surfaces=dashboard | ops=insert:1, select:8, update:4 | files=`site/dashboard/assets/app.js`
 
 ### orders
-- Columns (12): `id:uuid`, `description:text`, `value:numeric`, `supplier_id:uuid`, `volume_m3:numeric`, `weight_kg:numeric`, `customer_id:uuid`, `status:order_status`, `notes:text`, `creation_date:timestamptz`, `updated_at:timestamptz`, `charges_applied:bool`
+- Columns (20): `id:uuid`, `description:text`, `value:numeric`, `supplier_id:uuid`, `volume_m3:numeric`, `weight_kg:numeric`, `customer_id:uuid`, `status:order_status`, `notes:text`, `creation_date:timestamptz`, `updated_at:timestamptz`, `charges_applied:bool`, `origin_country:text`, `origin_city:text`, `destination_country:text`, `destination_city:text`, `destination_port:text`, `ready_date:date`, `order_code:text`, `requested_supplier_name:text`
 - Primary key: `id`
 - Foreign keys: `customer_id -> customers.id`, `supplier_id -> suppliers.id`
-- RLS policies: `orders_admin_delete`, `orders_admin_update`, `orders_insert_self_or_admin`, `orders_select_self_or_admin`
+- RLS policies: `orders_admin_delete`, `orders_admin_update`, `orders_customer_draft_delete`, `orders_customer_draft_update`, `orders_insert_self_or_admin`, `orders_select_self_or_admin`
+- Check constraints: `orders_value_check`, `orders_volume_m3_check`, `orders_weight_kg_check` (status-aware: Draft/Submitted allow `>= 0`, others require `> 0`)
 - Triggers: `update_orders_updated_at -> update_updated_at_column`
 - Frontend usage: surfaces=dashboard | ops=delete:2, insert:2, select:18, update:2 | files=`site/dashboard/assets/app.js`
 

@@ -39,6 +39,14 @@ npm run stop
 - `.env` is git-ignored.
 - Template variables are in `.env.example`.
 
+## Order Draft Approval Migration
+
+Customer draft orders with admin approval require a Supabase schema/policy update.
+
+- SQL file: `docs/sql/2026-03-01-order-draft-approval.sql`
+- SQL file: `docs/sql/2026-03-01-order-draft-metrics-constraints.sql`
+- Apply it in Supabase SQL Editor before using the full draft workflow in production.
+
 ## Maintainability helpers
 
 - Shared Netlify Function utilities are in `netlify/functions/_shared.js`.

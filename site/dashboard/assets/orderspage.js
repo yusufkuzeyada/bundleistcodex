@@ -29,6 +29,8 @@ import "./react.js";
 import "./supabase.js";
 import "./icons.js";
 const FILTERABLE_ORDER_STATUSES = [
+  Z.Draft,
+  Z.Submitted,
   Z.Pending,
   Z.Processing,
   Z.QualityCheck,
@@ -306,6 +308,7 @@ const st = a.forwardRef(tt),
     onClose: m,
     onSave: u,
     allSuppliers: M,
+    isAdmin: $ = !0,
     lockValue: z = !1,
     lockLogistics: w = !1,
     lockReasonValue: W,
@@ -315,7 +318,10 @@ const st = a.forwardRef(tt),
       [h, v] = a.useState(t.value.toString()),
       [b, S] = a.useState(t.volumeM3.toString()),
       [F, K] = a.useState(t.weightKG.toString()),
-      [D, E] = a.useState(t.supplierId),
+      [D, E] = a.useState(t.supplierId || ""),
+      [requestedSupplierName, setRequestedSupplierName] = a.useState(
+        t.requestedSupplierName || "",
+      ),
       [n, r] = a.useState(t.notes || ""),
       [originCountry, setOriginCountry] = a.useState(t.originCountry || ""),
       [originCity, setOriginCity] = a.useState(t.originCity || ""),
@@ -337,7 +343,8 @@ const st = a.forwardRef(tt),
           v(t.value.toString()),
           S(t.volumeM3.toString()),
           K(t.weightKG.toString()),
-          E(t.supplierId),
+          E(t.supplierId || ""),
+          setRequestedSupplierName(t.requestedSupplierName || ""),
           r(t.notes || ""),
           setOriginCountry(t.originCountry || ""),
           setOriginCity(t.originCity || ""),
@@ -350,46 +357,63 @@ const st = a.forwardRef(tt),
     )
       return null;
     const U = () => {
-      if (!f.trim() || !h.trim() || !b.trim() || !F.trim() || !D) {
+      const x = D || "",
+        C = normalizeLocationValue(requestedSupplierName),
+        B = !$ && [Z.Draft, Z.Submitted].includes(t.status);
+      if (!f.trim() || ($ ? !x : !x && !C)) {
         d(
           "Missing Fields",
-          "Please fill in all fields: Description, Value, Volume, Weight, and Supplier.",
+          $
+            ? "Please fill in all fields: Description and Supplier are required."
+            : "Please provide description and supplier information.",
         );
         return;
       }
-      const x = z ? t.value : parseFloat(h),
-        C = w ? t.volumeM3 : parseFloat(b),
-        B = w ? t.weightKG : parseFloat(F);
-      if (isNaN(x) || x <= 0) {
+      if (!B && (!h.trim() || !b.trim() || !F.trim())) {
+        d("Missing Fields", "Value, volume, and weight are required.");
+        return;
+      }
+      const V = parseFloat(h),
+        P = parseFloat(b),
+        j = parseFloat(F),
+        A = z ? t.value : Number.isFinite(V) ? V : 0,
+        c = w ? t.volumeM3 : Number.isFinite(P) ? P : 0,
+        ee = w ? t.weightKG : Number.isFinite(j) ? j : 0;
+      if (!B && (isNaN(A) || A <= 0)) {
         d("Invalid Value", "Order value must be positive.");
         return;
       }
-      if (isNaN(C) || C <= 0) {
+      if (!B && (isNaN(c) || c <= 0)) {
         d("Invalid Volume", "Order volume must be positive.");
         return;
       }
-      if (isNaN(B) || B <= 0) {
+      if (!B && (isNaN(ee) || ee <= 0)) {
         d("Invalid Weight", "Order weight must be positive.");
         return;
       }
-      if (
-        !hasLocationValue(originCountry) ||
-        !hasLocationValue(originCity) ||
-        !hasLocationValue(destinationCountry) ||
-        !hasLocationValue(destinationCity)
-      ) {
-        d(
-          "Missing Route Fields",
-          "Origin country/city and destination country/city are required.",
-        );
-        return;
+      if (!B) {
+        const i = !hasLocationValue(destinationCountry) ||
+            !hasLocationValue(destinationCity),
+          g =
+            $ &&
+            (!hasLocationValue(originCountry) || !hasLocationValue(originCity));
+        if (i || g) {
+          d(
+            "Missing Route Fields",
+            $
+              ? "Origin country/city and destination country/city are required."
+              : "Destination country/city are required.",
+          );
+          return;
+        }
       }
       (u(t.id, {
         description: f,
-        value: x,
-        volumeM3: C,
-        weightKG: B,
-        supplierId: D,
+        value: A,
+        volumeM3: c,
+        weightKG: ee,
+        supplierId: x || null,
+        requestedSupplierName: x ? "" : C,
         notes: n,
         originCountry: normalizeLocationValue(originCountry),
         originCity: normalizeLocationValue(originCity),
@@ -519,24 +543,99 @@ const st = a.forwardRef(tt),
                   }),
                 ],
               }),
-              e.jsxs("div", {
-                children: [
-                  e.jsx("label", {
-                    htmlFor: "editOrderSupplier",
-                    className: "block text-sm font-semibold text-gray-700 mb-2",
-                    children: "Supplier",
+              $
+                ? e.jsxs("div", {
+                    children: [
+                      e.jsx("label", {
+                        htmlFor: "editOrderSupplier",
+                        className:
+                          "block text-sm font-semibold text-gray-700 mb-2",
+                        children: "Supplier",
+                      }),
+                      e.jsx("select", {
+                        id: "editOrderSupplier",
+                        value: D,
+                        onChange: (x) => E(x.target.value),
+                        className: "ui-field",
+                        children: M.map((x) =>
+                          e.jsx(
+                            "option",
+                            { value: x.id, children: x.name },
+                            x.id,
+                          ),
+                        ),
+                      }),
+                      t.requestedSupplierName &&
+                        !D &&
+                        e.jsxs("div", {
+                          className:
+                            "mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900",
+                          children: [
+                            e.jsx("div", {
+                              className: "font-semibold",
+                              children: "Customer requested supplier",
+                            }),
+                            e.jsx("div", {
+                              className: "mt-1",
+                              children: t.requestedSupplierName,
+                            }),
+                          ],
+                        }),
+                    ],
+                  })
+                : e.jsxs("div", {
+                    className: "grid grid-cols-1 md:grid-cols-2 gap-4",
+                    children: [
+                      e.jsxs("div", {
+                        children: [
+                          e.jsx("label", {
+                            htmlFor: "editOrderSupplier",
+                            className:
+                              "block text-sm font-semibold text-gray-700 mb-2",
+                            children: "Existing Supplier",
+                          }),
+                          e.jsxs("select", {
+                            id: "editOrderSupplier",
+                            value: D,
+                            onChange: (x) => E(x.target.value),
+                            className: "ui-field",
+                            children: [
+                              e.jsx("option", {
+                                value: "",
+                                children: "Select existing supplier (optional)",
+                              }),
+                              M.map((x) =>
+                                e.jsx(
+                                  "option",
+                                  { value: x.id, children: x.name },
+                                  x.id,
+                                ),
+                              ),
+                            ],
+                          }),
+                        ],
+                      }),
+                      e.jsxs("div", {
+                        children: [
+                          e.jsx("label", {
+                            htmlFor: "editRequestedSupplierName",
+                            className:
+                              "block text-sm font-semibold text-gray-700 mb-2",
+                            children: "Supplier Name",
+                          }),
+                          e.jsx("input", {
+                            type: "text",
+                            id: "editRequestedSupplierName",
+                            value: requestedSupplierName,
+                            onChange: (x) =>
+                              setRequestedSupplierName(x.target.value),
+                            className: "ui-field",
+                            placeholder: "Type supplier name if not listed",
+                          }),
+                        ],
+                      }),
+                    ],
                   }),
-                  e.jsx("select", {
-                    id: "editOrderSupplier",
-                    value: D,
-                    onChange: (x) => E(x.target.value),
-                    className: "ui-field",
-                    children: M.map((x) =>
-                      e.jsx("option", { value: x.id, children: x.name }, x.id),
-                    ),
-                  }),
-                ],
-              }),
               e.jsxs("div", {
                 className: "grid grid-cols-1 md:grid-cols-2 gap-4",
                 children: [
@@ -817,16 +916,18 @@ const st = a.forwardRef(tt),
       [destinationCity, setDestinationCity] = a.useState(""),
       [destinationPort, setDestinationPort] = a.useState(""),
       [readyDate, setReadyDate] = a.useState(""),
-      [D, E] = a.useState(o.length > 0 ? o[0].id : ""),
+      [D, E] = a.useState(u && o.length > 0 ? o[0].id : ""),
+      [requestedSupplierName, setRequestedSupplierName] = a.useState(""),
+      [submitIntent, setSubmitIntent] = a.useState(u ? "pending" : "draft"),
       [n, r] = a.useState(u ? (m.length > 0 ? m[0].id : "") : M || ""),
       [d, U] = a.useState(!1),
       [x, C] = a.useState(!1),
       { showError: B } = xe();
     a.useEffect(() => {
-      (!D && o.length > 0 && E(o[0].id),
+      (u && !D && o.length > 0 && E(o[0].id),
         u && !n && m.length > 0 && r(m[0].id),
         !u && M && n !== M && r(M));
-    }, [o, m, D, n]);
+    }, [o, m, D, n, u, M]);
     const V = () => {
         (I(""),
           L(""),
@@ -839,7 +940,9 @@ const st = a.forwardRef(tt),
           setDestinationCity(""),
           setDestinationPort(""),
           setReadyDate(""),
-          E(o.length > 0 ? o[0].id : ""),
+          E(u && o.length > 0 ? o[0].id : ""),
+          setRequestedSupplierName(""),
+          setSubmitIntent(u ? "pending" : "draft"),
           r(u ? (m.length > 0 ? m[0].id : "") : M || ""));
       },
       P = () => {
@@ -847,20 +950,85 @@ const st = a.forwardRef(tt),
       },
       j = async (c) => {
         if ((c.preventDefault(), x)) return;
-        const ee = u ? n : M || "";
-        if (!W.trim() || !f.trim() || !h.trim() || !b.trim() || !D || !ee) {
-          B("Missing Fields", "Please fill in all fields.");
+        const ee =
+            c != null &&
+            c.nativeEvent &&
+            c.nativeEvent.submitter &&
+            c.nativeEvent.submitter.dataset
+              ? String(c.nativeEvent.submitter.dataset.intent || "")
+              : "",
+          i = ["draft", "submitted", "pending"].includes(ee)
+            ? ee
+            : u
+              ? "pending"
+              : "draft",
+          g = u ? n : M || "",
+          y = D || "",
+          R = normalizeLocationValue(requestedSupplierName),
+          J = u,
+          N = !u && i === "submitted";
+        setSubmitIntent(i);
+        if (!W.trim() || !g) {
+          B("Missing Fields", "Description is required.");
           return;
         }
-        if (
-          !hasLocationValue(originCountry) ||
-          !hasLocationValue(originCity) ||
+        if (u && !y) {
+          B("Missing Supplier", "Please select a supplier.");
+          return;
+        }
+        if (!u && !y && !R) {
+          B(
+            "Missing Supplier",
+            "Select an existing supplier or enter a supplier name.",
+          );
+          return;
+        }
+        const T = parseFloat(f),
+          ae = parseFloat(h),
+          de = parseFloat(b),
+          oe = Number.isFinite(T) ? T : 0,
+          ve = Number.isFinite(ae) ? ae : 0,
+          ce = Number.isFinite(de) ? de : 0;
+        if (J && (!f.trim() || !h.trim() || !b.trim())) {
+          B("Missing Fields", "Value, volume, and weight are required.");
+          return;
+        }
+        if (J && (isNaN(oe) || oe <= 0)) {
+          B("Invalid Value", "Order value must be positive.");
+          return;
+        }
+        if (J && (isNaN(ve) || ve <= 0)) {
+          B("Invalid Volume", "Order volume must be positive.");
+          return;
+        }
+        if (J && (isNaN(ce) || ce <= 0)) {
+          B("Invalid Weight", "Order weight must be positive.");
+          return;
+        }
+        if (u) {
+          if (
+            !hasLocationValue(originCountry) ||
+            !hasLocationValue(originCity) ||
+            !hasLocationValue(destinationCountry) ||
+            !hasLocationValue(destinationCity)
+          ) {
+            B(
+              "Missing Route Fields",
+              "Origin country/city and destination country/city are required.",
+            );
+            return;
+          }
+        } else if (
           !hasLocationValue(destinationCountry) ||
           !hasLocationValue(destinationCity)
         ) {
+          B("Missing Route Fields", "Destination country/city are required.");
+          return;
+        }
+        if (!u && N && !y && !R) {
           B(
-            "Missing Route Fields",
-            "Origin country/city and destination country/city are required.",
+            "Missing Supplier",
+            "Submitted orders need supplier selection or supplier name.",
           );
           return;
         }
@@ -870,10 +1038,11 @@ const st = a.forwardRef(tt),
             t(
               {
                 description: W,
-                value: parseFloat(f),
-                volumeM3: parseFloat(h),
-                weightKG: parseFloat(b),
-                supplierId: D,
+                value: oe,
+                volumeM3: ve,
+                weightKG: ce,
+                supplierId: y || null,
+                requestedSupplierName: y ? "" : R,
                 notes: F,
                 originCountry: normalizeLocationValue(originCountry),
                 originCity: normalizeLocationValue(originCity),
@@ -882,7 +1051,8 @@ const st = a.forwardRef(tt),
                 destinationPort: normalizeLocationValue(destinationPort),
                 readyDate: readyDate || "",
               },
-              ee,
+              g,
+              { intent: u ? "pending" : i },
             ),
           ),
             P());
@@ -892,6 +1062,7 @@ const st = a.forwardRef(tt),
       },
       A = e.jsxs("form", {
         onSubmit: j,
+        noValidate: !0,
         className: "ui-form-skin",
         children: [
           e.jsxs(Be, {
@@ -935,31 +1106,81 @@ const st = a.forwardRef(tt),
                               ),
                       }),
                     }),
-                  e.jsx(Y, {
-                    label: "Supplier",
-                    required: !0,
-                    error:
-                      o.length === 0 ? "Please add a supplier first" : void 0,
-                    children: e.jsx("select", {
-                      value: D,
-                      onChange: (c) => E(c.target.value),
-                      className: "ui-field",
-                      disabled: o.length === 0,
-                      required: !0,
-                      children:
-                        o.length === 0
-                          ? e.jsx("option", {
-                              children: "Please add a supplier first",
-                            })
-                          : o.map((c) =>
-                              e.jsx(
-                                "option",
-                                { value: c.id, children: c.name },
-                                c.id,
-                              ),
-                            ),
-                    }),
-                  }),
+                  u
+                    ? e.jsx(Y, {
+                        label: "Supplier",
+                        required: !0,
+                        error:
+                          o.length === 0
+                            ? "Please add a supplier first"
+                            : void 0,
+                        children: e.jsx("select", {
+                          value: D,
+                          onChange: (c) => E(c.target.value),
+                          className: "ui-field",
+                          disabled: o.length === 0,
+                          required: !0,
+                          children:
+                            o.length === 0
+                              ? e.jsx("option", {
+                                  children: "Please add a supplier first",
+                                })
+                              : o.map((c) =>
+                                  e.jsx(
+                                    "option",
+                                    { value: c.id, children: c.name },
+                                    c.id,
+                                  ),
+                                ),
+                        }),
+                      })
+                    : e.jsxs(e.Fragment, {
+                        children: [
+                          e.jsx(Y, {
+                            label: "Existing Supplier",
+                            help: "Optional. Select if listed in the system.",
+                            children: e.jsxs("select", {
+                              value: D,
+                              onChange: (c) => E(c.target.value),
+                              className: "ui-field",
+                              children: [
+                                e.jsx("option", {
+                                  value: "",
+                                  children: "Select existing supplier (optional)",
+                                }),
+                                o.length === 0
+                                  ? e.jsx("option", {
+                                      value: "",
+                                      disabled: !0,
+                                      children:
+                                        "No existing suppliers available yet",
+                                    })
+                                  : null,
+                                o.map((c) =>
+                                  e.jsx(
+                                    "option",
+                                    { value: c.id, children: c.name },
+                                    c.id,
+                                  ),
+                                ),
+                              ],
+                            }),
+                          }),
+                          e.jsx(Y, {
+                            label: "Supplier Name",
+                            required: !D,
+                            help: "If supplier is not listed, type it here.",
+                            children: e.jsx("input", {
+                              type: "text",
+                              value: requestedSupplierName,
+                              onChange: (c) =>
+                                setRequestedSupplierName(c.target.value),
+                              className: "ui-field",
+                              placeholder: "Enter supplier name",
+                            }),
+                          }),
+                        ],
+                      }),
                 ],
               }),
               e.jsx("div", {
@@ -1082,14 +1303,14 @@ const st = a.forwardRef(tt),
                 children: [
                   e.jsx(Y, {
                     label: "Order Value",
-                    required: !0,
+                    required: u,
                     help: "Total value in USD",
                     children: e.jsx(se, {
                       type: "number",
                       value: f,
                       onChange: (c) => L(c.target.value),
                       placeholder: "25000.00",
-                      required: !0,
+                      required: u,
                       min: "0.01",
                       step: "0.01",
                       suffix: "USD",
@@ -1097,14 +1318,14 @@ const st = a.forwardRef(tt),
                   }),
                   e.jsx(Y, {
                     label: "Volume",
-                    required: !0,
+                    required: u,
                     help: "Cubic meters",
                     children: e.jsx(se, {
                       type: "number",
                       value: h,
                       onChange: (c) => v(c.target.value),
                       placeholder: "15.5",
-                      required: !0,
+                      required: u,
                       min: "0.001",
                       step: "0.001",
                       suffix: "m3",
@@ -1112,14 +1333,14 @@ const st = a.forwardRef(tt),
                   }),
                   e.jsx(Y, {
                     label: "Weight",
-                    required: !0,
+                    required: u,
                     help: "Kilograms",
                     children: e.jsx(se, {
                       type: "number",
                       value: b,
                       onChange: (c) => S(c.target.value),
                       placeholder: "3000",
-                      required: !0,
+                      required: u,
                       min: "0.001",
                       step: "0.001",
                       suffix: "kg",
@@ -1152,12 +1373,36 @@ const st = a.forwardRef(tt),
                 onClick: P,
                 children: "Cancel",
               }),
-              e.jsx(k, {
-                type: "submit",
-                disabled:
-                  x || (u && m.length === 0) || o.length === 0 || (!u && !M),
-                children: x ? "Creating..." : "Create Order",
-              }),
+              u
+                ? e.jsx(k, {
+                    type: "submit",
+                    "data-intent": "pending",
+                    disabled: x || m.length === 0 || o.length === 0 || !M,
+                    children: x ? "Creating..." : "Create Order",
+                  })
+                : e.jsxs(e.Fragment, {
+                    children: [
+                      e.jsx(k, {
+                        type: "submit",
+                        variant: "secondary",
+                        "data-intent": "draft",
+                        disabled: x || !M,
+                        children:
+                          x && submitIntent === "draft"
+                            ? "Saving..."
+                            : "Save Draft",
+                      }),
+                      e.jsx(k, {
+                        type: "submit",
+                        "data-intent": "submitted",
+                        disabled: x || !M,
+                        children:
+                          x && submitIntent === "submitted"
+                            ? "Submitting..."
+                            : "Submit for Approval",
+                      }),
+                    ],
+                  }),
             ],
           }),
         ],
@@ -1167,9 +1412,11 @@ const st = a.forwardRef(tt),
       : e.jsxs(e.Fragment, {
           children: [
             e.jsx(at, {
-              title: "Create New Order",
-              subtitle: "Add a new order to the system",
-              actionLabel: "Create Order",
+              title: u ? "Create New Order" : "Create Draft Order",
+              subtitle: u
+                ? "Add a new order to the system"
+                : "Save a draft and submit it for admin approval.",
+              actionLabel: u ? "Create Order" : "Create Draft",
               onAction: () => U(!0),
               gradientFrom: "from-emerald-50",
               gradientTo: "to-green-50",
@@ -1191,8 +1438,10 @@ const st = a.forwardRef(tt),
               children: e.jsx(Me, {
                 isOpen: d,
                 onClose: P,
-                title: "Create New Order",
-                subtitle: "Add a new order to the system",
+                title: u ? "Create New Order" : "Create Draft Order",
+                subtitle: u
+                  ? "Add a new order to the system"
+                  : "Save a draft and submit it for admin approval",
                 maxWidth: "xl",
                 gradientFrom: "from-emerald-50",
                 gradientTo: "to-green-50",
@@ -1518,7 +1767,7 @@ const st = a.forwardRef(tt),
                     }),
                     e.jsx("p", {
                       className: "text-xs text-gray-500 mt-1",
-                      children: m(t.supplierId),
+                      children: m(t.supplierId, t.requestedSupplierName),
                     }),
                     e.jsxs("div", {
                       className:
@@ -1721,6 +1970,22 @@ const st = a.forwardRef(tt),
                       }),
                     ],
                   }),
+                  t.requestedSupplierName &&
+                    !t.supplierId &&
+                    e.jsxs("div", {
+                      className: "sm:col-span-2",
+                      children: [
+                        e.jsx("label", {
+                          className:
+                            "text-xs font-semibold text-gray-600 uppercase tracking-wider",
+                          children: "Requested Supplier",
+                        }),
+                        e.jsx("p", {
+                          className: "text-sm font-medium text-gray-900 mt-1",
+                          children: t.requestedSupplierName,
+                        }),
+                      ],
+                    }),
                 ],
               }),
               e.jsxs("div", {
@@ -1919,6 +2184,14 @@ const st = a.forwardRef(tt),
                           "aria-label": `Update status for order ${t.id}`,
                           children: P ? "Status Locked" : "Update Status",
                         }),
+                        t.status === Z.Submitted &&
+                          !P &&
+                          e.jsx(k, {
+                            onClick: () => M(t.id, Z.Pending),
+                            size: "xs",
+                            className: "h-8",
+                            children: "Approve (Pending)",
+                          }),
                         H &&
                           e.jsxs("div", {
                             className: "relative group",
@@ -1962,17 +2235,66 @@ const st = a.forwardRef(tt),
                       }),
                       e.jsxs(k, {
                         onClick: () => w(t.id),
-                        disabled: t.status !== Z.Pending,
+                        disabled: ![Z.Draft, Z.Submitted, Z.Pending].includes(
+                          t.status,
+                        ),
                         variant: "destructive",
                         size: "xs",
                         className: "h-8 justify-center gap-2",
                         title:
-                          t.status !== Z.Pending
-                            ? "Can only delete pending orders"
+                          ![Z.Draft, Z.Submitted, Z.Pending].includes(t.status)
+                            ? "Can only delete draft/submitted/pending orders"
                             : "Delete order",
                         children: [
                           e.jsx(st, { className: "w-4 h-4 shrink-0" }),
                           "Delete",
+                        ],
+                      }),
+                    ],
+                  }),
+                }),
+              !o &&
+                [Z.Draft, Z.Submitted].includes(t.status) &&
+                e.jsx("div", {
+                  className: "border-t border-gray-100 pt-4",
+                  children: e.jsxs("div", {
+                    className: "flex items-center justify-end gap-2 flex-wrap",
+                    children: [
+                      t.status === Z.Draft &&
+                        e.jsxs(k, {
+                          onClick: () => z(t),
+                          variant: "outline",
+                          size: "xs",
+                          className: "h-8 justify-center gap-2",
+                          children: [
+                            e.jsx(et, { className: "w-4 h-4 shrink-0" }),
+                            "Edit Draft",
+                          ],
+                        }),
+                      t.status === Z.Draft &&
+                        e.jsx(k, {
+                          onClick: () => M(t.id, Z.Submitted),
+                          variant: "default",
+                          size: "xs",
+                          className: "h-8 justify-center",
+                          children: "Submit for Approval",
+                        }),
+                      t.status === Z.Submitted &&
+                        e.jsx(k, {
+                          onClick: () => M(t.id, Z.Draft),
+                          variant: "secondary",
+                          size: "xs",
+                          className: "h-8 justify-center",
+                          children: "Move Back to Draft",
+                        }),
+                      e.jsxs(k, {
+                        onClick: () => w(t.id),
+                        variant: "destructive",
+                        size: "xs",
+                        className: "h-8 justify-center gap-2",
+                        children: [
+                          e.jsx(st, { className: "w-4 h-4 shrink-0" }),
+                          t.status === Z.Draft ? "Delete Draft" : "Delete",
                         ],
                       }),
                     ],
@@ -2153,11 +2475,11 @@ const st = a.forwardRef(tt),
       (!R || !_.some((s) => s.id === R)) && J(Q.id);
     }, [V, U, C, H, c]);
     const Ee = "Orders",
-      me = (s) => {
-        var l;
+      me = (s, l = "") => {
+        var $;
         return (
-          ((l = w.find(($) => $.id === s)) == null ? void 0 : l.name) ||
-          "Unknown"
+          (($ = w.find((T) => T.id === s)) == null ? void 0 : $.name) ||
+          (String(l || "").trim() ? `Requested: ${String(l).trim()}` : "Unknown")
         );
       },
       ue = (s) => {
@@ -2209,10 +2531,10 @@ const st = a.forwardRef(tt),
               children: e.jsx(Me, {
                 isOpen: g,
                 onClose: () => y(!1),
-                title: "Create Order",
+                title: b ? "Create Order" : "Create Draft Order",
                 subtitle: b
                   ? "Enter order details and assign customer/supplier."
-                  : "Enter order details.",
+                  : "Save a draft and submit it for admin approval.",
                 gradientFrom: "from-emerald-50",
                 gradientTo: "to-slate-50",
                 icon: e.jsx("svg", {
@@ -2430,7 +2752,7 @@ const st = a.forwardRef(tt),
                             variant: "default",
                             title: "Create a new order",
                             disabled: !b && !I,
-                            children: "Create Order",
+                            children: b ? "Create Order" : "Create Draft",
                           }),
                           e.jsxs("div", {
                             className:
@@ -2695,6 +3017,7 @@ const st = a.forwardRef(tt),
                                                           e.jsx("span", {
                                                             children: me(
                                                               s.supplierId,
+                                                              s.requestedSupplierName,
                                                             ),
                                                           }),
                                                           b
@@ -2899,6 +3222,7 @@ const st = a.forwardRef(tt),
               onClose: pe,
               onSave: Ie,
               allSuppliers: w,
+              isAdmin: b,
               lockValue: $,
               lockLogistics: Ne,
               lockReasonValue: $

@@ -1499,6 +1499,8 @@ var St = ((s) => ((s.Admin = "admin"), (s.Customer = "customer"), s))(St || {}),
     s
   ))(qe || {}),
   d = ((s) => (
+    (s.Draft = "Draft"),
+    (s.Submitted = "Submitted"),
     (s.Pending = "Pending"),
     (s.Processing = "Processing"),
     (s.QualityCheck = "QualityCheck"),
@@ -1653,6 +1655,8 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
     [qe.Corporate]: { name: "Enterprise", minimumFee: 750, percentageFee: 0.01 },
   },
   Nc = {
+    [d.Draft]: "bg-slate-100 text-slate-800",
+    [d.Submitted]: "bg-cyan-100 text-cyan-800",
     [d.Pending]: "bg-yellow-100 text-yellow-800",
     [d.Processing]: "bg-blue-100 text-blue-800",
     [d.QualityCheck]: "bg-indigo-100 text-indigo-800",
@@ -1667,6 +1671,8 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
     [d.OnHold]: "bg-gray-100 text-gray-800",
   },
   ea = {
+    [d.Draft]: [d.Submitted, d.Cancelled],
+    [d.Submitted]: [d.Draft, d.Pending, d.OnHold, d.Cancelled],
     [d.Pending]: [d.Processing, d.OnHold, d.Cancelled],
     [d.Processing]: [
       d.QualityCheck,
@@ -1694,6 +1700,10 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
     ],
   },
   Ac = {
+    [d.Draft]:
+      "Customer draft saved. Order can be edited before submission for admin review",
+    [d.Submitted]:
+      "Draft submitted by customer and waiting for admin approval",
     [d.Pending]:
       "Order received and awaiting confirmation - No charges applied yet",
     [d.Processing]:
@@ -1713,6 +1723,8 @@ const ti = ["Processing", "QualityCheck", "ReadyToShip"],
   },
   Dc = {
     Preparation: [
+      d.Draft,
+      d.Submitted,
       d.Pending,
       d.Processing,
       d.QualityCheck,
@@ -11890,6 +11902,7 @@ class Wt {
           customerId: e.customer_id,
           status: e.status,
           notes: e.notes,
+          requestedSupplierName: e.requested_supplier_name || "",
           creationDate: e.creation_date,
           originCountry: e.origin_country || "",
           originCity: e.origin_city || "",
@@ -11958,6 +11971,9 @@ class Wt {
         description: e.description,
         value: e.value,
         supplier_id: e.supplierId,
+        requested_supplier_name: hasGeoText(e.requestedSupplierName)
+          ? String(e.requestedSupplierName).trim()
+          : null,
         volume_m3: e.volumeM3,
         weight_kg: e.weightKG,
         customer_id: e.customerId,
@@ -12007,6 +12023,10 @@ class Wt {
     (t.description !== void 0 && (r.description = t.description),
       t.value !== void 0 && (r.value = t.value),
       t.supplierId !== void 0 && (r.supplier_id = t.supplierId),
+      t.requestedSupplierName !== void 0 &&
+        (r.requested_supplier_name = hasGeoText(t.requestedSupplierName)
+          ? String(t.requestedSupplierName).trim()
+          : null),
       t.volumeM3 !== void 0 && (r.volume_m3 = t.volumeM3),
       t.weightKG !== void 0 && (r.weight_kg = t.weightKG),
       t.customerId !== void 0 && (r.customer_id = t.customerId),
@@ -12200,18 +12220,26 @@ class Wt {
     return e.reduce((t, r) => t + r.weightKG, 0);
   }
   validateOrder(e) {
-    const t = [];
-    return (
+    const t = [],
+      r = String(e == null ? void 0 : e.status || "");
+    (e.customerId || t.push("Customer is required"),
       (!e.description || e.description.trim() === "") &&
         t.push("Order description is required"),
-      (!e.value || e.value <= 0) &&
+      !e.supplierId &&
+        !hasGeoText(e.requestedSupplierName) &&
+        t.push("Supplier is required"));
+    if (r !== d.Draft) {
+      ((!e.value || e.value <= 0) &&
         t.push("Order value must be greater than 0"),
-      (!e.volumeM3 || e.volumeM3 <= 0) &&
-        t.push("Volume must be greater than 0"),
-      (!e.weightKG || e.weightKG <= 0) &&
-        t.push("Weight must be greater than 0"),
-      e.customerId || t.push("Customer is required"),
-      e.supplierId || t.push("Supplier is required"),
+        (!e.volumeM3 || e.volumeM3 <= 0) &&
+          t.push("Volume must be greater than 0"),
+        (!e.weightKG || e.weightKG <= 0) &&
+          t.push("Weight must be greater than 0"));
+    }
+    return (
+      r === d.Submitted &&
+        (!hasGeoText(e.destinationCountry) || !hasGeoText(e.destinationCity)) &&
+        t.push("Destination country/city are required for submitted orders"),
       { isValid: t.length === 0, errors: t }
     );
   }
@@ -12991,6 +13019,7 @@ class Jt {
             customerId: e.customer_id,
             status: e.status,
             notes: e.notes,
+            requestedSupplierName: e.requested_supplier_name || "",
             creationDate: e.creation_date,
             originCountry: e.origin_country || "",
             originCity: e.origin_city || "",
@@ -13286,6 +13315,7 @@ class Qt {
             customerId: e.customer_id,
             status: e.status,
             notes: e.notes,
+            requestedSupplierName: e.requested_supplier_name || "",
             creationDate: e.creation_date,
             originCountry: e.origin_country || "",
             originCity: e.origin_city || "",
@@ -15262,104 +15292,161 @@ const hc = Qt.getInstance(),
           te(!1);
         }
       }, []),
-      $s = async (f, g) => {
-        var D;
-        const { data: v, error: w } = await _.from("orders")
-          .insert([
-            {
-              description: f.description,
-              value: f.value,
-              supplier_id: f.supplierId,
-              volume_m3: f.volumeM3,
-              weight_kg: f.weightKG,
-              customer_id: g,
-              status: d.Pending,
-              notes: f.notes,
-              origin_country: hasGeoText(f.originCountry)
-                ? formatGeoText(f.originCountry)
-                : null,
-              origin_city: hasGeoText(f.originCity)
-                ? formatGeoText(f.originCity)
-                : null,
-              destination_country: hasGeoText(f.destinationCountry)
-                ? formatGeoText(f.destinationCountry)
-                : null,
-              destination_city: hasGeoText(f.destinationCity)
-                ? formatGeoText(f.destinationCity)
-                : null,
-              destination_port: hasGeoText(f.destinationPort)
-                ? formatGeoText(f.destinationPort)
-                : null,
-              ready_date: hasGeoText(f.readyDate) ? f.readyDate : null,
-            },
-          ])
-          .select();
-        if (w) {
-          r("Database Error", "Error adding order: " + w.message);
+      $s = async (f, g, v = {}) => {
+        var oe;
+        const w = String((v == null ? void 0 : v.intent) || "").toLowerCase(),
+          C = !!pe,
+          M = hasGeoText(f.requestedSupplierName)
+            ? String(f.requestedSupplierName).trim()
+            : "",
+          E = f.supplierId || null;
+        let D = C ? d.Pending : d.Draft;
+        (w === "submitted" && (D = d.Submitted),
+          C && w === "draft" && (D = d.Draft));
+        if (C && !E) {
+          r("Missing Supplier", "Admin orders must have a supplier selected.");
           return;
         }
-        const C = (v || []).map((S) => ({
-          id: S.id,
-          description: S.description,
-          value: S.value,
-          supplierId: S.supplier_id,
-          volumeM3: S.volume_m3,
-          weightKG: S.weight_kg,
-          customerId: S.customer_id,
-          status: S.status,
-          notes: S.notes,
-          creationDate: S.creation_date,
-          originCountry: S.origin_country || "",
-          originCity: S.origin_city || "",
-          destinationCountry: S.destination_country || "",
-          destinationCity: S.destination_city || "",
-          destinationPort: S.destination_port || "",
-          readyDate: S.ready_date || "",
-          chargesApplied: !!S.charges_applied,
+        if (!C && !E && !M) {
+          r(
+            "Missing Supplier",
+            "Select an existing supplier or enter a supplier name.",
+          );
+          return;
+        }
+        const S = {
+          description: f.description,
+          value: f.value,
+          supplier_id: E,
+          requested_supplier_name: E ? null : M || null,
+          volume_m3: f.volumeM3,
+          weight_kg: f.weightKG,
+          customer_id: g,
+          status: D,
+          notes: f.notes,
+          origin_country: hasGeoText(f.originCountry)
+            ? formatGeoText(f.originCountry)
+            : null,
+          origin_city: hasGeoText(f.originCity)
+            ? formatGeoText(f.originCity)
+            : null,
+          destination_country: hasGeoText(f.destinationCountry)
+            ? formatGeoText(f.destinationCountry)
+            : null,
+          destination_city: hasGeoText(f.destinationCity)
+            ? formatGeoText(f.destinationCity)
+            : null,
+          destination_port: hasGeoText(f.destinationPort)
+            ? formatGeoText(f.destinationPort)
+            : null,
+          ready_date: hasGeoText(f.readyDate) ? f.readyDate : null,
+        };
+        let $ = null,
+          T = null;
+        ({ data: $, error: T } = await _.from("orders").insert([S]).select());
+        if (T) {
+          const Q = String(T.message || ""),
+            j = String(T.code || ""),
+            de =
+              j === "42703" ||
+              Q.toLowerCase().includes("requested_supplier_name");
+          if (!de) {
+            r("Database Error", "Error adding order: " + T.message);
+            return;
+          }
+          const se = {
+              ...S,
+              notes: [
+                S.notes || "",
+                !S.supplier_id && M ? `[Requested Supplier] ${M}` : "",
+              ]
+                .filter(Boolean)
+                .join("\n"),
+            },
+            Y = { ...se };
+          delete Y.requested_supplier_name;
+          const { data: X, error: V } = await _.from("orders")
+            .insert([Y])
+            .select();
+          if (V) {
+            r("Database Error", "Error adding order: " + V.message);
+            return;
+          }
+          $ = X || [];
+        }
+        const B = ($ || []).map((Q) => ({
+          id: Q.id,
+          description: Q.description,
+          value: Q.value,
+          supplierId: Q.supplier_id,
+          volumeM3: Q.volume_m3,
+          weightKG: Q.weight_kg,
+          customerId: Q.customer_id,
+          status: Q.status,
+          notes: Q.notes,
+          requestedSupplierName: Q.requested_supplier_name || (!Q.supplier_id ? M : ""),
+          creationDate: Q.creation_date,
+          originCountry: Q.origin_country || "",
+          originCity: Q.origin_city || "",
+          destinationCountry: Q.destination_country || "",
+          destinationCity: Q.destination_city || "",
+          destinationPort: Q.destination_port || "",
+          readyDate: Q.ready_date || "",
+          chargesApplied: !!Q.charges_applied,
         }));
-        H((S) => [...S, ...C]);
-        const M = C[0];
-        if (M)
+        H((Q) => [...Q, ...B]);
+        const Q = B[0];
+        if (Q)
           try {
-            await ie.createCustomerNotification(
-              g,
-              `New order "${M.description}" created`,
-              {
-                importance: K.Medium,
-                linkToPage: "orders",
-                linkToId: M.id,
-                eventType: "order_created",
-                relatedEntityType: "order",
-                relatedEntityId: M.id,
-              },
-            );
-            const S =
-                ((D = h.find((T) => T.id === g)) == null
-                  ? void 0
-                  : D.contactPerson) || "Customer",
-              $ = pe
-                ? `New order "${M.description}" created by Admin for ${S}`
-                : `New order "${M.description}" created by ${S}`;
-            (await ie.createAdminNotification($, {
-              importance: K.Medium,
+            const j =
+              Q.status === d.Draft
+                ? `Draft order "${Q.description}" saved`
+                : Q.status === d.Submitted
+                  ? `Order "${Q.description}" submitted for approval`
+                  : `New order "${Q.description}" created`;
+            await ie.createCustomerNotification(g, j, {
+              importance: Q.status === d.Submitted ? K.High : K.Medium,
               linkToPage: "orders",
-              linkToId: M.id,
+              linkToId: Q.id,
               eventType: "order_created",
               relatedEntityType: "order",
-              relatedEntityId: M.id,
+              relatedEntityId: Q.id,
+            });
+            const de =
+                ((oe = h.find((X) => X.id === g)) == null
+                  ? void 0
+                  : oe.contactPerson) || "Customer",
+              se = C
+                ? `New order "${Q.description}" created by Admin for ${de}`
+                : Q.status === d.Submitted
+                  ? `Order "${Q.description}" submitted for approval by ${de}`
+                  : `Draft order "${Q.description}" saved by ${de}`,
+              Y = Q.status === d.Submitted ? K.High : K.Medium;
+            (await ie.createAdminNotification(se, {
+              importance: Y,
+              linkToPage: "orders",
+              linkToId: Q.id,
+              eventType: "order_created",
+              relatedEntityType: "order",
+              relatedEntityId: Q.id,
             }),
               await st());
-          } catch (S) {
-            console.error("Error creating notification:", S);
+          } catch (j) {
+            console.error("Error creating notification:", j);
           }
-        const E = C[0];
-        E &&
+        const j = B[0];
+        j &&
           (await ie.createNotification({
             userId: g,
-            message: `Order "${E.description}" has been created and is pending confirmation`,
+            message:
+              j.status === d.Draft
+                ? `Draft order "${j.description}" has been saved`
+                : j.status === d.Submitted
+                  ? `Order "${j.description}" has been submitted for admin approval`
+                  : `Order "${j.description}" has been created and is pending confirmation`,
             linkToPage: "orders",
-            linkToId: E.id,
-            importance: K.Medium,
+            linkToId: j.id,
+            importance: j.status === d.Submitted ? K.High : K.Medium,
           }));
       },
       We = async (f, g, v = !1) => {
@@ -15390,6 +15477,10 @@ const hc = Qt.getInstance(),
         (g.description !== void 0 && (C.description = g.description),
           g.value !== void 0 && (C.value = g.value),
           g.supplierId !== void 0 && (C.supplier_id = g.supplierId),
+          g.requestedSupplierName !== void 0 &&
+            (C.requested_supplier_name = hasGeoText(g.requestedSupplierName)
+              ? String(g.requestedSupplierName).trim()
+              : null),
           g.volumeM3 !== void 0 && (C.volume_m3 = g.volumeM3),
           g.weightKG !== void 0 && (C.weight_kg = g.weightKG),
           g.customerId !== void 0 && (C.customer_id = g.customerId),
@@ -15417,10 +15508,38 @@ const hc = Qt.getInstance(),
               : null),
           g.readyDate !== void 0 &&
             (C.ready_date = hasGeoText(g.readyDate) ? g.readyDate : null));
-        const { data: M, error: E } = await _.from("orders")
+        let M = null,
+          E = null;
+        ({ data: M, error: E } = await _.from("orders")
           .update(C)
           .eq("id", f)
-          .select();
+          .select());
+        if (
+          E &&
+          C.requested_supplier_name !== void 0 &&
+          (String(E.code || "") === "42703" ||
+            String(E.message || "")
+              .toLowerCase()
+              .includes("requested_supplier_name"))
+        ) {
+          const D = { ...C };
+          delete D.requested_supplier_name;
+          if (g.requestedSupplierName !== void 0 && g.notes === void 0) {
+            const S = hasGeoText(g.requestedSupplierName)
+              ? `[Requested Supplier] ${String(g.requestedSupplierName).trim()}`
+              : "";
+            const $ = String(w.notes || "")
+              .split(/\r?\n/)
+              .filter((T) => !String(T).startsWith("[Requested Supplier]"))
+              .join("\n")
+              .trim();
+            D.notes = [$, S].filter(Boolean).join("\n");
+          }
+          ({ data: M, error: E } = await _.from("orders")
+            .update(D)
+            .eq("id", f)
+            .select());
+        }
         if (E) r("Update Error", "Error updating order: " + E.message);
         else {
           const D = (M || []).map((S) => ({
@@ -15433,6 +15552,7 @@ const hc = Qt.getInstance(),
             customerId: S.customer_id,
             status: S.status,
             notes: S.notes,
+            requestedSupplierName: S.requested_supplier_name || "",
             creationDate: S.creation_date,
             originCountry: S.origin_country || "",
             originCity: S.origin_city || "",
@@ -15472,10 +15592,10 @@ const hc = Qt.getInstance(),
           r("Order Not Found", "Order not found for deletion");
           return;
         }
-        if (g.status === d.Pending) {
+        if ([d.Draft, d.Submitted, d.Pending].includes(g.status)) {
           const { error: v } = await _.from("orders").delete().eq("id", f);
           v
-            ? r("Delete Error", "Error deleting pending order: " + v.message)
+            ? r("Delete Error", "Error deleting order: " + v.message)
             : (H((w) => w.filter((C) => C.id !== f)),
               await ie.createNotification({
                 userId: g.customerId,
@@ -15610,6 +15730,70 @@ const hc = Qt.getInstance(),
       Ms = async (f, g) => {
         const v = A.find((T) => T.id === f);
         if (!v) return;
+        const currentStatus = String(v.status || ""),
+          nextStatus = String(g || ""),
+          isCustomerActor =
+            !pe &&
+            !!(s != null && s.id) &&
+            String(v.customerId || "") === String(s == null ? void 0 : s.id),
+          customerTransitions = {
+            [d.Draft]: [d.Submitted, d.Cancelled],
+            [d.Submitted]: [d.Draft, d.Cancelled],
+          };
+        if (!pe && !isCustomerActor) {
+          n(
+            "Not Allowed",
+            "You can only update statuses for your own draft orders.",
+          );
+          return;
+        }
+        if (isCustomerActor) {
+          if (currentStatus === nextStatus) return;
+          const allowed = customerTransitions[currentStatus] || [];
+          if (!allowed.includes(nextStatus)) {
+            n(
+              "Not Allowed",
+              "Customers can only move draft orders between Draft, Submitted, and Cancelled.",
+            );
+            return;
+          }
+        }
+        if (g === d.Submitted) {
+          const missing = [];
+          ((!v.description || String(v.description).trim() === "") &&
+            missing.push("description"),
+            !hasGeoText(v.destinationCountry) &&
+              missing.push("destination country"),
+            !hasGeoText(v.destinationCity) && missing.push("destination city"),
+            !v.supplierId &&
+              !hasGeoText(v.requestedSupplierName) &&
+              missing.push("supplier"));
+          if (missing.length > 0) {
+            n(
+              "Missing Required Fields",
+              `Before submission, fill: ${missing.join(", ")}.`,
+            );
+            return;
+          }
+        }
+        if (g === d.Pending) {
+          const missing = [];
+          ((!v.description || String(v.description).trim() === "") &&
+            missing.push("description"),
+            (!v.value || Number(v.value) <= 0) && missing.push("value"),
+            (!v.volumeM3 || Number(v.volumeM3) <= 0) && missing.push("volume"),
+            (!v.weightKG || Number(v.weightKG) <= 0) && missing.push("weight"),
+            !hasGeoText(v.destinationCountry) &&
+              missing.push("destination country"),
+            !hasGeoText(v.destinationCity) && missing.push("destination city"));
+          if (missing.length > 0) {
+            n(
+              "Missing Required Fields",
+              `Before approving to Pending, fill: ${missing.join(", ")}.`,
+            );
+            return;
+          }
+        }
         const w = ce.find((T) => T.orderIds.includes(f));
         if (w) {
           n(
@@ -15641,6 +15825,25 @@ const hc = Qt.getInstance(),
             ? "This order is locked because it is currently being shipped. Status changes for shipped orders must be managed through the Shipments page for proper tracking and audit purposes."
             : "This order is locked because it has already been delivered or has shipment activity. For audit and business reasons, these orders cannot be edited. If you need to make an exception, please contact an administrator.";
           n("Order Locked", B);
+          return;
+        }
+        const requiresAssignedSupplier = [
+          d.Pending,
+          d.Processing,
+          d.QualityCheck,
+          d.ReadyToShip,
+          d.InConsolidation,
+          d.InTransit,
+          d.CustomsClearance,
+          d.OutForDelivery,
+          d.Delivered,
+          d.Completed,
+        ];
+        if (requiresAssignedSupplier.includes(g) && !v.supplierId) {
+          n(
+            "Supplier Required",
+            "Assign a supplier before approving this order to operational statuses.",
+          );
           return;
         }
         if (g === d.InTransit) {
@@ -16820,6 +17023,7 @@ const hc = Qt.getInstance(),
                       .order("creation_date", { ascending: !1 })
                       .limit(5e3)
                       .in("status", [
+                        d.Submitted,
                         d.Pending,
                         d.Processing,
                         d.QualityCheck,
@@ -17020,6 +17224,7 @@ const hc = Qt.getInstance(),
                   customerId: j.customer_id,
                   status: j.status,
                   notes: j.notes,
+                  requestedSupplierName: j.requested_supplier_name || "",
                   creationDate: j.creation_date,
                   originCountry: j.origin_country || "",
                   originCity: j.origin_city || "",
@@ -17531,7 +17736,7 @@ const hc = Qt.getInstance(),
                 ![m.Delivered, m.Completed, m.Cancelled].includes(C.status),
             ),
             adminOrdersNeedingAttention: A.filter((C) =>
-              [d.Pending, d.Processing].includes(C.status),
+              [d.Submitted, d.Pending, d.Processing].includes(C.status),
             ).slice(0, 10),
             customerActiveConsolidations: sr.filter(
               (C) =>
