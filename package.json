@@ -14,7 +14,6 @@
     "hooks:install": "node ./scripts/install-git-hooks.mjs",
     "protect:branch": "node ./scripts/configure-branch-protection.mjs",
     "protect:branch:apply": "node ./scripts/configure-branch-protection.mjs --apply",
-    "map:supabase": "node ./scripts/generate-supabase-map.mjs",
     "migrate:codes": "node ./scripts/migrate-entity-codes.mjs",
     "sync:completed": "node ./scripts/sync-completed-statuses.mjs",
     "reset:seed:orders": "node ./scripts/reset-and-seed-orders.mjs",

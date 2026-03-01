@@ -1,5 +1,7 @@
 # Supabase Map
 
+> Snapshot note: This file is a static reference captured on **2026-02-23** and is **not auto-updated** anymore.
+
 Generated (UTC): 2026-02-23T10:53:40.833Z
 
 ## Project

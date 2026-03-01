@@ -1,6 +1,6 @@
 # Feature Map
 
-This map is based on `docs/supabase-map.json` and current bundle files under `site/`.
+This map is maintained from the current bundle files under `site/` and active database behavior.
 
 ## Entry Points
 - Main site bootstrap: `site/assets/index.js`
@@ -55,8 +55,7 @@ This map is based on `docs/supabase-map.json` and current bundle files under `si
   - `cleanup-notifications` (ACTIVE, `verify_jwt=true`)
 
 ## Fast Path When You Ask for a Feature Change
-1. Run `npm run map:supabase` to refresh live schema and usage.
-2. Open `docs/supabase-map.md` for table columns, policies, functions, and triggers.
-3. Open this file to jump to the likely bundle file.
-4. Edit smallest page-specific file first; if logic is centralized, patch `site/assets/app.js` or `site/dashboard/assets/app.js`.
+1. Open this file to jump to the likely bundle file.
+2. Edit smallest page-specific file first; if logic is centralized, patch `site/assets/app.js` or `site/dashboard/assets/app.js`.
+3. Confirm DB assumptions directly in Supabase before shipping data-layer changes.
 

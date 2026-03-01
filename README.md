@@ -33,24 +33,6 @@ npm run dev
 npm run stop
 ```
 
-## Supabase map snapshot
-
-Generate a fresh live schema + local usage map:
-
-```bash
-npm run map:supabase
-```
-
-Output files refreshed by this command:
-
-- `docs/supabase-map.json`
-- `docs/supabase-map.md`
-
-Related planning docs:
-
-- `docs/feature-map.md`
-- `docs/project-roadmap.md`
-
 ## Environment variables
 
 - Real values are stored in `.env` (copied from `.env.codex.supabase.txt`).

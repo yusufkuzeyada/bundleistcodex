@@ -2,7 +2,7 @@
 
 Scope: stabilize the de-minified Netlify bundle workspace and make feature work faster and safer.
 
-## Baseline (as of map generation)
+## Baseline (current snapshot)
 - App is an editable static build artifact under `site/` (not original source repo).
 - Supabase is live and active with 12 `public` tables, 1 `public` view, multiple SQL functions, and application triggers.
 - Edge function exists: `cleanup-notifications`.
@@ -12,9 +12,8 @@ Scope: stabilize the de-minified Netlify bundle workspace and make feature work 
   - No missing JS module imports.
 
 ## Phase 1: Reliability Foundation
-- Keep schema map current:
-  - Run `npm run map:supabase` before major feature edits.
-  - Commit updates to `docs/supabase-map.json` and `docs/supabase-map.md`.
+- Keep architecture/docs current:
+  - Update `docs/feature-map.md` when data access paths or feature ownership changes.
 - Reduce breakage risk in bundle edits:
   - Limit first-pass changes to page-specific files when possible.
   - Use `npm run health` and manual smoke checks for `/` and `/dashboard/` after each change.
@@ -39,7 +38,7 @@ Scope: stabilize the de-minified Netlify bundle workspace and make feature work 
   - Confirm admin vs customer access boundaries for `orders`, `shipments`, `payment_transactions`, `notifications`, `customers`.
 - Clean up schema inconsistencies:
   - Investigate duplicate FK constraints on `shipments.order_id`.
-  - Document intentional multi-FK cases in `docs/supabase-map.md`.
+  - Document intentional multi-FK cases in `docs/feature-map.md`.
 
 ## Phase 4: Maintainability and Speed
 - Add feature ownership map updates to PR process:
