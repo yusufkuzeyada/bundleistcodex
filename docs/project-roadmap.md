@@ -50,4 +50,5 @@ Scope: stabilize the de-minified Netlify bundle workspace and make feature work 
 - Plan source-reconstruction track (optional but high ROI):
   - Recreate modular source structure (components/services) incrementally from bundle files.
   - Move from direct bundle editing to a maintainable source project when feasible.
+  - See `docs/source-reconstruction-plan.md` for phased cutover steps.
 

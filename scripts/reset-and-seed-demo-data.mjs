@@ -1,5 +1,8 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
+import { loadEnv } from "./lib/env.mjs";
+import {
+  createSupabaseProjectQueryRunner,
+  getProjectRefFromSupabaseUrl,
+} from "./lib/supabase-project-query.mjs";
 
 const ADMIN_EMAIL = "yusufbicer@gmail.com";
 
@@ -95,27 +98,6 @@ const DEMO_CUSTOMERS = [
   },
 ];
 
-function readEnvFile(filePath) {
-  const out = {};
-  const content = readFileSync(filePath, "utf8");
-  for (const rawLine of content.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith("#")) continue;
-    const firstEq = line.indexOf("=");
-    if (firstEq < 1) continue;
-    const key = line.slice(0, firstEq).trim().replace(/^\uFEFF/, "");
-    let value = line.slice(firstEq + 1).trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-    out[key] = value;
-  }
-  return out;
-}
-
 function sqlString(value) {
   return `'${String(value).replace(/'/g, "''")}'`;
 }
@@ -125,13 +107,10 @@ function normalizeEmail(value) {
 }
 
 async function main() {
-  const envFromFile = readEnvFile(path.join(process.cwd(), ".env"));
-  const supabaseUrl = process.env.SUPABASE_URL || envFromFile.SUPABASE_URL;
-  const accessToken =
-    process.env.SUPABASE_ACCESS_TOKEN || envFromFile.SUPABASE_ACCESS_TOKEN;
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    envFromFile.SUPABASE_SERVICE_ROLE_KEY;
+  const env = loadEnv();
+  const supabaseUrl = env.SUPABASE_URL;
+  const accessToken = env.SUPABASE_ACCESS_TOKEN;
+  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !accessToken || !serviceRoleKey) {
     throw new Error(
@@ -139,27 +118,12 @@ async function main() {
     );
   }
 
-  const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
-
-  async function runQuery(query, { readOnly = false } = {}) {
-    const endpoint = `https://api.supabase.com/v1/projects/${projectRef}/database/query${readOnly ? "/read-only" : ""}`;
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query }),
-    });
-    const text = await response.text();
-    if (!response.ok) {
-      const excerpt = text.length > 500 ? `${text.slice(0, 500)}...` : text;
-      throw new Error(
-        `Supabase query failed (${response.status} ${response.statusText}): ${excerpt}`,
-      );
-    }
-    return text ? JSON.parse(text) : [];
-  }
+  const projectRef = getProjectRefFromSupabaseUrl(supabaseUrl);
+  const runQuery = createSupabaseProjectQueryRunner({
+    projectRef,
+    accessToken,
+    defaultExcerptMax: 500,
+  });
 
   async function authAdminRequest(method, pathSuffix, body) {
     const response = await fetch(`${supabaseUrl}/auth/v1/admin${pathSuffix}`, {
@@ -185,15 +149,18 @@ async function main() {
     const users = [];
     let page = 1;
     const perPage = 200;
-    while (true) {
+    let hasMore = true;
+    while (hasMore) {
       const data = await authAdminRequest(
         "GET",
         `/users?page=${page}&per_page=${perPage}`,
       );
       const batch = Array.isArray(data?.users) ? data.users : [];
       users.push(...batch);
-      if (batch.length < perPage) break;
-      page += 1;
+      hasMore = batch.length >= perPage;
+      if (hasMore) {
+        page += 1;
+      }
     }
     return users;
   }

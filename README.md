@@ -57,6 +57,43 @@ Related planning docs:
 - `.env` is git-ignored.
 - Template variables are in `.env.example`.
 
+## Maintainability helpers
+
+- Shared Netlify Function utilities are in `netlify/functions/_shared.js`.
+- Shared script utilities are in `scripts/lib/env.mjs` and `scripts/lib/supabase-project-query.mjs`.
+- Run `npm run check:syntax` to syntax-check all `netlify/functions` and `scripts` files before deploy.
+- Run `npm run lint` for maintainability-focused lint checks.
+- Run `npm test` for baseline unit tests around shared helpers.
+- Dashboard debug logging is centralized in `site/dashboard/assets/debug-tools.js`.
+- Enable dashboard debug logs temporarily with `?dashboard_debug=1` (persisted in local storage).
+
+## CI
+
+- GitHub Actions workflow: `.github/workflows/ci.yml`
+- CI runs: `check:syntax`, `lint`, and `test` on pushes and pull requests.
+
+## Local Hooks
+
+- Install repo hooks once per clone:
+  - `npm run hooks:install`
+- Hook behavior:
+  - `pre-commit`: runs `check:syntax` and `lint`
+  - `pre-push`: runs `verify` (`check:syntax`, `lint`, `test`)
+
+## Branch Protection
+
+- Full checklist and exact required settings:
+  - `docs/branch-protection.md`
+- Optional API dry-run:
+  - `npm run protect:branch`
+- Optional explicit-branch override:
+  - `npm run protect:branch -- --branch your-default-branch`
+  - `npm run protect:branch -- your-default-branch`
+
+## Source Reconstruction
+
+- Incremental reconstruction plan: `docs/source-reconstruction-plan.md`.
+
 ### Newsletter email + unsubscribe flow
 
 This workspace now includes Netlify Functions for newsletter:

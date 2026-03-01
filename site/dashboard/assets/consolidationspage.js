@@ -1,4 +1,4 @@
-import { r, j as e } from "./radix.js";
+﻿import { r, j as e } from "./radix.js";
 import {
   q as Ne,
   e as Ue,
@@ -25,6 +25,7 @@ import { D as Qt } from "./datafreshnesspill.js";
 import { A as Xt } from "./activitytimeline.js";
 import { B as Zt, f as es, A as ts } from "./audittrailpanel.js";
 import { R as ss } from "./relatedpanel.js";
+import { debugLog } from "./debug-tools.js";
 import "./react.js";
 import "./supabase.js";
 import "./icons.js";
@@ -191,8 +192,8 @@ const formatLocationField = (s) =>
     let F = null;
     (j.includes("->")
       ? (F = "->")
-      : j.includes("→")
-        ? (F = "→")
+      : j.includes("â†’")
+        ? (F = "â†’")
         : /\s+to\s+/i.test(j) && (F = "to"));
     if (!F)
       return {
@@ -737,7 +738,7 @@ const as = ({
                     }),
                     P === "fixed_rate_m3" &&
                       e.jsx(Ce, {
-                        label: "Fixed Rate per M³",
+                        label: "Fixed Rate per MÂ³",
                         required: !0,
                         help: "Rate in USD charged per cubic meter",
                         children: e.jsxs("div", {
@@ -761,7 +762,7 @@ const as = ({
                             e.jsx("span", {
                               className:
                                 "absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium",
-                              children: "/m³",
+                              children: "/mÂ³",
                             }),
                           ],
                         }),
@@ -826,7 +827,7 @@ const as = ({
                         className:
                           "w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200",
                         placeholder:
-                          "e.g., Istanbul Warehouse → Matadi Port, DRC",
+                          "e.g., Istanbul Warehouse â†’ Matadi Port, DRC",
                         required: !0,
                       }),
                     }),
@@ -930,7 +931,7 @@ const as = ({
                                 h.name,
                                 " (Max Vol: ",
                                 h.maxVolumeM3,
-                                "m³, Max Wt: ",
+                                "mÂ³, Max Wt: ",
                                 h.maxWeightKG,
                                 "kg)",
                               ],
@@ -3527,7 +3528,7 @@ const as = ({
         if (p.status === Ut.Pending) {
           N(
             "Order Not Confirmed",
-            "This order is still Pending. Confirm it (Pending → Processing) so order-cost charges are applied before adding it to a consolidation.",
+            "This order is still Pending. Confirm it (Pending â†’ Processing) so order-cost charges are applied before adding it to a consolidation.",
           );
           return;
         }
@@ -3688,7 +3689,7 @@ Total would be: ${Xe.toFixed(2)} KG`,
         } else x(t, a);
       },
       Ct = (t) => {
-        (console.log(
+        (debugLog(
           "[DEBUG] Status update clicked for:",
           getConsolidationIdentityText(t),
           "Status:",
@@ -7073,3 +7074,4 @@ Total would be: ${Xe.toFixed(2)} KG`,
     });
   };
 export { ys as ConsolidationsPage };
+

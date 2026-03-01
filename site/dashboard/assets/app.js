@@ -1,4 +1,4 @@
-const __vite__mapDeps = (
+﻿const __vite__mapDeps = (
   i,
   m = __vite__mapDeps,
   d = m.f ||
@@ -41,6 +41,7 @@ import {
   e as ro,
 } from "./icons.js";
 import { b as so, g as io } from "./react.js";
+import { debugLog } from "./debug-tools.js";
 function $i(s) {
   var e,
     t,
@@ -2381,7 +2382,7 @@ function ni({
                                             children: [
                                               W.linkToPage ? W.linkToPage : "",
                                               W.linkToId
-                                                ? ` • ${W.linkToId}`
+                                                ? ` â€¢ ${W.linkToId}`
                                                 : "",
                                             ],
                                           })
@@ -4461,7 +4462,7 @@ const yi = (s, e, t = {}) => {
       try {
         return JSON.parse(s);
       } catch (e) {
-        return (console.log(`JSON parse error: ${e}`), s);
+        return (debugLog(`JSON parse error: ${e}`), s);
       }
     return s;
   },
@@ -7311,14 +7312,14 @@ class bn extends Error {
 class Ql extends bn {}
 async function Yl(s, e, t) {
   Ft.debug &&
-    console.log("@supabase/gotrue-js: navigatorLock: acquire lock", s, e);
+    debugLog("@supabase/gotrue-js: navigatorLock: acquire lock", s, e);
   const r = new globalThis.AbortController();
   return (
     e > 0 &&
       setTimeout(() => {
         (r.abort(),
           Ft.debug &&
-            console.log(
+            debugLog(
               "@supabase/gotrue-js: navigatorLock acquire timed out",
               s,
             ));
@@ -7332,7 +7333,7 @@ async function Yl(s, e, t) {
         async (i) => {
           if (i) {
             Ft.debug &&
-              console.log(
+              debugLog(
                 "@supabase/gotrue-js: navigatorLock: acquired",
                 s,
                 i.name,
@@ -7341,7 +7342,7 @@ async function Yl(s, e, t) {
               return await t();
             } finally {
               Ft.debug &&
-                console.log(
+                debugLog(
                   "@supabase/gotrue-js: navigatorLock: released",
                   s,
                   i.name,
@@ -7351,7 +7352,7 @@ async function Yl(s, e, t) {
             if (e === 0)
               throw (
                 Ft.debug &&
-                  console.log(
+                  debugLog(
                     "@supabase/gotrue-js: navigatorLock: not immediately available",
                     s,
                   ),
@@ -7362,7 +7363,7 @@ async function Yl(s, e, t) {
             if (Ft.debug)
               try {
                 const n = await globalThis.navigator.locks.query();
-                console.log(
+                debugLog(
                   "@supabase/gotrue-js: Navigator LockManager state",
                   JSON.stringify(n, null, "  "),
                 );
@@ -9735,11 +9736,11 @@ class qt {
         } = e,
         p = this.createDeduplicationKey(t, a, c, u, r);
       if (this.pendingNotifications.has(p))
-        return (console.log("Notification already pending:", p), null);
+        return (debugLog("Notification already pending:", p), null);
       this.pendingNotifications.add(p);
       try {
         if (await this.findDuplicate(t, a, c, u, r))
-          return (console.log("Duplicate notification prevented:", p), null);
+          return (debugLog("Duplicate notification prevented:", p), null);
         const k = {
           message: r,
           importance: i.toLowerCase(),
@@ -9846,7 +9847,7 @@ class qt {
           console.warn("No admin users found for system notification"),
           []
         );
-      console.log(
+      debugLog(
         `[DEBUG] Creating system notification for ${r.length} admin users:`,
         { message: e, adminUserIds: r.map((o) => o.id) },
       );
@@ -9864,16 +9865,16 @@ class qt {
         });
         a
           ? (n.push(a),
-            console.log(
+            debugLog(
               `[DEBUG] Created system notification for admin ${o.id}:`,
               a.id,
             ))
-          : console.log(
+          : debugLog(
               `[DEBUG] Failed to create system notification for admin ${o.id}`,
             );
       }
       return (
-        console.log(
+        debugLog(
           `[DEBUG] System notification creation complete: ${n.length} notifications created`,
         ),
         n
@@ -10060,9 +10061,9 @@ class qt {
         return (
           t
             ? ((o = o.is(n, null)),
-              console.log(`Getting unread count for admin - filter: ${n} IS NULL`))
+              debugLog(`Getting unread count for admin - filter: ${n} IS NULL`))
             : ((o = o.or(buildNotificationOwnerOrFilter(e, !1, n))),
-              console.log(
+              debugLog(
                 `Getting unread count for customer ${e} - filter: ${buildNotificationOwnerOrFilter(e, !1, n)}`,
               )),
           await o
@@ -10079,7 +10080,7 @@ class qt {
           ((i = getNotificationOwnerColumnName()), ({ count: n, error: o } = await r(i))),
         o
           ? (console.error("Error getting unread count:", o), 0)
-          : (console.log(
+          : (debugLog(
               `Unread count result for ${t ? "admin" : "customer " + e}: ${n}`,
             ),
             n || 0)
@@ -10265,7 +10266,7 @@ const ie = qt.getInstance(),
             .single();
           if (!H && A != null && A.role) ((k = A.role), (I = A.name));
           else {
-            console.log("No customer record found, creating one...");
+            debugLog("No customer record found, creating one...");
             const J =
                 ((L = b.user_metadata) == null ? void 0 : L.name) ||
                 "New Customer",
@@ -10596,7 +10597,7 @@ class Ut {
       );
     const i = r.reduce((o, a) => o + a.value, 0),
       n = new Map();
-    console.log("PROPORTIONAL DISTRIBUTION DEBUG:", {
+    debugLog("PROPORTIONAL DISTRIBUTION DEBUG:", {
       totalShippingCost: t,
       totalValue: i,
       orderDetails: r.map((o) => ({
@@ -10609,12 +10610,12 @@ class Ut {
     for (const o of r) {
       const a = o.value / i,
         c = t * a;
-      (console.log(
+      (debugLog(
         `Customer ${o.customerId}: orderValue=${o.value}, share=${(a * 100).toFixed(2)}%, cost=${c.toFixed(2)}`,
       ),
         n.set(o.customerId, (n.get(o.customerId) || 0) + c));
     }
-    return (console.log("FINAL DISTRIBUTION:", Object.fromEntries(n)), n);
+    return (debugLog("FINAL DISTRIBUTION:", Object.fromEntries(n)), n);
   }
   static calculateFixedRateDistribution(e, t) {
     const r = new Map();
@@ -10659,7 +10660,7 @@ class Ut {
       );
     const i = r.reduce((o, a) => o + a.chargeableUnits, 0),
       n = new Map();
-    console.log("VOLUME-BASED DISTRIBUTION DEBUG:", {
+    debugLog("VOLUME-BASED DISTRIBUTION DEBUG:", {
       totalShippingCost: t,
       totalChargeableUnits: i,
       orderDetails: r.map(({ order: o, chargeableUnits: a }) => ({
@@ -10674,13 +10675,13 @@ class Ut {
     for (const { order: o, chargeableUnits: a } of r) {
       const c = a / i,
         u = t * c;
-      (console.log(
+      (debugLog(
         `Customer ${o.customerId}: chargeableUnits=${a.toFixed(3)}, share=${(c * 100).toFixed(2)}%, cost=${u.toFixed(2)}`,
       ),
         n.set(o.customerId, (n.get(o.customerId) || 0) + u));
     }
     return (
-      console.log("FINAL VOLUME DISTRIBUTION:", Object.fromEntries(n)),
+      debugLog("FINAL VOLUME DISTRIBUTION:", Object.fromEntries(n)),
       n
     );
   }
@@ -11020,12 +11021,12 @@ class zt {
       const o = await this.findDuplicateShippingTransaction(e);
       if (o.length > 0)
         return (
-          console.log("Duplicate transaction detected, skipping:", e),
+          debugLog("Duplicate transaction detected, skipping:", e),
           o[0]
         );
     }
     const i = { ...e, id: crypto.randomUUID(), date: new Date().toISOString() };
-    console.log("💰 CREATING TRANSACTION:", {
+    debugLog("[DEBUG] Creating transaction:", {
       type: i.type,
       amount: i.amount,
       customerId: i.customerId,
@@ -11092,14 +11093,14 @@ class zt {
             : ee.MiscellaneousCost;
   }
   async distributeShippingCost(e, t, r, i, n, o = !1, a) {
-    console.log("🚨🚨🚨 UPDATED CODE IS RUNNING - NEW VERSION! 🚨🚨🚨");
+    debugLog("[DEBUG] Distribution code path reached");
     const { data: c, error: u } = await _.from("consolidations")
       .select("*")
       .eq("id", e)
       .single();
     if (u || !c)
       throw (
-        console.error("❌ Failed to fetch fresh consolidation data:", u),
+        console.error("âŒ Failed to fetch fresh consolidation data:", u),
         new Error("Failed to fetch consolidation data for distribution")
       );
     const h = {
@@ -11111,7 +11112,7 @@ class zt {
       p = i.filter((y) => r.orderIds.includes(y.id));
     if (
       (p.reduce((y, b) => y + b.value, 0),
-      console.log("🚨🚨🚨 DISTRIBUTION METHOD DEBUG (FRESH DATA) 🚨🚨🚨:", {
+      debugLog("[DEBUG] Distribution method selection:", {
         consolidationId: e,
         oldMethod: r.costDistributionMethod,
         freshMethod: h.costDistributionMethod,
@@ -11133,16 +11134,16 @@ class zt {
       (await $e.logCostDistribution(e, "fixed_rate_m3", t, y),
         await this.distributeFixedRateShipping(e, t, h, p, n, o, a));
     } else if (h.costDistributionMethod === "proportional") {
-      console.log(
-        "⚠️ LEGACY PROPORTIONAL METHOD DETECTED - Converting to volume-based distribution",
+      debugLog(
+        "[DEBUG] Legacy proportional method detected; using volume-based distribution",
       );
       const y = Ut.calculateVolumeProportionalDistribution(p, t);
       (await $e.logCostDistribution(e, "volume_proportional", t, y),
         await this.distributeVolumeProportionalShipping(e, t, h, p, n, o, a));
     } else if (h.costDistributionMethod === "volume_proportional") {
-      (console.log("✅ USING VOLUME-BASED DISTRIBUTION!"),
-        console.log(
-          "📦 ORDERS FOR VOLUME CALCULATION:",
+      (debugLog("[DEBUG] Using volume-based distribution"),
+        debugLog(
+          "[DEBUG] Orders for volume calculation:",
           p.map((b) => ({
             id: b.id,
             customerId: b.customerId,
@@ -11155,8 +11156,8 @@ class zt {
       (await $e.logCostDistribution(e, "volume_proportional", t, y),
         await this.distributeVolumeProportionalShipping(e, t, h, p, n, o, a));
     } else {
-      console.log(
-        "🚨 UNKNOWN METHOD, DEFAULTING TO VOLUME-BASED:",
+      console.warn(
+        "[WARN] Unknown distribution method, defaulting to volume-based:",
         h.costDistributionMethod,
       );
       const y = Ut.calculateVolumeProportionalDistribution(p, t);
@@ -11399,16 +11400,16 @@ class zt {
           a,
         ));
     if (u > 0) {
-      console.log(
-        `💰 Updating consolidation ${e} with total_billed_amount: ${u}`,
+      debugLog(
+        `[DEBUG] Updating consolidation ${e} with total_billed_amount: ${u}`,
       );
       const { error: p } = await _.from("consolidations")
         .update({ total_billed_amount: u })
         .eq("id", e);
       p
         ? console.error("Error updating total_billed_amount:", p)
-        : console.log(
-            `✅ Successfully updated total_billed_amount for consolidation ${e}`,
+        : debugLog(
+            `[DEBUG] Updated total_billed_amount for consolidation ${e}`,
           );
     }
     const h = Number((u - Math.abs(t || 0)).toFixed(2));
@@ -11689,7 +11690,7 @@ class Gt {
       throw new Error(
         `Invalid shipment status transition for ${a}: ${o} -> ${n}`,
       );
-    console.log("Updating shipment status:", {
+    debugLog("Updating shipment status:", {
       shipmentId: e,
       oldStatus: i,
       newStatus: t,
@@ -11707,7 +11708,7 @@ class Gt {
         r.description,
         String(t),
       ),
-      console.log(`[DEBUG] Shipment ${e} status updated: ${i} -> ${t}`));
+      debugLog(`[DEBUG] Shipment ${e} status updated: ${i} -> ${t}`));
     return u;
   }
   async updateTracking(e, t, r) {
@@ -11868,7 +11869,7 @@ class Gt {
   }
   async createShipmentNotifications(e, t, r, i, n) {
     const o = await ie.createShipmentNotification(e, t, r, i, n);
-    console.log(`Created ${o.length} shipment notifications`);
+    debugLog(`Created ${o.length} shipment notifications`);
   }
 }
 const yt = Gt.getInstance();
@@ -12311,7 +12312,7 @@ class Kt {
     return (t || []).map(this.transformDatabaseConsolidation);
   }
   async create(e, t, r, i, n, o) {
-    console.log("🏗️ CREATING CONSOLIDATION:", {
+    debugLog("[DEBUG] Creating consolidation:", {
       name: e.name,
       estimatedShippingCost: t,
       estimatedShippingCostType: typeof t,
@@ -12636,7 +12637,7 @@ class Kt {
           restoredTransactionCount: i.length,
         },
       }),
-        console.log(
+        debugLog(
           `Successfully rolled back cost distribution for consolidation ${e}`,
         ));
     } catch (n) {
@@ -12657,7 +12658,7 @@ class Kt {
   }
   async createShipment(e, t, r, i, n, o, a, c, u) {
     var Me, Ee;
-    console.log("🚢 CREATE SHIPMENT CALLED:", {
+    debugLog("[DEBUG] createShipment called:", {
       consolidationId: e,
       consolidationName: c.name,
       actualShippingCost: t,
@@ -12678,10 +12679,10 @@ class Kt {
       I = (h > 0 && Math.abs(y || 0) > 0.01) || (h === 0 && t > 0 && !k),
       P = I
         ? h > 0
-          ? `Actual shipping cost differs from estimate: $${h} → $${t}`
+          ? `Actual shipping cost differs from estimate: $${h} â†’ $${t}`
           : `Shipping cost assigned: $${t} (estimated cost was not provided during consolidation creation)`
         : void 0;
-    console.log("🔍 ADJUSTMENT DETECTION DEBUG:", {
+    debugLog("[DEBUG] Adjustment detection:", {
       consolidationId: e,
       consolidationName: c.name,
       estimatedCost: h,
@@ -15491,9 +15492,9 @@ const hc = Qt.getInstance(),
       [$n, Cr] = x.useState(new Set()),
       Hr = async (f) => {
         if (
-          (console.log(`[DEBUG] confirmOrder called for order ${f}`), $n.has(f))
+          (debugLog(`[DEBUG] confirmOrder called for order ${f}`), $n.has(f))
         ) {
-          (console.log(
+          (debugLog(
             `[DEBUG] Order ${f} is already being charged, skipping duplicate charge application`,
           ),
             n(
@@ -15507,10 +15508,10 @@ const hc = Qt.getInstance(),
           r("Order Not Found", "Order not found for confirmation");
           return;
         }
-        (console.log(
+        (debugLog(
           `[DEBUG] Order found: ${g.description} - Status: ${g.status}`,
         ),
-          console.log(
+          debugLog(
             `[DEBUG] Total payment transactions in memory: ${R.length}`,
           ));
         const v = R.filter(
@@ -15522,10 +15523,10 @@ const hc = Qt.getInstance(),
           C = Math.max(0, v - w),
           M = C > 0.01;
         if (
-          (console.log(
+          (debugLog(
             `[DEBUG] Checking for existing charges for order ${f}...`,
           ),
-          console.log("[DEBUG] Charge state:", {
+          debugLog("[DEBUG] Charge state:", {
             chargedOrderCost: v,
             reversedOrderCost: w,
             remainingOrderCost: C,
@@ -15533,7 +15534,7 @@ const hc = Qt.getInstance(),
           }),
           M)
         ) {
-          (console.log(
+          (debugLog(
             `[DEBUG] Found existing charges for order ${f}, skipping duplicate charge application`,
           ),
             n(
@@ -15571,7 +15572,7 @@ const hc = Qt.getInstance(),
             await We(f, { chargesApplied: !0 });
           } catch (se) {
             if (se instanceof Error && se.message.includes("charges_applied"))
-              console.log(
+              debugLog(
                 "[DEBUG] chargesApplied column not yet added to database - using transaction-based duplicate detection",
               );
             else throw se;
@@ -15587,7 +15588,7 @@ const hc = Qt.getInstance(),
               const de = new Set(j);
               return (de.delete(f), de);
             }),
-            console.log(
+            debugLog(
               `[DEBUG] Successfully charged order ${f}, clearing charging flag`,
             ));
         } catch (T) {
@@ -15932,7 +15933,7 @@ const hc = Qt.getInstance(),
       }, []),
       Ln = async (f, g, v, w, C, M) => {
         try {
-          console.log("ğŸ–¥ï¸ UI CALLING consolidationService.create:", {
+          debugLog("[DEBUG] UI calling consolidationService.create:", {
             consolidationName: f.name,
             estimatedShippingCost: g,
             estimatedShippingCostType: typeof g,
@@ -16306,7 +16307,7 @@ const hc = Qt.getInstance(),
           T = [...new Set(D.map((V) => V.customerId).filter(Boolean))],
           B = T.length > 1,
           Q = B ? null : (T[0] ?? null);
-        console.log(`Updating consolidation ${f} - involved customer IDs:`, T);
+        debugLog(`Updating consolidation ${f} - involved customer IDs:`, T);
         const j = Math.min((S / w.maxVolumeM3) * 100, 100),
           de = Math.min(($ / w.maxWeightKG) * 100, 100);
         if (E.length > 0) {
@@ -16449,7 +16450,7 @@ const hc = Qt.getInstance(),
                       ct = Ue[d.QualityCheck] || 0;
                     (lt >= ct,
                       (Qe = d.InConsolidation),
-                      console.log(`[DEBUG] Planning phase - Order ${Ae}:`, {
+                      debugLog(`[DEBUG] Planning phase - Order ${Ae}:`, {
                         orderStatus: Ve.status,
                         currentOrderLevel: lt,
                         preservedReadiness: lt >= ct,
@@ -16459,7 +16460,7 @@ const hc = Qt.getInstance(),
                   } else {
                     const lt = Ue[Ve.status] || 0,
                       ct = Ue[xe] || 0;
-                    (console.log(`[DEBUG] Operational phase - Order ${Ae}:`, {
+                    (debugLog(`[DEBUG] Operational phase - Order ${Ae}:`, {
                       orderStatus: Ve.status,
                       currentOrderLevel: lt,
                       consolidationStatus: fe.status,
@@ -16544,7 +16545,7 @@ const hc = Qt.getInstance(),
                   (Ue >= Ae || Ue < wt[d.InConsolidation]
                     ? (xe = d.InConsolidation)
                     : (xe = ve.status),
-                    console.log(`[DEBUG] Planning phase sync - Order ${ke}:`, {
+                    debugLog(`[DEBUG] Planning phase sync - Order ${ke}:`, {
                       orderStatus: ve.status,
                       currentOrderLevel: Ue,
                       preservedReadiness: Ue >= Ae,
@@ -16553,7 +16554,7 @@ const hc = Qt.getInstance(),
                     }));
                 } else {
                   const Ae = wt[Je] || 0;
-                  (console.log(
+                  (debugLog(
                     `[DEBUG] Operational phase sync - Order ${ke}:`,
                     {
                       orderStatus: ve.status,
@@ -17216,7 +17217,7 @@ const hc = Qt.getInstance(),
             kind: "order",
             id: v.id,
             title: `${Se(v.id, "order")} ${v.description}`,
-            subtitle: `Value $${Number(v.value || 0).toLocaleString()} • ${String(v.status)}`,
+            subtitle: `Value $${Number(v.value || 0).toLocaleString()} â€¢ ${String(v.status)}`,
             pageId: "orders",
             itemId: v.id,
           });
@@ -17227,7 +17228,7 @@ const hc = Qt.getInstance(),
             title: v.manualName
               ? `${Se(v.id, "consolidation")} ${v.manualName}`
               : Se(v.id, "consolidation"),
-            subtitle: `${String(v.status)} • ${v.isMixed ? "Mixed" : "Regular"} • Orders ${((g = v.orderIds) == null ? void 0 : g.length) || 0}`,
+            subtitle: `${String(v.status)} â€¢ ${v.isMixed ? "Mixed" : "Regular"} â€¢ Orders ${((g = v.orderIds) == null ? void 0 : g.length) || 0}`,
             pageId: "consolidations",
             itemId: v.id,
           });
@@ -17236,7 +17237,7 @@ const hc = Qt.getInstance(),
             kind: "shipment",
             id: v.id,
             title: `${Se(v.id, "shipment")} ${v.description}`,
-            subtitle: `${v.type} • ${String(v.status)} • ${v.carrier || "Carrier N/A"}`,
+            subtitle: `${v.type} â€¢ ${String(v.status)} â€¢ ${v.carrier || "Carrier N/A"}`,
             pageId: "shipments",
             itemId: v.id,
           });
@@ -17245,7 +17246,7 @@ const hc = Qt.getInstance(),
             kind: "payment",
             id: v.id,
             title: `${Se(v.id, "payment")} ${String(v.type)}`,
-            subtitle: `${v.amount < 0 ? "-" : "+"}$${Math.abs(Number(v.amount || 0)).toLocaleString()} • ${(v.description || "").slice(0, 64)}`,
+            subtitle: `${v.amount < 0 ? "-" : "+"}$${Math.abs(Number(v.amount || 0)).toLocaleString()} â€¢ ${(v.description || "").slice(0, 64)}`,
             pageId: "payments",
             itemId: v.id,
           });
@@ -17348,7 +17349,7 @@ const hc = Qt.getInstance(),
         (Promise.all([lc(), cc()]).then(([f, g]) => {
           (!f || !g) &&
             console.error(
-              "âŒ Database schema or setup check failed. Notifications will not be created.",
+              "Ã¢ÂÅ’ Database schema or setup check failed. Notifications will not be created.",
             );
         }),
         st({ append: !1 }));
@@ -17857,3 +17858,4 @@ export {
   Qo as y,
   yt as z,
 };
+

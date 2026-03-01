@@ -1,6 +1,11 @@
 import { promises as fs } from "node:fs";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
+import { loadEnv } from "./lib/env.mjs";
+import {
+  createSupabaseProjectQueryRunner,
+  getProjectRefFromSupabaseUrl,
+} from "./lib/supabase-project-query.mjs";
 
 const ROOT = process.cwd();
 const DOCS_DIR = path.join(ROOT, "docs");
@@ -11,29 +16,6 @@ const VENDOR_FILES = new Set(["react.js", "radix.js", "supabase.js"]);
 
 function toRel(absPath) {
   return path.relative(ROOT, absPath).split(path.sep).join("/");
-}
-
-function readEnvFile(filePath) {
-  if (!existsSync(filePath)) return {};
-  const content = requireText(filePath);
-  const lines = content.split(/\r?\n/);
-  const out = {};
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith("#")) continue;
-    const firstEq = line.indexOf("=");
-    if (firstEq < 1) continue;
-    const key = line.slice(0, firstEq).trim().replace(/^\uFEFF/, "");
-    let value = line.slice(firstEq + 1).trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-    out[key] = value;
-  }
-  return out;
 }
 
 function requireText(filePath) {
@@ -60,21 +42,6 @@ async function fetchJson(url, { method = "GET", headers = {}, body } = {}) {
   }
   if (!text) return null;
   return JSON.parse(text);
-}
-
-async function runReadOnlyQuery(projectRef, accessToken, query) {
-  const payload = await fetchJson(
-    `https://api.supabase.com/v1/projects/${projectRef}/database/query/read-only`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: { query },
-    },
-  );
-  return normalizeRows(payload);
 }
 
 async function walkFiles(dir) {
@@ -519,11 +486,10 @@ function markdownForMap(mapData) {
 }
 
 async function main() {
-  const env = {
-    ...readEnvFile(path.join(ROOT, ".env.codex.supabase.txt")),
-    ...readEnvFile(path.join(ROOT, ".env")),
-    ...process.env,
-  };
+  const env = loadEnv({
+    cwd: ROOT,
+    files: [".env.codex.supabase.txt", ".env"],
+  });
 
   const supabaseUrl = env.SUPABASE_URL;
   const accessToken = env.SUPABASE_ACCESS_TOKEN;
@@ -534,7 +500,12 @@ async function main() {
     throw new Error("Missing SUPABASE_ACCESS_TOKEN in .env or process env.");
   }
 
-  const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
+  const projectRef = getProjectRefFromSupabaseUrl(supabaseUrl);
+  const runQuery = createSupabaseProjectQueryRunner({
+    projectRef,
+    accessToken,
+    defaultExcerptMax: 400,
+  });
   const project = await fetchJson(
     `https://api.supabase.com/v1/projects/${projectRef}`,
     {
@@ -687,7 +658,7 @@ async function main() {
   const queryResults = await Promise.all(
     Object.entries(queries).map(async ([key, sql]) => [
       key,
-      await runReadOnlyQuery(projectRef, accessToken, sql),
+      normalizeRows(await runQuery(sql, { readOnly: true })),
     ]),
   );
   const database = Object.fromEntries(queryResults);

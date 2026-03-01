@@ -1,26 +1,8 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
-function readEnvFile(filePath) {
-  const out = {};
-  const content = readFileSync(filePath, "utf8");
-  for (const rawLine of content.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith("#")) continue;
-    const firstEq = line.indexOf("=");
-    if (firstEq < 1) continue;
-    const key = line.slice(0, firstEq).trim().replace(/^\uFEFF/, "");
-    let value = line.slice(firstEq + 1).trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-    out[key] = value;
-  }
-  return out;
-}
+import { loadEnv } from "./lib/env.mjs";
+import {
+  createSupabaseProjectQueryRunner,
+  getProjectRefFromSupabaseUrl,
+} from "./lib/supabase-project-query.mjs";
 
 function toCount(rows, key) {
   const value = rows?.[0]?.[key];
@@ -29,36 +11,20 @@ function toCount(rows, key) {
 }
 
 async function main() {
-  const envFromFile = readEnvFile(path.join(process.cwd(), ".env"));
-  const supabaseUrl = process.env.SUPABASE_URL || envFromFile.SUPABASE_URL;
-  const accessToken =
-    process.env.SUPABASE_ACCESS_TOKEN || envFromFile.SUPABASE_ACCESS_TOKEN;
+  const env = loadEnv();
+  const supabaseUrl = env.SUPABASE_URL;
+  const accessToken = env.SUPABASE_ACCESS_TOKEN;
 
   if (!supabaseUrl || !accessToken) {
     throw new Error("Missing SUPABASE_URL or SUPABASE_ACCESS_TOKEN.");
   }
 
-  const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
-
-  async function runQuery(query, { readOnly = false } = {}) {
-    const endpoint = `https://api.supabase.com/v1/projects/${projectRef}/database/query${readOnly ? "/read-only" : ""}`;
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query }),
-    });
-    const text = await response.text();
-    if (!response.ok) {
-      const excerpt = text.length > 600 ? `${text.slice(0, 600)}...` : text;
-      throw new Error(
-        `Supabase query failed (${response.status} ${response.statusText}): ${excerpt}`,
-      );
-    }
-    return text ? JSON.parse(text) : [];
-  }
+  const projectRef = getProjectRefFromSupabaseUrl(supabaseUrl);
+  const runQuery = createSupabaseProjectQueryRunner({
+    projectRef,
+    accessToken,
+    defaultExcerptMax: 600,
+  });
 
   const preview = await runQuery(
     `

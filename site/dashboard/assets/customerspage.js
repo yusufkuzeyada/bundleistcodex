@@ -1,4 +1,4 @@
-import { r as n, j as e } from "./radix.js";
+﻿import { r as n, j as e } from "./radix.js";
 import {
   w as N,
   e as Ct,
@@ -21,6 +21,7 @@ import {
 } from "./formerrorboundary.js";
 import { P as kt } from "./pageheader.js";
 import { R as Tt } from "./relatedpanel.js";
+import { debugLog } from "./debug-tools.js";
 import "./react.js";
 import "./supabase.js";
 import "./icons.js";
@@ -921,7 +922,7 @@ const $t = ({
                                                     "text-xs text-gray-600 truncate",
                                                   children: [
                                                     s.contactPerson,
-                                                    " Â· ",
+                                                    " Ã‚Â· ",
                                                     s.email,
                                                   ],
                                                 }),
@@ -1342,7 +1343,7 @@ const $t = ({
                                               children: [
                                                 "Open: ",
                                                 r.openShipments,
-                                                " Â· Delivered: ",
+                                                " Ã‚Â· Delivered: ",
                                                 r.deliveredShipments,
                                               ],
                                             }),
@@ -1593,7 +1594,7 @@ const $t = ({
                                         a = s.map((l) => ({
                                           id: l.id,
                                           label: re(l.id, "order"),
-                                          subtitle: `${l.status} Â· $${Math.round(Number(l.value || 0)).toLocaleString()}`,
+                                          subtitle: `${l.status} Ã‚Â· $${Math.round(Number(l.value || 0)).toLocaleString()}`,
                                           onClick: () => {
                                             try {
                                               localStorage.setItem(
@@ -1610,7 +1611,7 @@ const $t = ({
                                         d = m.map((l) => ({
                                           id: l.id,
                                           label: re(l.id, "consolidation"),
-                                          subtitle: `${l.status} Â· ${l.route}`,
+                                          subtitle: `${l.status} Ã‚Â· ${l.route}`,
                                           onClick: () => {
                                             try {
                                               localStorage.setItem(
@@ -1627,7 +1628,7 @@ const $t = ({
                                         b = o.map((l) => ({
                                           id: l.id,
                                           label: re(l.id, "shipment"),
-                                          subtitle: `${l.type} Â· ${String(l.status)}`,
+                                          subtitle: `${l.type} Ã‚Â· ${String(l.status)}`,
                                           onClick: () => {
                                             try {
                                               localStorage.setItem(
@@ -2470,7 +2471,7 @@ const $t = ({
             ],
           }),
         })
-      : (console.log("RENDERING FINAL FALLBACK"),
+      : (debugLog("RENDERING FINAL FALLBACK"),
         e.jsx("div", {
           className:
             "min-h-screen flex items-center justify-center text-red-600 font-bold",
@@ -2512,3 +2513,4 @@ const $t = ({
       }));
 };
 export { $t as default };
+

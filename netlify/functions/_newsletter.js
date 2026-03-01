@@ -1,4 +1,11 @@
 const crypto = require("node:crypto");
+const {
+  getRequiredEnv,
+  htmlResponse,
+  jsonResponse,
+  parseJsonResponse,
+  readHeader,
+} = require("./_shared");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -13,28 +20,6 @@ function isValidEmail(email) {
   return EMAIL_PATTERN.test(email);
 }
 
-function jsonResponse(statusCode, payload) {
-  return {
-    statusCode,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
-    },
-    body: JSON.stringify(payload),
-  };
-}
-
-function htmlResponse(statusCode, html) {
-  return {
-    statusCode,
-    headers: {
-      "content-type": "text/html; charset=utf-8",
-      "cache-control": "no-store",
-    },
-    body: html,
-  };
-}
-
 function getBaseUrl(event) {
   const configuredBaseUrl =
     process.env.PUBLIC_SITE_URL ||
@@ -46,8 +31,8 @@ function getBaseUrl(event) {
     return configuredBaseUrl.replace(/\/+$/, "");
   }
 
-  const proto = event.headers["x-forwarded-proto"] || "https";
-  const host = event.headers["x-forwarded-host"] || event.headers.host;
+  const proto = readHeader(event, "x-forwarded-proto") || "https";
+  const host = readHeader(event, "x-forwarded-host") || readHeader(event, "host");
 
   if (!host) {
     throw new Error("Could not resolve request host for unsubscribe URL.");
@@ -77,14 +62,6 @@ function isValidUnsubscribeSignature(email, signature, secret) {
   }
 
   return crypto.timingSafeEqual(expectedBuffer, providedBuffer);
-}
-
-function getRequiredEnv(name) {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
 }
 
 function getSupabaseConfig() {
@@ -121,21 +98,13 @@ async function callSupabaseRest(config, path, options = {}) {
     body: options.body,
   });
 
-  const rawBody = await response.text();
-  let parsedBody = null;
-  if (rawBody) {
-    try {
-      parsedBody = JSON.parse(rawBody);
-    } catch {
-      parsedBody = rawBody;
-    }
-  }
+  const parsedBody = await parseJsonResponse(response);
 
   if (!response.ok) {
     const errorDetail =
       typeof parsedBody === "object" && parsedBody !== null
         ? JSON.stringify(parsedBody)
-        : rawBody || response.statusText;
+        : parsedBody || response.statusText;
     throw new Error(
       `Supabase REST request failed (${response.status}): ${errorDetail}`,
     );
@@ -190,21 +159,13 @@ async function sendResendEmail(config, payload) {
     body: JSON.stringify(payload),
   });
 
-  const rawBody = await response.text();
-  let parsedBody = null;
-  if (rawBody) {
-    try {
-      parsedBody = JSON.parse(rawBody);
-    } catch {
-      parsedBody = rawBody;
-    }
-  }
+  const parsedBody = await parseJsonResponse(response);
 
   if (!response.ok) {
     const errorDetail =
       typeof parsedBody === "object" && parsedBody !== null
         ? JSON.stringify(parsedBody)
-        : rawBody || response.statusText;
+        : parsedBody || response.statusText;
     throw new Error(`Resend send failed (${response.status}): ${errorDetail}`);
   }
 

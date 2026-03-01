@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+echo "[pre-commit] Running syntax and lint checks..."
+npm run check:syntax
+npm run lint
+
+echo "[pre-commit] Checks passed."

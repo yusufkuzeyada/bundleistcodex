@@ -2,6 +2,12 @@ const DEFAULT_READ_RETENTION_DAYS = 21;
 const DEFAULT_UNREAD_RETENTION_DAYS = 75;
 const DEFAULT_BATCH_SIZE = 5000;
 const DEFAULT_MAX_BATCHES = 10;
+const {
+  getRequiredEnv,
+  jsonResponse,
+  parseJsonResponse,
+  readHeader,
+} = require("./_shared");
 
 const READ_RETENTION_MIN = 14;
 const READ_RETENTION_MAX = 30;
@@ -16,17 +22,6 @@ exports.config = {
   schedule: "15 2 * * *",
 };
 
-function jsonResponse(statusCode, payload) {
-  return {
-    statusCode,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
-    },
-    body: JSON.stringify(payload),
-  };
-}
-
 function parseIntOrFallback(value, fallback) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -36,37 +31,20 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-function readHeader(headers, name) {
-  if (!headers || typeof headers !== "object") return "";
-  const direct = headers[name];
-  if (typeof direct === "string") return direct;
-  const lower = headers[name.toLowerCase()];
-  return typeof lower === "string" ? lower : "";
-}
-
 function isScheduledInvocation(event) {
-  const eventHeader = readHeader(event.headers, "x-nf-event");
+  const eventHeader = readHeader(event, "x-nf-event");
   return eventHeader.toLowerCase() === "schedule";
 }
 
 function hasValidManualSecret(event, secret) {
   if (!secret) return false;
-  const provided = readHeader(event.headers, "x-notification-cleanup-secret");
+  const provided = readHeader(event, "x-notification-cleanup-secret");
   return provided && provided === secret;
 }
 
 function getConfig() {
-  const supabaseUrlRaw = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrlRaw) {
-    throw new Error("Missing required environment variable: SUPABASE_URL");
-  }
-  if (!serviceRoleKey) {
-    throw new Error(
-      "Missing required environment variable: SUPABASE_SERVICE_ROLE_KEY",
-    );
-  }
+  const supabaseUrlRaw = getRequiredEnv("SUPABASE_URL");
+  const serviceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
 
   const readRetentionDays = clamp(
     parseIntOrFallback(
@@ -132,15 +110,7 @@ async function callCleanupBatch(config) {
     },
   );
 
-  const raw = await response.text();
-  let payload = null;
-  if (raw) {
-    try {
-      payload = JSON.parse(raw);
-    } catch {
-      payload = raw;
-    }
-  }
+  const payload = await parseJsonResponse(response);
 
   if (!response.ok) {
     throw new Error(
