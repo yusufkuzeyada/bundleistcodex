@@ -15121,7 +15121,8 @@ const hc = Qt.getInstance(),
           "/netlify/functions/admin-generate-magic-link",
         ];
         let E = null,
-          D = null;
+          D = null,
+          T = null;
         for (const S of M) {
           const $ = await fetch(S, {
             method: "POST",
@@ -15135,19 +15136,25 @@ const hc = Qt.getInstance(),
                 : { userId: f },
             ),
           });
-          if ($.status !== 404 || S === M[M.length - 1]) {
-            (E = $, (D = S));
+          const Tt = await $.clone().json().catch(() => null),
+            Q =
+              Tt &&
+              typeof Tt == "object" &&
+              typeof Tt.code == "string" &&
+              Tt.code.trim() !== "";
+          if ($.status !== 404 || Q || S === M[M.length - 1]) {
+            (E = $, (D = S), (T = Tt && typeof Tt == "object" ? Tt : null));
             break;
           }
         }
-        const T = await (E == null ? void 0 : E.json()).catch(() => ({}));
+        const N = T || (await (E == null ? void 0 : E.json()).catch(() => ({})));
         if (!(E != null && E.ok)) {
-          if ((E == null ? void 0 : E.status) === 404)
+          const S = String((N == null ? void 0 : N.code) || "").trim();
+          if ((E == null ? void 0 : E.status) === 404 && !S)
             throw new Error(
               `Magic link endpoint not found (${D || "/.netlify/functions/admin-generate-magic-link"}). If local, run a Netlify functions runtime. If deployed, redeploy the site with latest functions.`,
             );
-          const S = String((T == null ? void 0 : T.code) || "").trim();
-          const $ = String((T == null ? void 0 : T.message) || "").trim();
+          const $ = String((N == null ? void 0 : N.message) || "").trim();
           throw new Error(
             S === "forbidden"
               ? "Only admins can generate magic links."
@@ -15166,7 +15173,7 @@ const hc = Qt.getInstance(),
                           : "Failed to generate magic link.",
           );
         }
-        const magicLink = String((T == null ? void 0 : T.actionLink) || "").trim();
+        const magicLink = String((N == null ? void 0 : N.actionLink) || "").trim();
         if (!magicLink)
           throw new Error(
             "Magic link was generated but no link was returned by the server.",
@@ -15186,7 +15193,8 @@ const hc = Qt.getInstance(),
           "/netlify/functions/order-draft-docs-cleanup",
         ];
         let E = null,
-          D = null;
+          D = null,
+          T = null;
         for (const S of M) {
           const $ = await fetch(S, {
             method: "POST",
@@ -15196,19 +15204,25 @@ const hc = Qt.getInstance(),
             },
             body: JSON.stringify({ orderId: f }),
           });
-          if ($.status !== 404 || S === M[M.length - 1]) {
-            (E = $, (D = S));
+          const Tt = await $.clone().json().catch(() => null),
+            Q =
+              Tt &&
+              typeof Tt == "object" &&
+              typeof Tt.code == "string" &&
+              Tt.code.trim() !== "";
+          if ($.status !== 404 || Q || S === M[M.length - 1]) {
+            (E = $, (D = S), (T = Tt && typeof Tt == "object" ? Tt : null));
             break;
           }
         }
-        const T = await (E == null ? void 0 : E.json()).catch(() => ({}));
+        const N = T || (await (E == null ? void 0 : E.json()).catch(() => ({})));
         if (!(E != null && E.ok)) {
-          if ((E == null ? void 0 : E.status) === 404)
+          const S = String((N == null ? void 0 : N.code) || "").trim();
+          if ((E == null ? void 0 : E.status) === 404 && !S)
             throw new Error(
               `Draft docs cleanup endpoint not found (${D || "/.netlify/functions/order-draft-docs-cleanup"}). If local, run a Netlify functions runtime. If deployed, redeploy the site with latest functions.`,
             );
-          const S = String((T == null ? void 0 : T.code) || "").trim(),
-            $ = String((T == null ? void 0 : T.message) || "").trim();
+          const $ = String((N == null ? void 0 : N.message) || "").trim();
           throw new Error(
             S === "forbidden"
               ? "Only admins can clean draft temp documents."
@@ -15225,7 +15239,7 @@ const hc = Qt.getInstance(),
                         : "Draft docs cleanup failed.",
           );
         }
-        return T || null;
+        return N || null;
       },
       ORDER_DRAFT_TEMP_BUCKET = "order-draft-temp",
       ORDER_DRAFT_DOC_MAX_BYTES = 10 * 1024 * 1024,
