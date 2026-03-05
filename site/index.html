@@ -56,13 +56,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap"
+    />
+    <link
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     <link rel="dns-prefetch" href="//fonts.gstatic.com" />
     <link rel="preconnect" href="https://fbpemdlnlsgqkovnatro.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="//fbpemdlnlsgqkovnatro.supabase.co" />
+    <link
+      rel="preload"
+      as="image"
+      href="/images/business-core-hero.svg"
+      type="image/svg+xml"
+      fetchpriority="high"
+    />
 
     <script type="module" crossorigin src="/assets/index.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/react.js" />
@@ -108,6 +122,12 @@
         }
       ]
     </script>
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
   <body>
     <main id="root" role="main"></main>
