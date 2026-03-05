@@ -1069,7 +1069,7 @@ const $t = ({
                             y.totalPages > 1 &&
                               e.jsxs("div", {
                                 className:
-                                  "mt-4 flex items-center justify-between",
+                                  "mt-4 px-1 sm:px-0 flex items-center justify-between",
                                 children: [
                                   e.jsx("button", {
                                     type: "button",

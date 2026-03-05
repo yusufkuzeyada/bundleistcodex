@@ -16,10 +16,16 @@ npm install
 npm run setup:static
 ```
 
-3. Start local server:
+3. Start local server (functions + redirects enabled):
 
 ```bash
 npm run dev
+```
+
+If you only need static pages, use:
+
+```bash
+npm run dev:static
 ```
 
 4. Open:
@@ -38,6 +44,12 @@ npm run stop
 - Real values are stored in `.env` (copied from `.env.codex.supabase.txt`).
 - `.env` is git-ignored.
 - Template variables are in `.env.example`.
+- WhatsApp redirect env vars:
+  - `WHATSAPP_PHONE_NUMBER` (required; used by `/.netlify/functions/whatsapp-redirect` and `/whatsapp`)
+  - `WHATSAPP_PREFILL_TEXT` (optional fallback for all languages)
+  - `WHATSAPP_PREFILL_TEXT_EN` (optional EN-specific template)
+  - `WHATSAPP_PREFILL_TEXT_TR` (optional TR-specific template)
+  - `WHATSAPP_PREFILL_TEXT_FR` (optional FR-specific template)
 
 ## Order Draft Approval Migration
 
@@ -112,7 +124,8 @@ Required env vars for this flow:
 Notes:
 
 - Resend has a free tier; this keeps initial cost at $0 if your volume stays within free limits.
-- `npm run dev` serves static files only. Netlify Functions run in Netlify or via Netlify CLI (`netlify dev`).
+- `npm run dev` runs Netlify Dev (functions + redirects).
+- `npm run dev:static` serves static files only.
 
 ### Notification policy and cleanup
 

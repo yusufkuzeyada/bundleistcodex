@@ -1724,7 +1724,7 @@ const F = 20,
                               }),
                               e.jsxs("div", {
                                 className:
-                                  "mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-100 pt-4",
+                                  "mt-6 px-1 sm:px-0 pb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-100 pt-4",
                                 children: [
                                   e.jsxs("p", {
                                     className: "text-sm text-gray-600",

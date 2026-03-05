@@ -112,7 +112,7 @@ const ht = ({
                   }),
                   e.jsx("div", {
                     className:
-                      "mt-1 text-2xl font-extrabold tracking-tight text-slate-900",
+                      "mt-1 text-lg sm:text-2xl font-extrabold tracking-tight text-slate-900 break-words [overflow-wrap:anywhere]",
                     children: i,
                   }),
                   r

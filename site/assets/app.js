@@ -3081,9 +3081,14 @@ const ma = "https://fbpemdlnlsgqkovnatro.supabase.co",
   },
   xa = () => {
     const [e, s] = u.useState(!1),
-      l = `https://wa.me/+905533684250?text=${encodeURIComponent("Hello, I'd like to inquire about your shipping consolidation services.")}`;
+      { i18n: l } = ee(),
+      n = String(
+        ((l == null ? void 0 : l.resolvedLanguage) || (l == null ? void 0 : l.language) || "en"),
+      ).toLowerCase(),
+      i = n.startsWith("tr") ? "tr" : n.startsWith("fr") ? "fr" : "en",
+      r = `/whatsapp?lang=${encodeURIComponent(i)}`;
     return t.jsxs("a", {
-      href: l,
+      href: r,
       target: "_blank",
       rel: "noopener noreferrer",
       className: `fixed bottom-6 right-6 z-50 flex items-center gap-2 p-3 rounded-full ${e ? "bg-green-600 pr-4" : "bg-green-500"} text-white shadow-lg transition-all duration-300 hover:shadow-xl`,
@@ -5387,6 +5392,12 @@ const Ge = "bundleist_language_mode",
                                     "text-sm font-semibold text-slate-700 hover:text-emerald-700",
                                   children: e("blog"),
                                 }),
+                                t.jsx("a", {
+                                  href: "/faq/",
+                                  className:
+                                    "text-sm font-semibold text-slate-700 hover:text-emerald-700",
+                                  children: e("faq"),
+                                }),
                               ],
                             }),
                             t.jsxs("div", {
@@ -5464,60 +5475,67 @@ const Ge = "bundleist_language_mode",
       o = r || c;
     return (
       u.useEffect(() => {
+        const p = window.location.origin,
+          w = l || `${p}${window.location.pathname}`;
         document.title = h;
-        const p = document.querySelector('meta[name="description"]');
-        p && p.setAttribute("content", g);
-        const w = document.querySelector('meta[name="keywords"]');
-        w && w.setAttribute("content", o);
-        const b = document.querySelector('meta[name="robots"]');
-        b &&
-          b.setAttribute(
+        const b = document.querySelector('meta[name="description"]');
+        b && b.setAttribute("content", g);
+        const f = document.querySelector('meta[name="keywords"]');
+        f && f.setAttribute("content", o);
+        const N = document.querySelector('meta[name="robots"]');
+        N &&
+          N.setAttribute(
             "content",
             n
               ? "noindex, nofollow"
               : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
           );
-        let f = document.querySelector('link[rel="canonical"]');
-        (f ||
-          ((f = document.createElement("link")),
-          (f.rel = "canonical"),
-          document.head.appendChild(f)),
-          (f.href = l || window.location.href));
-        const N = document.querySelector('meta[property="og:title"]');
-        N && N.setAttribute("content", h);
-        const S = document.querySelector('meta[property="og:description"]');
-        S && S.setAttribute("content", g);
-        const R = document.querySelector('meta[property="og:image"]');
-        R && R.setAttribute("content", `${window.location.origin}${a}`);
-        const M = document.querySelector('meta[property="og:url"]');
-        M && M.setAttribute("content", window.location.href);
-        const T = document.querySelector('meta[property="twitter:title"]');
-        T && T.setAttribute("content", h);
-        const B = document.querySelector(
+        let S = document.querySelector('link[rel="canonical"]');
+        (S ||
+          ((S = document.createElement("link")),
+          (S.rel = "canonical"),
+          document.head.appendChild(S)),
+          (S.href = w));
+        const R = document.querySelector('meta[property="og:title"]');
+        R && R.setAttribute("content", h);
+        const M = document.querySelector('meta[property="og:description"]');
+        M && M.setAttribute("content", g);
+        const T = document.querySelector('meta[property="og:image"]');
+        T && T.setAttribute("content", `${p}${a}`);
+        const B = document.querySelector('meta[property="og:url"]');
+        B && B.setAttribute("content", w);
+        const D = document.querySelector('meta[property="og:site_name"]');
+        D && D.setAttribute("content", "Bundleist");
+        const K = document.querySelector('meta[property="og:type"]');
+        K && K.setAttribute("content", "website");
+        const G = document.querySelector('meta[property="twitter:title"]');
+        G && G.setAttribute("content", h);
+        const te = document.querySelector(
           'meta[property="twitter:description"]',
         );
-        B && B.setAttribute("content", g);
-        const D = document.querySelector('meta[property="twitter:image"]');
-        (D && D.setAttribute("content", `${window.location.origin}${a}`),
-          (() => {
-            const G = window.location.origin,
-              te = [
-                { lang: "en", url: `${G}/en` },
-                { lang: "tr", url: `${G}/tr` },
-                { lang: "fr", url: `${G}/fr` },
-                { lang: "x-default", url: G },
-              ];
-            (document
-              .querySelectorAll("link[hreflang]")
-              .forEach((V) => V.remove()),
-              te.forEach(({ lang: V, url: C }) => {
-                const F = document.createElement("link");
-                ((F.rel = "alternate"),
-                  (F.hreflang = V),
-                  (F.href = C),
-                  document.head.appendChild(F));
-              }));
-          })());
+        te && te.setAttribute("content", g);
+        const V = document.querySelector('meta[property="twitter:image"]');
+        V && V.setAttribute("content", `${p}${a}`);
+        const C =
+          document.querySelector('meta[name="twitter:card"]') ||
+          document.querySelector('meta[property="twitter:card"]');
+        C && C.setAttribute("content", "summary_large_image");
+        const F = [
+          { lang: "en", url: `${p}/en` },
+          { lang: "tr", url: `${p}/tr` },
+          { lang: "fr", url: `${p}/fr` },
+          { lang: "x-default", url: p },
+        ];
+        (document
+          .querySelectorAll("link[hreflang]")
+          .forEach((Y) => Y.remove()),
+          F.forEach(({ lang: Y, url: j }) => {
+            const W = document.createElement("link");
+            ((W.rel = "alternate"),
+              (W.hreflang = Y),
+              (W.href = j),
+              document.head.appendChild(W));
+          }));
       }, [h, g, o, a, l, n, i.language]),
       null
     );
@@ -5532,11 +5550,9 @@ const Ge = "bundleist_language_mode",
             "@type": "Organization",
             name: "Bundleist",
             description:
-              "AI-powered Turkish export consolidation platform for seamless supply chain management",
+              "Bundleist coordinates supplier validation, managed settlements, Istanbul warehouse consolidation, and export documentation in one accountable workflow.",
             url: l,
-            logo: `${l}/logo.png`,
-            foundingDate: "2024",
-            industry: "Supply Chain Management",
+            logo: `${l}/images/business-core-hero.svg`,
             services: [
               "Export Consolidation",
               "Supplier Management",
@@ -5564,10 +5580,6 @@ const Ge = "bundleist_language_mode",
               "Logistics Management",
               "B2B Marketplace",
             ],
-            sameAs: [
-              "https://linkedin.com/company/bundleist",
-              "https://twitter.com/bundleist",
-            ],
             ...s,
           },
           i = {
@@ -5576,20 +5588,15 @@ const Ge = "bundleist_language_mode",
             name: "Bundleist",
             url: l,
             description:
-              "Turkish export consolidation platform for efficient supply chain management",
+              "Supplier consolidation and export operations platform for Turkish sourcing teams.",
             inLanguage: ["en", "tr", "fr"],
-            potentialAction: {
-              "@type": "SearchAction",
-              target: `${l}/search?q={search_term_string}`,
-              "query-input": "required name=search_term_string",
-            },
           },
           d = {
             "@context": "https://schema.org",
             "@type": "Service",
-            name: "Turkish Export Consolidation",
+            name: "Turkish Supplier Consolidation and Export Operations",
             description:
-              "Comprehensive export consolidation services for Turkish suppliers and international buyers",
+              "Managed supplier settlements, warehouse intake, consolidation planning, export documentation, and dispatch tracking for Turkish procurement workflows.",
             provider: { "@type": "Organization", name: "Bundleist" },
             serviceType: "Supply Chain Management",
             areaServed: { "@type": "Country", name: "Turkey" },
@@ -5606,26 +5613,42 @@ const Ge = "bundleist_language_mode",
             mainEntity: [
               {
                 "@type": "Question",
-                name: "What is export consolidation?",
+                name: "What does Bundleist coordinate?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Export consolidation is the process of combining multiple smaller shipments from different suppliers into a single, larger shipment to reduce shipping costs and improve efficiency.",
+                  text: "Bundleist coordinates supplier validation, managed settlements, warehouse intake, consolidation planning, export documentation, and dispatch tracking in one workflow.",
                 },
               },
               {
                 "@type": "Question",
-                name: "How much can I save with Bundleist?",
+                name: "How does consolidation lower shipping waste?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Bundleist customers typically save 65% on shipping costs, reduce documentation time by 15x, and save 80% of their time managing Turkish suppliers.",
+                  text: "Combining approved supplier orders into fewer outbound loads improves container utilization and reduces repeated handling and transfer overhead.",
                 },
               },
               {
                 "@type": "Question",
-                name: "What types of products can be consolidated?",
+                name: "What documentation support is included?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "We consolidate various products including textiles, machinery, automotive parts, chemicals, and other manufactured goods from Turkish suppliers.",
+                  text: "Bundleist supports a structured export documentation pack, including commercial invoices, packing details, and shipment paperwork through one checklist.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How are supplier payments handled?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Customers fund one controlled payment flow. Bundleist executes supplier settlements, provides proof of payment, and keeps a reconciled ledger.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Which languages does customer communication support?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "The platform supports English, Turkish, and French interface and communication coverage.",
                 },
               },
             ],

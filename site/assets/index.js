@@ -426,6 +426,7 @@ No need to build an in-house ops team just to buy from Turkey.`,
         invalidEmailAddress: "Please enter a valid email address.",
         genericTryAgain: "Something went wrong. Please try again.",
         footerContact: "Contact",
+        faq: "FAQ",
         footerBuiltFor:
           "Built for procurement teams, forwarders, and operators.",
         subscribeNewsletter: "Subscribe to Newsletter",
@@ -959,6 +960,7 @@ Pas besoin de constituer une equipe operations interne juste pour acheter en Tur
         invalidEmailAddress: "Veuillez saisir une adresse e-mail valide.",
         genericTryAgain: "Un probleme est survenu. Veuillez reessayer.",
         footerContact: "Contact",
+        faq: "FAQ",
         footerBuiltFor:
           "Concu pour les equipes achats, transitaires et operations.",
         heroOpsConsole: "Console ops",
@@ -1443,6 +1445,7 @@ Pas besoin de constituer une equipe operations interne juste pour acheter en Tur
         invalidEmailAddress: "Please enter a valid email address.",
         genericTryAgain: "Something went wrong. Please try again.",
         footerContact: "Contact",
+        faq: "FAQ",
         footerBuiltFor:
           "Built for procurement teams, forwarders, and operators.",
         heroOpsConsole: "Ops console",
@@ -1848,6 +1851,7 @@ Sadece TÃƒÂ¼rkiye'den alÃ„Â±m yapmak iÃƒÂ§in Ã…Å¸irket iÃƒÂ
         invalidEmailAddress: "LÃƒÂ¼tfen geÃƒÂ§erli bir e-posta girin.",
         genericTryAgain: "Bir sorun oluÃ…Å¸tu. LÃƒÂ¼tfen tekrar deneyin.",
         footerContact: "Ã„Â°letiÃ…Å¸im",
+        faq: "FAQ",
         footerBuiltFor:
           "SatÃ„Â±n alma ekipleri, forwarderlar ve operasyon ekipleri iÃƒÂ§in.",
         heroOpsConsole: "Operasyon paneli",

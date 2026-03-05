@@ -3460,7 +3460,7 @@ const st = a.forwardRef(tt),
                             }),
                             e.jsxs("div", {
                               className:
-                                "mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-100 pt-4",
+                                "mt-6 px-4 sm:px-6 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-100 pt-4",
                               children: [
                                 e.jsxs("p", {
                                   className: "text-sm text-gray-600",

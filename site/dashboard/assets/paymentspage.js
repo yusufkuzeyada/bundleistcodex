@@ -844,7 +844,7 @@ const V = 20,
                                 }),
                         e.jsxs("div", {
                           className:
-                            "mt-4 flex items-center justify-between border-t border-gray-100 pt-4",
+                            "mt-4 px-1 sm:px-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-gray-100 pt-4",
                           children: [
                             e.jsxs("div", {
                               className: "text-xs font-semibold text-gray-600",

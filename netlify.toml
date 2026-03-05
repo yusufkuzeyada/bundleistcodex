@@ -5,6 +5,16 @@ publish = "site"
 directory = "netlify/functions"
 
 [[redirects]]
+from = "/whatsapp"
+to = "/.netlify/functions/whatsapp-redirect"
+status = 200
+
+[[redirects]]
+from = "/whatsapp/"
+to = "/.netlify/functions/whatsapp-redirect"
+status = 200
+
+[[redirects]]
 from = "/dashboard/*"
 to = "/dashboard/index.html"
 status = 200
