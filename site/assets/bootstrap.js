@@ -1,1 +1,1 @@
-const r="/assets/index.js",n=5e3;let o=!1;const t=()=>{o||(o=!0,import(r).catch(e=>{console.error("Bundleist bootstrap failed",e)}))},i=()=>{window.setTimeout(t,n)};window.addEventListener("load",i,{once:!0});for(const e of["pointerdown","touchstart","keydown","scroll","wheel"])window.addEventListener(e,t,{once:!0,passive:!0});
+import("/assets/index.js").catch((e)=>{console.error("Bundleist bootstrap failed",e)});
