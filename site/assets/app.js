@@ -5120,6 +5120,8 @@ const Ge = "bundleist_language_mode",
                                       className:
                                         "w-full h-44 object-cover group-hover:scale-[1.02] transition-transform duration-500",
                                       loading: "lazy",
+                                      decoding: "async",
+                                      fetchPriority: "low",
                                     })
                                   : t.jsx("div", {
                                       className:

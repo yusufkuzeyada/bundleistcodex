@@ -216,7 +216,9 @@ import "./radix.js";
                                 src: a.image_url,
                                 alt: (t == null ? void 0 : t.title) || a.title,
                                 className: "w-full max-h-[420px] object-cover",
-                                loading: "lazy",
+                                loading: "eager",
+                                fetchPriority: "high",
+                                decoding: "async",
                               }),
                             }),
                           e.jsx("div", {

@@ -257,7 +257,10 @@ const P = () => {
                                           alt: t.title,
                                           className:
                                             "w-full h-48 object-cover group-hover:scale-[1.02] transition-transform duration-500",
-                                          loading: "lazy",
+                                          loading: a === 0 ? "eager" : "lazy",
+                                          fetchPriority:
+                                            a === 0 ? "high" : "low",
+                                          decoding: "async",
                                         })
                                       : e.jsx("div", {
                                           className:
