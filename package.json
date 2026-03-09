@@ -18,7 +18,7 @@
     "migrate:codes": "node ./scripts/migrate-entity-codes.mjs",
     "sync:completed": "node ./scripts/sync-completed-statuses.mjs",
     "reset:seed:orders": "node ./scripts/reset-and-seed-orders.mjs",
-    "dev:functions": "npx netlify-cli@latest dev --port 4173 --offline",
+    "dev:functions": "npx --yes netlify-cli@24.0.1 dev --port 4173 --offline",
     "dev:static": "serve -l 4173 site",
     "dev:static:open": "serve -l 4173 -o site",
     "dev": "npm run dev:functions",
