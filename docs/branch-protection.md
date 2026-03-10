@@ -1,6 +1,6 @@
 # Branch Protection Guide
 
-Target repository: `yusufkuzeyada/bundleistcodex`  
+Target repository: your current GitHub repository (`origin` remote)  
 Protected branch: your GitHub default branch (auto-detected from `origin/HEAD` unless overridden)
 
 ## Required GitHub Settings (Exact)

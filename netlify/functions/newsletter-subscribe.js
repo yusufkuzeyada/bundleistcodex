@@ -22,7 +22,7 @@ function buildWelcomeHtml(unsubscribeUrl) {
               <td style="padding:28px;">
                 <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#0f172a;">You are subscribed</h1>
                 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#334155;">
-                  Thanks for subscribing to Bundleist updates. You will receive product updates, logistics insights, and release notes.
+                  Thanks for subscribing to Sourcevia updates. You will receive product updates, logistics insights, and release notes.
                 </p>
                 <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#334155;">
                   If this was not you, you can unsubscribe anytime with one click.
@@ -44,7 +44,7 @@ function buildWelcomeHtml(unsubscribeUrl) {
 
 function buildWelcomeText(unsubscribeUrl) {
   return [
-    "You are subscribed to Bundleist updates.",
+    "You are subscribed to Sourcevia updates.",
     "",
     "Thanks for subscribing. You will receive product updates, logistics insights, and release notes.",
     "",
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
       await sendResendEmail(config, {
         from: config.newsletterFromEmail,
         to: [email],
-        subject: "Bundleist newsletter subscription confirmed",
+        subject: "Sourcevia newsletter subscription confirmed",
         html: buildWelcomeHtml(unsubscribeUrl),
         text: buildWelcomeText(unsubscribeUrl),
       });

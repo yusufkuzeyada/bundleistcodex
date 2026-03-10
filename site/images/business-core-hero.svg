@@ -1,5 +1,5 @@
 ﻿<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Bundleist Business Logic Hero</title>
+  <title id="title">Sourcevia Business Logic Hero</title>
   <desc id="desc">Abstract logistics control center with connected workflow steps for orders, consolidations, and shipments.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -54,7 +54,7 @@
   </g>
 
   <g font-family="Segoe UI, Arial, sans-serif" fill="#bcdfff" font-size="22">
-    <text x="170" y="680">Bundleist</text>
+    <text x="170" y="680">Sourcevia</text>
     <text x="290" y="680" fill="#87c8f6">Operational integrity by design</text>
   </g>
 </svg>

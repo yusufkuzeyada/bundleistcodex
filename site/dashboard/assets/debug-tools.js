@@ -1,4 +1,4 @@
-const DEBUG_STORAGE_KEY = "bundleist:dashboard:debug";
+const DEBUG_STORAGE_KEY = "sourcevia:dashboard:debug";
 const DEBUG_QUERY_PARAM = "dashboard_debug";
 
 let cachedDebugEnabled = null;

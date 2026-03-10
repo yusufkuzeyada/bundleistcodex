@@ -6,6 +6,8 @@ npm-debug.log*
 *.log
 *.zip
 .dev-server.log
+.npm-cache-temp/
+lighthouse-reports/
 
 # Local Netlify folder
 .netlify

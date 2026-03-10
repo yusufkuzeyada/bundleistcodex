@@ -1,1 +1,1 @@
-import("/assets/index.js").catch((e)=>{console.error("Bundleist bootstrap failed",e)});
+import("/assets/index.js").catch((e)=>{console.error("Sourcevia bootstrap failed",e)});

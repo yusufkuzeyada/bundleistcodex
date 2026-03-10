@@ -4,4 +4,4 @@ Disallow: /dashboard/
 Disallow: /.netlify/
 Disallow: /.netlify/functions/
 
-Sitemap: https://bundleistcodex.netlify.app/sitemap.xml
+Sitemap: /sitemap.xml

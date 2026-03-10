@@ -7,7 +7,7 @@ import path from "node:path";
 import { loadEnv, readEnvFile } from "../scripts/lib/env.mjs";
 
 test("readEnvFile parses comments, quoted values, and blanks", async () => {
-  const tempRoot = await mkdtemp(path.join(tmpdir(), "bundleist-env-"));
+  const tempRoot = await mkdtemp(path.join(tmpdir(), "sourcevia-env-"));
   const envPath = path.join(tempRoot, ".env");
   await writeFile(
     envPath,
@@ -36,7 +36,7 @@ test("readEnvFile parses comments, quoted values, and blanks", async () => {
 });
 
 test("loadEnv merges files in order and allows process env override", async () => {
-  const tempRoot = await mkdtemp(path.join(tmpdir(), "bundleist-env-"));
+  const tempRoot = await mkdtemp(path.join(tmpdir(), "sourcevia-env-"));
   const firstEnv = path.join(tempRoot, ".env.base");
   const secondEnv = path.join(tempRoot, ".env.local");
 
