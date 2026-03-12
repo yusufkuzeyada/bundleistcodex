@@ -1,1 +1,1 @@
-import("/assets/index.js?v=20260312d").catch((e)=>{console.error("Sourcevia bootstrap failed",e)});
+import("/assets/index.js?v=20260312e").catch((e)=>{console.error("Sourcevia bootstrap failed",e)});
