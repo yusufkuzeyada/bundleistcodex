@@ -88,7 +88,7 @@ const u = () => {
           className: "mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14",
           children: [
             e.jsxs("div", {
-              className: "grid items-start gap-6 lg:grid-cols-2 lg:gap-8",
+              className: "grid gap-6",
               children: [
                 e.jsxs("section", {
                   className:
@@ -299,7 +299,7 @@ const u = () => {
                               placeholder: c("tellUsAboutNeeds"),
                               className:
                                 "min-h-[180px] w-full rounded-[1.75rem] border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
-                              style: { minHeight: 220 },
+                              style: { minHeight: 260 },
                               required: true,
                             }),
                           ],
