@@ -85,14 +85,14 @@ const u = () => {
         className:
           "min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_32%),linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#f8fafc_100%)]",
         children: e.jsxs("div", {
-          className: "mx-auto max-w-[1280px] px-4 py-10 sm:px-6 sm:py-14",
+          className: "mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14",
           children: [
             e.jsxs("div", {
-              className: "grid items-start gap-6 xl:grid-cols-[0.8fr_1.2fr] xl:gap-8",
+              className: "grid items-start gap-6 lg:grid-cols-2 lg:gap-8",
               children: [
                 e.jsxs("section", {
                   className:
-                    "rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] backdrop-blur sm:p-8 xl:p-9",
+                    "rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] backdrop-blur sm:p-8",
                   children: [
                     e.jsx("div", {
                       className:
@@ -192,7 +192,7 @@ const u = () => {
                 e.jsxs("section", {
                   id: "contact-form",
                   className:
-                    "rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] sm:p-8 xl:p-9",
+                    "rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] sm:p-8",
                   children: [
                     e.jsx("div", {
                       className:
@@ -244,7 +244,7 @@ const u = () => {
                                   value: l.fullName,
                                   onChange: N,
                                   className:
-                                    "h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-[15px] text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
+                                    "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
                                   required: true,
                                 }),
                               ],
@@ -262,7 +262,7 @@ const u = () => {
                                   value: l.email,
                                   onChange: N,
                                   className:
-                                    "h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-[15px] text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
+                                    "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
                                   required: true,
                                 }),
                               ],
@@ -281,7 +281,7 @@ const u = () => {
                               value: l.company,
                               onChange: N,
                               className:
-                                "h-14 w-full rounded-2xl border border-slate-200 bg-white px-5 text-[15px] text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
+                                "h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
                             }),
                           ],
                         }),
@@ -298,7 +298,8 @@ const u = () => {
                               onChange: N,
                               placeholder: c("tellUsAboutNeeds"),
                               className:
-                                "min-h-[240px] w-full rounded-[1.75rem] border border-slate-200 bg-white px-5 py-4 text-[15px] leading-relaxed text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
+                                "min-h-[180px] w-full rounded-[1.75rem] border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
+                              style: { minHeight: 220 },
                               required: true,
                             }),
                           ],
