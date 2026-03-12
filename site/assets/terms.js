@@ -1,1 +1,298 @@
-import{j as e}from"./query.js";import{L as a}from"./react.js";import{u as r}from"./i18n.js";const n=()=>{const{t}=r();return e.jsx("main",{className:"min-h-screen bg-slate-50",children:e.jsx("div",{className:"mx-auto max-w-4xl px-4 sm:px-6 py-12 sm:py-16",children:e.jsxs("div",{className:"rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm",children:[e.jsx("h1",{className:"text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950",children:t("termsOfService")}),e.jsx("p",{className:"mt-2 text-sm text-slate-600",children:"Last updated: February 18, 2026"}),e.jsxs("div",{className:"mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4",children:[e.jsx("div",{className:"text-xs font-bold uppercase tracking-wide text-slate-600",children:"Contents"}),e.jsx("div",{className:"mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm",children:[["#acceptance","1. Acceptance"],["#services","2. Services and Role"],["#accounts","3. Accounts and Access"],["#orders","4. Orders and Instructions"],["#fees","5. Fees and Payment"],["#third-parties","6. Third-Party Providers"],["#compliance","7. Trade Compliance"],["#confidentiality","8. Confidentiality and Data"],["#ip","9. Intellectual Property"],["#warranties","10. Disclaimers"],["#liability","11. Limitation of Liability"],["#termination","12. Suspension and Termination"],["#law","13. Governing Law and Disputes"],["#contact","14. Contact"]].map(([s,i])=>e.jsx("a",{href:s,className:"text-slate-700 hover:text-emerald-700 font-semibold",children:i},s))})]}),e.jsxs("div",{className:"mt-6 space-y-7 text-sm sm:text-base text-slate-700 leading-relaxed",children:[e.jsxs("section",{id:"acceptance",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"1. Acceptance"}),e.jsx("p",{className:"mt-2",children:`These Terms of Service ("Terms") govern your access to and use of Sourcevia's platform and operations services. By accessing or using the Services, you agree to these Terms.`}),e.jsx("p",{className:"mt-2",children:"If you use the Services on behalf of an entity, you represent that you have authority to bind that entity."})]}),e.jsxs("section",{id:"services",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"2. Services and Role"}),e.jsx("p",{className:"mt-2",children:"Sourcevia provides a software-enabled operations layer for procurement coordination, supplier workflow management, consolidation planning, shipment documentation support, and financial workflow visibility."}),e.jsx("p",{className:"mt-2",children:"Unless explicitly stated in a signed Order Form or services agreement, Sourcevia is not acting as the legal importer of record, exporter of record, customs broker, insurer, common carrier, or freight forwarder."})]}),e.jsxs("section",{id:"accounts",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"3. Accounts and Access"}),e.jsx("p",{className:"mt-2",children:"You are responsible for account credentials, user access controls, and all activity under your account. You must promptly notify us of unauthorized access or suspected security incidents."})]}),e.jsxs("section",{id:"orders",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"4. Orders, Data, and Instructions"}),e.jsx("p",{className:"mt-2",children:"You are responsible for the accuracy and completeness of orders, product specifications, commercial terms, destination requirements, and supplier instructions entered or approved in the Services."}),e.jsx("p",{className:"mt-2",children:"Sourcevia may rely on data and instructions provided by you or your authorized users and partners."})]}),e.jsxs("section",{id:"fees",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"5. Fees and Payment"}),e.jsx("p",{className:"mt-2",children:"Fees, billing cadence, and payment terms are defined in the applicable commercial plan, proposal, or signed Order Form. You remain responsible for taxes, duties, and third-party charges unless otherwise agreed in writing."}),e.jsx("p",{className:"mt-2",children:"If payments are overdue, we may suspend non-essential features or Services until balances are settled."})]}),e.jsxs("section",{id:"third-parties",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"6. Third-Party Providers"}),e.jsx("p",{className:"mt-2",children:"Execution of procurement and logistics workflows may involve third parties such as suppliers, carriers, banks, warehouses, and customs-related providers. Delivery times, costs, and outcomes may depend on those parties."})]}),e.jsxs("section",{id:"compliance",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"7. Trade Compliance and Restricted Activity"}),e.jsx("p",{className:"mt-2",children:"You agree to comply with applicable import/export laws, sanctions, anti-bribery rules, and product-level legal requirements in origin, transit, and destination countries."}),e.jsx("p",{className:"mt-2",children:"You may not use the Services for unlawful trade, restricted goods, sanctions evasion, or any activity prohibited by applicable law."})]}),e.jsxs("section",{id:"confidentiality",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"8. Confidentiality and Data"}),e.jsx("p",{className:"mt-2",children:"Each party will protect the other party's confidential information and use it only for performance of the Services relationship. Privacy handling is described in the Privacy Policy, which forms part of these Terms."})]}),e.jsxs("section",{id:"ip",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"9. Intellectual Property"}),e.jsx("p",{className:"mt-2",children:"Sourcevia retains all rights in the Services, software, workflows, designs, and documentation. You retain rights in your data and grant Sourcevia a limited license to process that data for service delivery, security, support, and legal compliance."})]}),e.jsxs("section",{id:"warranties",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"10. Disclaimers"}),e.jsx("p",{className:"mt-2",children:'Services are provided on an "as is" and "as available" basis. To the extent permitted by law, Sourcevia disclaims implied warranties including merchantability, fitness for a particular purpose, and non-infringement.'}),e.jsx("p",{className:"mt-2",children:"Sourcevia does not guarantee uninterrupted availability, specific transit outcomes, customs release timing, or third-party performance unless expressly agreed in writing."})]}),e.jsxs("section",{id:"liability",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"11. Limitation of Liability"}),e.jsx("p",{className:"mt-2",children:"To the maximum extent permitted by law, Sourcevia is not liable for indirect, incidental, consequential, special, exemplary, or punitive damages, or for loss of profits, goodwill, data, or business interruption."}),e.jsx("p",{className:"mt-2",children:"Sourcevia's aggregate liability for claims arising from or related to the Services will not exceed the amount paid by you to Sourcevia for the Services during the 12 months preceding the claim event."})]}),e.jsxs("section",{id:"termination",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"12. Suspension and Termination"}),e.jsx("p",{className:"mt-2",children:"We may suspend or terminate access for material breach, non-payment, legal risk, security risk, or prohibited use. You may terminate according to the applicable commercial agreement."}),e.jsx("p",{className:"mt-2",children:"Rights and obligations that by nature should survive termination (including payment obligations, liability limits, confidentiality, and dispute terms) will survive."})]}),e.jsxs("section",{id:"law",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"13. Governing Law and Disputes"}),e.jsx("p",{className:"mt-2",children:"Unless otherwise specified in a signed Order Form, these Terms are governed by the laws of the Republic of Turkiye. Courts of Istanbul shall have exclusive jurisdiction for disputes arising from these Terms."})]}),e.jsxs("section",{id:"contact",children:[e.jsx("h2",{className:"text-lg sm:text-xl font-bold text-slate-950",children:"14. Contact"}),e.jsxs("p",{className:"mt-2",children:["For contractual questions, billing clarifications, or dispute notices, contact"," ",e.jsx("a",{href:"mailto:sourcevia.inc@gmail.com",className:"font-semibold text-emerald-700 hover:text-emerald-800",children:t("contactEmail")}),"."]}),e.jsx("p",{className:"mt-2",children:"Sourcevia Ltd., Istanbul, Turkiye."})]})]}),e.jsx(a,{to:"/",className:"inline-flex mt-8 items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:text-emerald-700",children:t("backToHome")})]})})})};export{n as default};
+import { j as e } from "./query.js";
+import { L as a } from "./react.js";
+import { u as r } from "./i18n.js";
+
+const s = [
+  ["acceptance", "1. Acceptance"],
+  ["services", "2. Services and Role"],
+  ["accounts", "3. Accounts and Access"],
+  ["orders", "4. Orders and Instructions"],
+  ["fees", "5. Fees and Payment"],
+  ["providers", "6. Third-Party Providers"],
+  ["compliance", "7. Compliance and Restricted Use"],
+  ["confidentiality", "8. Confidentiality and Data"],
+  ["ip", "9. Intellectual Property"],
+  ["changes", "10. Service Changes"],
+  ["disclaimers", "11. Disclaimers"],
+  ["liability", "12. Liability Limits"],
+  ["termination", "13. Suspension and Termination"],
+  ["law", "14. Governing Law"],
+  ["contact", "15. Contact"],
+];
+
+const i = [
+  {
+    title: "Service role",
+    body: "Sourcevia provides a software-enabled sourcing operations layer, not a blanket assumption of freight, customs, insurance, or importer obligations.",
+  },
+  {
+    title: "Commercial basis",
+    body: "Binding commercial terms should live in your proposal, order form, or signed service agreement alongside these platform terms.",
+  },
+  {
+    title: "Jurisdiction",
+    body: "Unless a signed contract says otherwise, these Terms are governed by the laws of T\u00fcrkiye and Istanbul courts.",
+  },
+];
+
+const l = [
+  {
+    id: "acceptance",
+    title: "1. Acceptance",
+    paragraphs: [
+      'These Terms of Service ("Terms") govern your access to and use of Sourcevia\'s website, software, dashboards, workflows, and related operational services (collectively, the "Services"). By accessing or using the Services, you agree to these Terms.',
+      "If you use the Services on behalf of a company or other legal entity, you represent that you have authority to bind that entity to these Terms.",
+    ],
+  },
+  {
+    id: "services",
+    title: "2. Services and Role",
+    paragraphs: [
+      "Sourcevia supports sourcing coordination, supplier workflow management, shipment planning, documentation support, and financial workflow visibility.",
+      "Unless expressly agreed in a signed order form or services agreement, Sourcevia is not acting as the legal importer of record, exporter of record, customs broker, insurer, common carrier, freight forwarder, or licensed escrow provider.",
+    ],
+  },
+  {
+    id: "accounts",
+    title: "3. Accounts and Access",
+    paragraphs: [
+      "You are responsible for your account credentials, user permissions, and all actions taken through your account.",
+      "You must promptly notify Sourcevia of suspected unauthorized access, compromised credentials, or other security incidents affecting your account or connected workflows.",
+    ],
+  },
+  {
+    id: "orders",
+    title: "4. Orders and Instructions",
+    paragraphs: [
+      "You are responsible for the accuracy and completeness of purchase details, product descriptions, supplier instructions, destination requirements, and operational approvals submitted through the Services.",
+      "Sourcevia may rely on information and approvals provided by you, your authorized users, or your designated partners when executing operational steps.",
+    ],
+  },
+  {
+    id: "fees",
+    title: "5. Fees and Payment",
+    paragraphs: [
+      "Fees, billing timing, and payment mechanics are governed by the relevant proposal, pricing plan, order form, or signed commercial agreement.",
+      "Unless expressly stated otherwise in writing, you remain responsible for taxes, duties, banking charges, freight costs, and third-party service fees.",
+      "Sourcevia may suspend non-critical Services or withhold further operational activity where overdue balances create commercial or operational risk.",
+    ],
+  },
+  {
+    id: "providers",
+    title: "6. Third-Party Providers",
+    paragraphs: [
+      "Operational execution may involve third parties such as suppliers, carriers, warehouses, customs agents, banks, or payment partners.",
+      "Sourcevia is not responsible for delays, refusals, service interruptions, pricing changes, or losses caused solely by third-party providers except to the extent required by applicable law or expressly assumed in writing.",
+    ],
+  },
+  {
+    id: "compliance",
+    title: "7. Compliance and Restricted Use",
+    paragraphs: [
+      "You agree to comply with all applicable import, export, sanctions, anti-bribery, tax, product safety, and customs laws relevant to your transactions.",
+      "You may not use the Services for unlawful trade, sanctions evasion, restricted goods, falsified documentation, fraudulent payment activity, or any activity prohibited by applicable law.",
+    ],
+  },
+  {
+    id: "confidentiality",
+    title: "8. Confidentiality and Data",
+    paragraphs: [
+      "Each party will protect the other party's confidential information using reasonable safeguards and will use it only for the business relationship governed by these Terms.",
+      "Personal data handling is described separately in the Privacy Policy, which should be read together with these Terms.",
+    ],
+  },
+  {
+    id: "ip",
+    title: "9. Intellectual Property",
+    paragraphs: [
+      "Sourcevia retains all rights, title, and interest in the Services, including software, operational workflows, designs, documentation, and branding.",
+      "You retain rights in your own data and content, while granting Sourcevia the limited rights necessary to host, process, secure, support, and improve the Services for your use.",
+    ],
+  },
+  {
+    id: "changes",
+    title: "10. Service Changes",
+    paragraphs: [
+      "Sourcevia may improve, modify, or discontinue features from time to time to maintain security, usability, or operational quality.",
+      "Where changes materially affect the Services, we will aim to provide reasonable notice through the platform, email, or another appropriate channel.",
+    ],
+  },
+  {
+    id: "disclaimers",
+    title: "11. Disclaimers",
+    paragraphs: [
+      'The Services are provided on an "as is" and "as available" basis to the fullest extent permitted by law.',
+      "Sourcevia does not guarantee uninterrupted availability, exact delivery schedules, customs clearance outcomes, supplier performance, or any particular commercial result unless expressly agreed in writing.",
+    ],
+  },
+  {
+    id: "liability",
+    title: "12. Liability Limits",
+    paragraphs: [
+      "To the maximum extent permitted by law, Sourcevia will not be liable for indirect, incidental, consequential, special, exemplary, or punitive damages, or for loss of profits, goodwill, data, or business interruption.",
+      "Sourcevia's aggregate liability arising out of or relating to the Services will not exceed the amounts paid by you to Sourcevia for the Services during the 12 months preceding the event giving rise to the claim.",
+    ],
+  },
+  {
+    id: "termination",
+    title: "13. Suspension and Termination",
+    paragraphs: [
+      "Sourcevia may suspend or terminate access for material breach, non-payment, legal or sanctions risk, abuse of the Services, or security concerns.",
+      "Sections that by nature should survive termination, including payment obligations, confidentiality, liability limits, dispute provisions, and accrued rights, will continue after termination.",
+    ],
+  },
+  {
+    id: "law",
+    title: "14. Governing Law",
+    paragraphs: [
+      "Unless otherwise stated in a signed order form or commercial agreement, these Terms are governed by the laws of the Republic of T\u00fcrkiye.",
+      "Courts of Istanbul, T\u00fcrkiye will have exclusive jurisdiction over disputes arising out of or in connection with these Terms.",
+    ],
+  },
+  {
+    id: "contact",
+    title: "15. Contact",
+    paragraphs: [
+      "For contractual questions, billing clarifications, or formal notices, contact Sourcevia at sourcevia.inc@gmail.com.",
+      "Sourcevia Inc. operates from Istanbul, T\u00fcrkiye.",
+    ],
+  },
+];
+
+const n = () => {
+  const { t } = r();
+
+  return e.jsx("main", {
+    className:
+      "min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_32%),linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#f8fafc_100%)]",
+    children: e.jsxs("div", {
+      className: "mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16",
+      children: [
+        e.jsxs("section", {
+          className:
+            "rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] backdrop-blur sm:p-8",
+          children: [
+            e.jsx("div", {
+              className:
+                "inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-800",
+              children: "Legal",
+            }),
+            e.jsx("h1", {
+              className:
+                "mt-5 text-3xl font-bold tracking-tight text-slate-950 sm:text-5xl",
+              children: t("termsOfService"),
+            }),
+            e.jsx("p", {
+              className: "mt-3 text-sm font-medium text-slate-500 sm:text-base",
+              children: "Last updated: March 12, 2026",
+            }),
+            e.jsx("p", {
+              className:
+                "mt-4 max-w-3xl text-base leading-relaxed text-slate-700 sm:text-lg",
+              children:
+                "These Terms describe the contractual framework for using Sourcevia's sourcing operations platform, workflow coordination tools, and related service interactions.",
+            }),
+            e.jsx("div", {
+              className: "mt-8 grid gap-4 md:grid-cols-3",
+              children: i.map((a) =>
+                e.jsxs(
+                  "div",
+                  {
+                    className:
+                      "rounded-[1.5rem] border border-slate-200 bg-slate-50/85 p-5 shadow-sm",
+                    children: [
+                      e.jsx("div", {
+                        className:
+                          "text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500",
+                        children: a.title,
+                      }),
+                      e.jsx("p", {
+                        className:
+                          "mt-3 text-sm leading-relaxed text-slate-700 sm:text-[15px]",
+                        children: a.body,
+                      }),
+                    ],
+                  },
+                  a.title,
+                ),
+              ),
+            }),
+          ],
+        }),
+        e.jsxs("section", {
+          className:
+            "mt-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.28)] sm:p-8",
+          children: [
+            e.jsx("div", {
+              className:
+                "text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500",
+              children: "Contents",
+            }),
+            e.jsx("div", {
+              className: "mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3",
+              children: s.map(([a, r]) =>
+                e.jsx(
+                  "a",
+                  {
+                    href: `#${a}`,
+                    className:
+                      "rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700",
+                    children: r,
+                  },
+                  a,
+                ),
+              ),
+            }),
+          ],
+        }),
+        e.jsx("div", {
+          className: "mt-6 space-y-4",
+          children: l.map((a) =>
+            e.jsxs(
+              "section",
+              {
+                id: a.id,
+                className:
+                  "rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-7",
+                children: [
+                  e.jsx("h2", {
+                    className:
+                      "text-lg font-bold tracking-tight text-slate-950 sm:text-xl",
+                    children: a.title,
+                  }),
+                  e.jsx("div", {
+                    className:
+                      "mt-3 space-y-3 text-sm leading-relaxed text-slate-700 sm:text-base",
+                    children: a.paragraphs.map((r, s) =>
+                      e.jsx("p", { children: r }, `${a.id}-${s}`),
+                    ),
+                  }),
+                ],
+              },
+              a.id,
+            ),
+          ),
+        }),
+        e.jsxs("div", {
+          className: "mt-8 flex flex-wrap items-center gap-3",
+          children: [
+            e.jsx(a, {
+              to: "/",
+              className:
+                "inline-flex items-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700",
+              children: t("backToHome"),
+            }),
+            e.jsx("a", {
+              href: "mailto:sourcevia.inc@gmail.com",
+              className:
+                "inline-flex items-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800",
+              children: "Contact legal",
+            }),
+          ],
+        }),
+      ],
+    }),
+  });
+};
+
+export { n as default };

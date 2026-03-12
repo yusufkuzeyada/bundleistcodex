@@ -89,10 +89,10 @@ const u = () => {
         className:
           "min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_32%),linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#f8fafc_100%)]",
         children: e.jsxs("div", {
-          className: "mx-auto max-w-[84rem] px-4 py-10 sm:px-6 sm:py-14",
+          className: "mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14",
           children: [
             e.jsxs("div", {
-              className: "grid gap-6",
+              className: "mx-auto grid max-w-6xl gap-6",
               children: [
                 e.jsx("a", {
                   href: "/",
@@ -138,7 +138,8 @@ const u = () => {
                               children: i,
                             }),
                             e.jsx("p", {
-                              className: "mt-3 text-sm leading-relaxed text-slate-600",
+                              className:
+                                "mt-3 text-sm leading-relaxed text-slate-600",
                               children:
                                 "Best for supplier lists, product briefs, and anything you want to document clearly from the start.",
                             }),
@@ -165,7 +166,8 @@ const u = () => {
                               children: "Open cal.com in a new tab",
                             }),
                             e.jsx("p", {
-                              className: "mt-3 text-sm leading-relaxed text-slate-600",
+                              className:
+                                "mt-3 text-sm leading-relaxed text-slate-600",
                               children:
                                 "Use this when you want a faster working session around supplier validation, production follow-up, or shipment planning.",
                             }),
@@ -191,7 +193,8 @@ const u = () => {
                           children: "Best use",
                         }),
                         e.jsx("p", {
-                          className: "mt-3 text-sm leading-relaxed text-slate-700",
+                          className:
+                            "mt-3 text-sm leading-relaxed text-slate-700",
                           children:
                             "If you already have SKUs, proforma invoices, lead times, target quantities, or shipping constraints, the form is the fastest path because it lands as a structured inquiry.",
                         }),
@@ -202,7 +205,7 @@ const u = () => {
                 e.jsxs("section", {
                   id: "contact-form",
                   className:
-                    "rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] sm:p-8",
+                    "mx-auto w-full max-w-5xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] sm:p-8",
                   children: [
                     e.jsx("div", {
                       className:
@@ -215,7 +218,8 @@ const u = () => {
                       children: "Share your sourcing needs",
                     }),
                     e.jsx("p", {
-                      className: "mt-3 max-w-2xl text-sm leading-relaxed text-slate-700",
+                      className:
+                        "mt-3 max-w-2xl text-sm leading-relaxed text-slate-700",
                       children:
                         "This form sends your brief directly to Sourcevia. Include product details, supplier context, timing, or shipment constraints if you have them.",
                     }),
@@ -230,7 +234,8 @@ const u = () => {
                         }),
                         e.jsx("a", {
                           href: r,
-                          className: "font-semibold text-emerald-700 hover:text-emerald-800",
+                          className:
+                            "font-semibold text-emerald-700 hover:text-emerald-800",
                           children: i,
                         }),
                       ],
@@ -246,7 +251,8 @@ const u = () => {
                               className: "grid gap-2",
                               children: [
                                 e.jsx("span", {
-                                  className: "text-sm font-semibold text-slate-800",
+                                  className:
+                                    "text-sm font-semibold text-slate-800",
                                   children: c("fullName"),
                                 }),
                                 e.jsx("input", {
@@ -263,7 +269,8 @@ const u = () => {
                               className: "grid gap-2",
                               children: [
                                 e.jsx("span", {
-                                  className: "text-sm font-semibold text-slate-800",
+                                  className:
+                                    "text-sm font-semibold text-slate-800",
                                   children: c("businessEmail"),
                                 }),
                                 e.jsx("input", {
