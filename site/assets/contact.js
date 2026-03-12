@@ -85,11 +85,17 @@ const u = () => {
         className:
           "min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_32%),linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#f8fafc_100%)]",
         children: e.jsxs("div", {
-          className: "mx-auto max-w-[88rem] px-4 py-10 sm:px-6 sm:py-14 lg:px-8",
+          className: "mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14",
           children: [
             e.jsxs("div", {
               className: "grid gap-6",
               children: [
+                e.jsx("a", {
+                  href: "/",
+                  className:
+                    "inline-flex w-fit items-center rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700",
+                  children: "Back to home",
+                }),
                 e.jsxs("section", {
                   className:
                     "rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)] backdrop-blur sm:p-8",
@@ -227,10 +233,10 @@ const u = () => {
                     }),
                     e.jsxs("form", {
                       onSubmit: x,
-                      className: "mt-6 space-y-5 lg:space-y-6",
+                      className: "mt-6 space-y-5",
                       children: [
                         e.jsxs("div", {
-                          className: "grid gap-4 lg:grid-cols-2",
+                          className: "grid gap-4 sm:grid-cols-2",
                           children: [
                             e.jsxs("label", {
                               className: "grid gap-2",
@@ -298,8 +304,8 @@ const u = () => {
                               onChange: N,
                               placeholder: c("tellUsAboutNeeds"),
                               className:
-                                "min-h-[220px] w-full rounded-[1.75rem] border border-slate-200 bg-white px-5 py-4 text-sm leading-relaxed text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
-                              style: { minHeight: 300 },
+                                "min-h-[180px] w-full rounded-[1.75rem] border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
+                              style: { minHeight: 320 },
                               required: true,
                             }),
                           ],
@@ -315,7 +321,7 @@ const u = () => {
                           ? e.jsx("div", {
                               className:
                                 "rounded-[1.5rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800",
-                              children: `Your message was sent to ${i}.`,
+                              children: "Your message was sent to Sourcevia.",
                             })
                           : null,
                         e.jsxs("div", {

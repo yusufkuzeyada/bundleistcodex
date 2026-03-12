@@ -12,8 +12,9 @@ function trimField(value, limit) {
     .slice(0, limit);
 }
 
-function buildHtml({ name, email, company, message, source }) {
+function buildHtml({ name, email, company, message, source, inboxTarget }) {
   const rows = [
+    ["Inbox target", inboxTarget || "sourcevia.inc@gmail.com"],
     ["Name", name],
     ["Email", email],
     ["Company", company || "-"],
@@ -60,10 +61,11 @@ function buildHtml({ name, email, company, message, source }) {
 </html>`;
 }
 
-function buildText({ name, email, company, message, source }) {
+function buildText({ name, email, company, message, source, inboxTarget }) {
   return [
     "New Sourcevia contact inquiry",
     "",
+    `Inbox target: ${inboxTarget || "sourcevia.inc@gmail.com"}`,
     `Name: ${name}`,
     `Email: ${email}`,
     `Company: ${company || "-"}`,
@@ -81,7 +83,48 @@ function getContactConfig() {
       process.env.CONTACT_FROM_EMAIL ||
       process.env.NEWSLETTER_FROM_EMAIL ||
       "Sourcevia <onboarding@resend.dev>",
+    toEmail: process.env.CONTACT_TO_EMAIL || "sourcevia.inc@gmail.com",
+    fallbackToEmail: process.env.CONTACT_FALLBACK_TO_EMAIL || "",
   };
+}
+
+function isResendTestingRecipientError(error) {
+  return /only send testing emails to your own email address/i.test(
+    String(error && error.message ? error.message : error || ""),
+  );
+}
+
+async function sendContactEmail(config, payload) {
+  const basePayload = {
+    from: config.fromEmail,
+    to: [config.toEmail],
+    reply_to: payload.email,
+    subject: `New Sourcevia inquiry from ${payload.name}`,
+    html: buildHtml({ ...payload, inboxTarget: config.toEmail }),
+    text: buildText({ ...payload, inboxTarget: config.toEmail }),
+  };
+
+  try {
+    await sendResendEmail(config, basePayload);
+    return { deliveredTo: config.toEmail, usedFallback: false };
+  } catch (error) {
+    // Resend test mode only allows delivery to the account owner's email until a domain is verified.
+    if (
+      !config.fallbackToEmail ||
+      config.fallbackToEmail === config.toEmail ||
+      !isResendTestingRecipientError(error)
+    ) {
+      throw error;
+    }
+
+    await sendResendEmail(config, {
+      ...basePayload,
+      to: [config.fallbackToEmail],
+      subject: `[Fallback for ${config.toEmail}] New Sourcevia inquiry from ${payload.name}`,
+    });
+
+    return { deliveredTo: config.fallbackToEmail, usedFallback: true };
+  }
 }
 
 exports.handler = async (event) => {
@@ -115,16 +158,15 @@ exports.handler = async (event) => {
   }
 
   try {
-    await sendResendEmail(config, {
-      from: config.fromEmail,
-      to: ["sourcevia.inc@gmail.com"],
-      reply_to: email,
-      subject: `New Sourcevia inquiry from ${name}`,
-      html: buildHtml({ name, email, company, message, source }),
-      text: buildText({ name, email, company, message, source }),
+    const result = await sendContactEmail(config, {
+      name,
+      email,
+      company,
+      message,
+      source,
     });
 
-    return jsonResponse(200, { ok: true });
+    return jsonResponse(200, { ok: true, ...result });
   } catch (error) {
     console.error("contact-submit failed:", error);
     return jsonResponse(500, { code: "contact_submit_failed" });
