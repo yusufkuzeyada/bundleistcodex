@@ -19,7 +19,7 @@ const u = () => {
   });
   const [m, p] = o.useState(false);
   const [h, g] = o.useState("");
-  const [f, y] = o.useState(false);
+  const [f, y] = o.useState("");
 
   const N = (w) => {
     const { name: v, value: b } = w.target;
@@ -29,7 +29,7 @@ const u = () => {
   const x = async (w) => {
     w.preventDefault();
     g("");
-    y(false);
+    y("");
 
     if (!l.fullName.trim() || !l.email.trim() || !l.message.trim()) {
       g(c("failedToSubmit"));
@@ -59,7 +59,11 @@ const u = () => {
         throw new Error("contact_submit_failed");
       }
 
-      y(true);
+      y(
+        C && C.usedFallback
+          ? "Your message was received and routed to the Sourcevia team."
+          : "Your message was sent to Sourcevia.",
+      );
       d({
         fullName: "",
         email: "",
@@ -85,7 +89,7 @@ const u = () => {
         className:
           "min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_28%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_32%),linear-gradient(180deg,#f8fafc_0%,#ffffff_48%,#f8fafc_100%)]",
         children: e.jsxs("div", {
-          className: "mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14",
+          className: "mx-auto max-w-[84rem] px-4 py-10 sm:px-6 sm:py-14",
           children: [
             e.jsxs("div", {
               className: "grid gap-6",
@@ -304,7 +308,7 @@ const u = () => {
                               onChange: N,
                               placeholder: c("tellUsAboutNeeds"),
                               className:
-                                "min-h-[180px] w-full rounded-[1.75rem] border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
+                                "min-h-[200px] w-full rounded-[1.75rem] border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10",
                               style: { minHeight: 320 },
                               required: true,
                             }),
@@ -321,18 +325,13 @@ const u = () => {
                           ? e.jsx("div", {
                               className:
                                 "rounded-[1.5rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800",
-                              children: "Your message was sent to Sourcevia.",
+                              children: f,
                             })
                           : null,
                         e.jsxs("div", {
                           className:
-                            "flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between",
+                            "flex justify-end border-t border-slate-200 pt-5",
                           children: [
-                            e.jsx("p", {
-                              className: "text-xs leading-relaxed text-slate-500",
-                              children:
-                                "If there is ever a delivery issue, email sourcevia.inc@gmail.com and we will respond manually.",
-                            }),
                             e.jsx("button", {
                               type: "submit",
                               disabled: m,
