@@ -5,6 +5,7 @@ import {
 } from "./lib/supabase-project-query.mjs";
 
 const ADMIN_EMAIL = "yusufbicer@gmail.com";
+const ADMIN_COMPANY_NAME = "Sourcevia Admin";
 
 const TABLES_TO_CLEAR = [
   "payment_transactions",
@@ -188,6 +189,7 @@ async function main() {
   await runQuery(`
     update public.customers
     set
+      company_name = ${sqlString(ADMIN_COMPANY_NAME)},
       role = 'admin',
       contract_type_id = 'growth'::contract_type,
       has_used_trial_fee = true
